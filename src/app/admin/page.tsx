@@ -34,6 +34,9 @@ export default async function AdminOverviewPage() {
     <>
       <PageHeader eyebrow="Operations" title="Overview" description="Review queues and the health of the vendor network." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label="Bookings awaiting payment" value={stats.bookingsAwaitingPayment} href="/admin/bookings?status=payment" tone="attention" />
+        <Stat label="Bookings awaiting vendor" value={stats.bookingsAwaitingVendor} href="/admin/bookings?status=pending" />
+        <Stat label="Confirmed bookings" value={stats.bookingsConfirmed} href="/admin/bookings?status=active" />
         <Stat label="Vendors awaiting review" value={stats.vendorsAwaiting} href="/admin/vendors?status=awaiting" tone="attention" />
         <Stat label="Trucks awaiting review" value={stats.trucksAwaiting} href="/admin/trucks?status=awaiting" tone="attention" />
         <Stat label="Documents expiring in 30 days" value={stats.documentsExpiringSoon} href="/admin/trucks?status=active" tone="attention" />

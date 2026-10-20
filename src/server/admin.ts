@@ -41,7 +41,7 @@ export type TruckFilter = keyof typeof TRUCK_FILTERS;
 
 export async function adminStats() {
   const database = db();
-  const [vendorRows, truckRows, expiring] = await Promise.all([
+  const [vendorRows, truckRows, expiring, bookingRows] = await Promise.all([
     database.select({ status: schema.vendorProfiles.verificationStatus, value: count() }).from(schema.vendorProfiles).groupBy(schema.vendorProfiles.verificationStatus),
     database
       .select({ status: schema.trucks.listingStatus, value: count() })
@@ -60,7 +60,13 @@ export async function adminStats() {
           sql`${schema.truckDocuments.expiryDate} > current_date`,
         ),
       ),
+    database
+      .select({ status: schema.bookings.status, value: count() })
+      .from(schema.bookings)
+      .where(inArray(schema.bookings.status, ["pending_vendor_acceptance", "awaiting_payment", "confirmed"]))
+      .groupBy(schema.bookings.status),
   ]);
+  const bookings = Object.fromEntries(bookingRows.map((row) => [row.status, row.value])) as Record<string, number>;
   const vendors = Object.fromEntries(vendorRows.map((row) => [row.status, row.value])) as Record<string, number>;
   const trucks = Object.fromEntries(truckRows.map((row) => [row.status, row.value])) as Record<string, number>;
   return {
@@ -71,6 +77,9 @@ export async function adminStats() {
     trucksActive: (trucks.active ?? 0) + (trucks.unavailable ?? 0),
     trucksExpired: trucks.expired_documentation ?? 0,
     documentsExpiringSoon: expiring[0]?.value ?? 0,
+    bookingsAwaitingPayment: bookings.awaiting_payment ?? 0,
+    bookingsAwaitingVendor: bookings.pending_vendor_acceptance ?? 0,
+    bookingsConfirmed: bookings.confirmed ?? 0,
   };
 }
 
