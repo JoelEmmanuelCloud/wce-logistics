@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-[24px] border border-navy/10 bg-white p-[clamp(20px,2.4vw,32px)] ${className ?? ""}`}>{children}</section>;
+const CARD_TONES = {
+  light: "border-navy/10 bg-white text-navy",
+  dark: "border-navy bg-navy text-white",
+} as const;
+
+export function Card({ children, className, tone = "light" }: { children: ReactNode; className?: string; tone?: keyof typeof CARD_TONES }) {
+  return <section className={`rounded-[24px] border p-[clamp(20px,2.4vw,32px)] ${CARD_TONES[tone]} ${className ?? ""}`}>{children}</section>;
 }
 
 export function CardHeader({ title, description, action }: { title: string; description?: ReactNode; action?: ReactNode }) {

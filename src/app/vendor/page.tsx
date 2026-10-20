@@ -97,7 +97,7 @@ export default async function VendorOverviewPage() {
           />
         </ol>
 
-        <Card className="bg-navy text-white">
+        <Card tone="dark">
           <p className="font-display text-[44px] uppercase leading-none">
             {trucks.active}
             <span className="ml-2 text-[20px] text-orange">active</span>
