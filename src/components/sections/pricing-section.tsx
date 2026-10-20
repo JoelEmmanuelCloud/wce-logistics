@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { LockIcon, ReceiptIcon, ScaleIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { IMAGES } from "@/data/images";
 
 const FORMULA = [
   { term: "Chargeable weight", note: "Your declared load in kg" },
@@ -72,19 +74,34 @@ export function PricingSection() {
         )}
       </div>
 
-      <ul className="mt-4 grid gap-4 md:grid-cols-3 lg:mt-5 lg:gap-5">
-        {RULES.map(({ Icon, title, detail }) => (
-          <li key={title} className="flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange">
-              <Icon className="size-6" />
-            </span>
-            <div>
-              <h3 className="text-[19px] font-semibold">{title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-navy/70">{detail}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-4 grid gap-4 lg:mt-5 lg:grid-cols-[5fr_7fr] lg:gap-5">
+        <div className="relative min-h-[260px] overflow-hidden rounded-[28px]">
+          <Image
+            src={IMAGES.warehouse.src}
+            alt={IMAGES.warehouse.alt}
+            fill
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/10 to-transparent" aria-hidden="true" />
+          <p className="absolute inset-x-6 bottom-6 font-display text-[clamp(26px,2.4vw,40px)] uppercase leading-[0.95] text-white">
+            Pay for the space <span className="text-orange">you use</span>
+          </p>
+        </div>
+        <ul className="grid gap-4 lg:gap-5">
+          {RULES.map(({ Icon, title, detail }) => (
+            <li key={title} className="flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange">
+                <Icon className="size-6" />
+              </span>
+              <div>
+                <h3 className="text-[19px] font-semibold">{title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-navy/70">{detail}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Section>
   );
 }
