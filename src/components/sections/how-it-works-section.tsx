@@ -41,10 +41,10 @@ export function HowItWorksSection() {
     <Section id="how-it-works" tone="sand" labelledBy="how-title">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange">How it works</Eyebrow>
+          <Eyebrow className="text-orange-ink">How it works</Eyebrow>
           <DisplayHeading id="how-title" className="mt-5">
             Four steps,
-            <span className="block pl-[0.6em] text-orange">one record</span>
+            <span className="block pl-[0.6em] text-orange-deep">one record</span>
           </DisplayHeading>
         </div>
         <div className="flex flex-col gap-6 lg:items-end">
@@ -77,36 +77,32 @@ export function HowItWorksSection() {
       </div>
 
       <figure className="relative mt-[clamp(40px,5vw,72px)] h-[clamp(220px,26vw,420px)] overflow-hidden rounded-[28px]">
-        <Image src={IMAGES.lagos.src} alt={IMAGES.lagos.alt} fill sizes="100vw" className="object-cover object-[center_60%]" />
+        <Image src={IMAGES.lagos.src} alt={IMAGES.lagos.alt} fill sizes="(min-width: 1760px) 1650px, 94vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/20 to-transparent" aria-hidden="true" />
         <figcaption className="absolute bottom-[clamp(20px,2.4vw,36px)] left-[clamp(20px,2.4vw,36px)] max-w-[14em] font-display text-[clamp(28px,3vw,52px)] uppercase leading-[0.95] text-white">
           Built for <span className="text-orange">Nigerian roads</span>
         </figcaption>
       </figure>
 
-      <ol
-        key={audience.key}
-        id={`how-panel-${audience.key}`}
-        role="tabpanel"
-        aria-labelledby={`how-tab-${audience.key}`}
-        className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-5 lg:grid-cols-4 lg:gap-5"
-      >
-        {audience.steps.map((step, index) => (
-          <li
-            key={step.title}
-            className="step-card group relative flex min-h-[220px] sm:min-h-[280px] flex-col justify-between overflow-hidden rounded-[28px] bg-white p-[clamp(24px,2.4vw,36px)] transition-colors duration-300 hover:bg-navy hover:text-white"
-            style={{ animationDelay: `${index * 90}ms` }}
-          >
-            <span className="font-display text-[clamp(72px,7vw,112px)] leading-none text-transparent [-webkit-text-stroke:2px_var(--color-orange)] transition-colors duration-300 group-hover:text-orange">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <div>
-              <h3 className="text-[clamp(20px,1.6vw,24px)] font-semibold">{step.title}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed opacity-75">{step.detail}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div id={`how-panel-${audience.key}`} role="tabpanel" aria-labelledby={`how-tab-${audience.key}`}>
+        <ol key={audience.key} className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-5 lg:grid-cols-4 lg:gap-5">
+          {audience.steps.map((step, index) => (
+            <li
+              key={step.title}
+              className="step-card group relative flex min-h-[220px] sm:min-h-[280px] flex-col justify-between overflow-hidden rounded-[28px] bg-white p-[clamp(24px,2.4vw,36px)] transition-colors duration-300 hover:bg-navy hover:text-white"
+              style={{ animationDelay: `${index * 90}ms` }}
+            >
+              <span className="font-display text-[clamp(72px,7vw,112px)] leading-none text-transparent [-webkit-text-stroke:2px_var(--color-orange)] transition-colors duration-300 group-hover:text-orange">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 className="text-[clamp(20px,1.6vw,24px)] font-semibold">{step.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed opacity-75">{step.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </Section>
   );
 }
