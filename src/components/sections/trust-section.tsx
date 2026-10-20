@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { DocumentIcon, GaugeIcon, PinCheckIcon, ShieldCheckIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { IMAGES } from "@/data/images";
 import { BOOKING_STATUSES } from "@/data/landing";
 
 const CHECKS = [
@@ -40,6 +42,18 @@ export function TrustSection() {
             Informal referrals and phone calls leave you guessing who is carrying your goods. Every vendor, truck
             and booking on WCE Logistics leaves a trail you can check.
           </p>
+          <div className="relative mt-10 aspect-[4/3] overflow-hidden rounded-[28px] lg:aspect-[16/11]">
+            <Image
+              src={IMAGES.inspection.src}
+              alt={IMAGES.inspection.alt}
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+            <span className="absolute left-4 top-4 rounded-full bg-orange px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-navy">
+              Checked per truck
+            </span>
+          </div>
         </div>
 
         <ul className="grid gap-4 sm:grid-cols-2">
