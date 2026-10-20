@@ -115,7 +115,7 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 
 ## Payments
 
-- Paying starts from the booking page. The server creates a `payments` row with a unique reference (`<booking reference>-<6 characters>`), then sends the shopper to Paystack checkout.
+- Paying starts from the booking page. The server creates a `payments` row with a unique reference (`<booking reference>-<6 characters>`), then sends the shipper to Paystack checkout.
 - Payment state is only ever changed after the server calls Paystack's verify endpoint. The browser callback and the `charge.success` webhook both run the same settlement, which locks the payment and booking rows, so whichever arrives first settles it and the other is a no-op.
 - Settlement checks the reference, amount and currency against the stored payment. A mismatch fails the payment and writes an audit entry.
 - A payment that succeeds after the booking was cancelled or expired is kept as successful and flagged for refund on the admin Payments page.
