@@ -1,14 +1,16 @@
+import Image from "next/image";
 import type { ComponentType } from "react";
 import { BusIcon, ExcavatorIcon, TruckIcon } from "@/components/fleet-icons";
 import { ClockIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { IMAGES } from "@/data/images";
 import { SERVICES, type ServiceKey } from "@/data/landing";
 
 const CARD_STYLES: Record<ServiceKey, { card: string; tag: string; layout: string }> = {
   freight: {
     card: "bg-navy text-white",
     tag: "border-white/25 text-white/90",
-    layout: "lg:col-span-7 lg:min-h-[440px]",
+    layout: "lg:col-span-7",
   },
   equipment: {
     card: "bg-orange text-navy",
@@ -58,24 +60,32 @@ export function ServicesSection() {
         {SERVICES.map((service) => {
           const style = CARD_STYLES[service.key];
           const Icon = ICONS[service.key];
+          const image = IMAGES[service.key];
           const featured = service.key === "freight";
           return (
             <li
               key={service.key}
-              className={`flex flex-col justify-between gap-10 rounded-[28px] p-[clamp(24px,2.6vw,40px)] ${style.card} ${style.layout}`}
+              className={`group flex flex-col gap-[clamp(20px,2vw,32px)] rounded-[28px] p-3 pb-[clamp(24px,2.6vw,40px)] ${style.card} ${style.layout}`}
             >
-              <span
-                className={`grid shrink-0 place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.18)] ${featured ? "size-[clamp(88px,9vw,136px)]" : "size-[clamp(64px,5.4vw,84px)]"}`}
-              >
-                <Icon className="w-[66%]" />
-              </span>
-              <div>
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[20px] lg:aspect-auto lg:h-[clamp(220px,19vw,320px)]">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+                <span className="absolute bottom-4 left-4 grid size-[clamp(56px,4.6vw,72px)] place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.3)]">
+                  <Icon className="w-[66%]" />
+                </span>
+              </div>
+              <div className="px-[clamp(12px,1.4vw,28px)]">
                 <h3
-                  className={`font-display uppercase leading-[0.95] ${featured ? "text-[clamp(40px,4.4vw,76px)]" : "text-[clamp(30px,2.6vw,44px)]"}`}
+                  className={`font-display uppercase leading-[0.95] ${featured ? "text-[clamp(36px,3.6vw,64px)]" : "text-[clamp(30px,2.6vw,44px)]"}`}
                 >
                   {service.title}
                 </h3>
-                <p className={`mt-4 max-w-[30em] leading-relaxed ${featured ? "text-[clamp(16px,1.3vw,20px)] text-white/80" : "text-[16px] opacity-80"}`}>
+                <p className={`mt-4 max-w-[34em] leading-relaxed ${featured ? "text-[clamp(16px,1.25vw,19px)] text-white/80" : "text-[16px] opacity-80"}`}>
                   {service.detail}
                 </p>
                 <ul className="mt-6 flex flex-wrap gap-2">
