@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { e2ePort, fakeResendPort, testEnv } from "./e2e/support/env";
+import { e2ePort, fakePaystackPort, fakeResendPort, paystackTestSecret, testEnv } from "./e2e/support/env";
 
 const baseURL = `http://localhost:${e2ePort}`;
 
@@ -27,6 +27,16 @@ export default defineConfig({
       url: `http://127.0.0.1:${fakeResendPort}/health`,
       reuseExistingServer: !process.env.CI,
       env: { FAKE_RESEND_PORT: String(fakeResendPort) },
+    },
+    {
+      command: "npx tsx e2e/support/fake-paystack.ts",
+      url: `http://127.0.0.1:${fakePaystackPort}/health`,
+      reuseExistingServer: !process.env.CI,
+      env: {
+        FAKE_PAYSTACK_PORT: String(fakePaystackPort),
+        PAYSTACK_SECRET_KEY: paystackTestSecret,
+        APP_WEBHOOK_URL: `${baseURL}/api/webhooks/paystack`,
+      },
     },
     {
       command: `npm run build && npm run start -- -p ${e2ePort}`,
