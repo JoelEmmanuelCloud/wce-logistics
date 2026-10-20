@@ -10,6 +10,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  partialPrefetching: false,
   poweredByHeader: false,
   experimental: {
     serverActions: {
