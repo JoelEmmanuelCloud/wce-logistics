@@ -5,7 +5,7 @@ import { completeOnboardingAction } from "@/app/(auth)/actions";
 import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/field";
-import { initialFormState } from "@/lib/form-state";
+import { initialFormState, valueOf } from "@/lib/form-state";
 
 const ROLES = [
   { value: "customer", title: "I want to ship goods", detail: "Book verified trucks for interstate loads from 50 kg." },
@@ -28,7 +28,14 @@ export function OnboardingForm() {
             key={role.value}
             className="flex cursor-pointer gap-4 rounded-2xl border border-navy/15 bg-white p-4 transition-colors has-checked:border-orange-ink has-checked:bg-orange/[0.07] has-focus-visible:ring-3 has-focus-visible:ring-orange/25"
           >
-            <input type="radio" name="role" value={role.value} className="mt-1 size-4 accent-[#B84A00]" required />
+            <input
+              type="radio"
+              name="role"
+              value={role.value}
+              defaultChecked={valueOf(state.values, "role", "") === role.value}
+              className="mt-1 size-4 accent-[#B84A00]"
+              required
+            />
             <span>
               <span className="block text-[16px] font-semibold text-navy">{role.title}</span>
               <span className="mt-1 block text-[14px] leading-snug text-navy/70">{role.detail}</span>
@@ -42,10 +49,10 @@ export function OnboardingForm() {
         ) : null}
       </fieldset>
       <Field id="fullName" label="Full name" required errors={state.fieldErrors?.fullName}>
-        <TextInput id="fullName" autoComplete="name" required errors={state.fieldErrors?.fullName} />
+        <TextInput id="fullName" autoComplete="name" defaultValue={valueOf(state.values, "fullName", "")} required errors={state.fieldErrors?.fullName} />
       </Field>
       <Field id="email" label="Email address" hint="For receipts and account notices." errors={state.fieldErrors?.email}>
-        <TextInput id="email" type="email" autoComplete="email" hasHint errors={state.fieldErrors?.email} />
+        <TextInput id="email" type="email" autoComplete="email" defaultValue={valueOf(state.values, "email", "")} hasHint errors={state.fieldErrors?.email} />
       </Field>
       <SubmitButton size="lg" pendingLabel="Saving">
         Create my account

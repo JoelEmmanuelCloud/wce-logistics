@@ -3,7 +3,7 @@
 import { eq, isNull, and, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { errorState, validationErrorState, type FormState } from "@/lib/form-state";
+import { errorState, snapshot, validationErrorState, type FormState } from "@/lib/form-state";
 import { maskPhone, normalizePhone } from "@/lib/phone";
 import { recordAudit } from "@/server/audit";
 import { getCurrentUser, homePathFor, requireUser } from "@/server/auth/dal";
@@ -145,7 +145,7 @@ export async function completeOnboardingAction(_previous: FormState, formData: F
     role: formData.get("role") ?? "",
   });
   if (!parsed.success) {
-    return validationErrorState(parsed.error);
+    return validationErrorState(parsed.error, formData);
   }
 
   const { fullName, email, role } = parsed.data;
@@ -156,7 +156,10 @@ export async function completeOnboardingAction(_previous: FormState, formData: F
       .where(sql`lower(${schema.users.email}) = ${email}`)
       .limit(1);
     if (existing && existing.id !== user.id) {
-      return errorState("Please correct the highlighted fields.", { email: ["This email is already linked to another account."] });
+      return {
+        ...errorState("Please correct the highlighted fields.", { email: ["This email is already linked to another account."] }),
+        values: snapshot(formData),
+      };
     }
   }
 
