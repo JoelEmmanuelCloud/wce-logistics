@@ -6,6 +6,13 @@ const CELL = 12;
 const WIDTH = NIGERIA_GRID.columns * CELL;
 const HEIGHT = NIGERIA_GRID.rows * CELL;
 
+const DOT_RADIUS = 3.7;
+
+const DOTS_PATH = NIGERIA_DOTS.map(
+  ([x, y]) =>
+    `M${x * CELL - DOT_RADIUS} ${y * CELL}a${DOT_RADIUS} ${DOT_RADIUS} 0 1 0 ${DOT_RADIUS * 2} 0a${DOT_RADIUS} ${DOT_RADIUS} 0 1 0 ${-DOT_RADIUS * 2} 0`,
+).join("");
+
 const HUBS = {
   lagos: { name: "Lagos", x: 30, y: 265 },
   abuja: { name: "Abuja", x: 175, y: 176 },
@@ -43,11 +50,7 @@ export function NigeriaRouteMap({ className }: { className?: string }) {
         role="img"
         aria-label="Map of Nigeria showing WCE Logistics routes linking Lagos, Abuja, Kano, Maiduguri and Port Harcourt"
       >
-        <g fill="var(--color-navy)" fillOpacity="0.82">
-          {NIGERIA_DOTS.map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x * CELL} cy={y * CELL} r={3.7} />
-          ))}
-        </g>
+        <path d={DOTS_PATH} fill="var(--color-navy)" fillOpacity="0.82" />
         <g
           fill="none"
           stroke="var(--color-orange)"
