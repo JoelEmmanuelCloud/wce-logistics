@@ -1,0 +1,34 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createTruckAction } from "@/app/vendor/trucks/actions";
+import { EMPTY_TRUCK, TruckForm } from "@/app/vendor/trucks/truck-form";
+import { Card, PageHeader } from "@/components/ui/card";
+import { requireRole } from "@/server/auth/dal";
+import { findVendorProfileByUser } from "@/server/vendors";
+
+export const metadata: Metadata = { title: "Add a truck" };
+
+export default async function NewTruckPage() {
+  const user = await requireRole("vendor");
+  const profile = await findVendorProfileByUser(user.id);
+  if (!profile) {
+    redirect("/vendor/profile");
+  }
+
+  return (
+    <>
+      <Link href="/vendor/trucks" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+        Back to trucks
+      </Link>
+      <PageHeader
+        eyebrow="Step 3 of 3"
+        title="Add a truck"
+        description="Enter the details exactly as they appear on the vehicle documents. Next you will upload documents and photos."
+      />
+      <Card>
+        <TruckForm action={createTruckAction} defaults={{ ...EMPTY_TRUCK, baseState: profile.state, baseCity: profile.city }} submitLabel="Save and continue" />
+      </Card>
+    </>
+  );
+}
