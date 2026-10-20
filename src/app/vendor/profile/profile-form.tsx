@@ -6,7 +6,7 @@ import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { CheckboxGroup, Field, SelectInput, TextInput } from "@/components/ui/field";
 import { NIGERIAN_STATES } from "@/data/nigeria-states";
-import { initialFormState, valueOf, valuesOf } from "@/lib/form-state";
+import { fieldsKey, initialFormState, valueOf, valuesOf } from "@/lib/form-state";
 import { VENDOR_CATEGORIES } from "@/lib/labels";
 
 export type ProfileDefaults = {
@@ -33,7 +33,7 @@ export function ProfileForm({ defaults, editable, isNew }: { defaults: ProfileDe
   return (
     <form action={action} className="grid gap-8" noValidate>
       <FormMessage state={state} />
-      <fieldset disabled={!editable} className="grid gap-8 disabled:opacity-80">
+      <fieldset key={fieldsKey(state)} disabled={!editable} className="grid gap-8 disabled:opacity-80">
         <fieldset className="grid gap-3" aria-describedby={errors.category ? "category-error" : undefined}>
           <legend className="mb-1 text-[14px] font-semibold text-navy">
             Vendor category<span className="text-orange-ink" aria-hidden="true"> *</span>

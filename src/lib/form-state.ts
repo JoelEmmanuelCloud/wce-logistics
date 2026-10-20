@@ -7,16 +7,29 @@ export type FormState = {
   message?: string;
   fieldErrors?: Record<string, string[] | undefined>;
   values?: FormValues;
+  attempt?: string;
 };
 
 export const initialFormState: FormState = { status: "idle" };
 
+function attemptId(): string {
+  return globalThis.crypto.randomUUID();
+}
+
 export function errorState(message: string, fieldErrors?: FormState["fieldErrors"]): FormState {
-  return { status: "error", message, fieldErrors };
+  return { status: "error", message, fieldErrors, attempt: attemptId() };
 }
 
 export function successState(message: string): FormState {
-  return { status: "success", message };
+  return { status: "success", message, attempt: attemptId() };
+}
+
+export function withValues(state: FormState, formData: FormData): FormState {
+  return { ...state, values: snapshot(formData) };
+}
+
+export function fieldsKey(state: FormState): string {
+  return state.attempt ?? "initial";
 }
 
 export function snapshot(formData: FormData): FormValues {

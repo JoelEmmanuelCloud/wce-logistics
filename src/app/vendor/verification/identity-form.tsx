@@ -5,7 +5,7 @@ import { saveIdentityAction } from "@/app/vendor/actions";
 import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, SelectInput, TextInput } from "@/components/ui/field";
-import { initialFormState, valueOf } from "@/lib/form-state";
+import { fieldsKey, initialFormState, valueOf } from "@/lib/form-state";
 import { ID_DOCUMENT_TYPES } from "@/lib/labels";
 
 export function IdentityForm({ defaultType, savedLast4, editable }: { defaultType: string; savedLast4: string | null; editable: boolean }) {
@@ -15,7 +15,7 @@ export function IdentityForm({ defaultType, savedLast4, editable }: { defaultTyp
   return (
     <form action={action} className="grid gap-5" noValidate>
       <FormMessage state={state} />
-      <fieldset disabled={!editable} className="grid gap-5 md:grid-cols-2">
+      <fieldset key={fieldsKey(state)} disabled={!editable} className="grid gap-5 md:grid-cols-2">
         <Field id="idDocumentType" label="ID type" required errors={errors.idDocumentType}>
           <SelectInput id="idDocumentType" defaultValue={valueOf(state.values, "idDocumentType", defaultType)} errors={errors.idDocumentType}>
             <option value="" disabled>

@@ -3,7 +3,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { errorState, snapshot, successState, validationErrorState, type FormState } from "@/lib/form-state";
+import { errorState, successState, validationErrorState, withValues, type FormState } from "@/lib/form-state";
 import { identitySchema, vendorDocumentTypeSchema, vendorProfileSchema } from "@/lib/validation/vendor";
 import { recordAudit } from "@/server/audit";
 import { requireRole } from "@/server/auth/dal";
@@ -60,12 +60,9 @@ export async function saveVendorProfileAction(_previous: FormState, formData: Fo
     }
   } catch (error) {
     if (isUniqueViolation(error, "vendor_profiles_cac_number_key")) {
-      return {
-        ...errorState("Please correct the highlighted fields.", {
+      return withValues(errorState("Please correct the highlighted fields.", {
           cacNumber: ["This CAC number is already registered. Contact support if you believe this is a mistake."],
-        }),
-        values: snapshot(formData),
-      };
+        }), formData);
     }
     throw error;
   }

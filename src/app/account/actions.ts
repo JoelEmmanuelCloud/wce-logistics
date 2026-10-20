@@ -3,7 +3,7 @@
 import { and, eq, ne, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { z } from "zod";
-import { errorState, snapshot, successState, validationErrorState, type FormState } from "@/lib/form-state";
+import { errorState, successState, validationErrorState, withValues, type FormState } from "@/lib/form-state";
 import { recordAudit } from "@/server/audit";
 import { requireUser } from "@/server/auth/dal";
 import { db, schema } from "@/server/db";
@@ -33,10 +33,7 @@ export async function updateAccountAction(_previous: FormState, formData: FormDa
       .where(and(sql`lower(${schema.users.email}) = ${parsed.data.email}`, ne(schema.users.id, user.id)))
       .limit(1);
     if (taken) {
-      return {
-        ...errorState("Please correct the highlighted fields.", { email: ["This email is already linked to another account."] }),
-        values: snapshot(formData),
-      };
+      return withValues(errorState("Please correct the highlighted fields.", { email: ["This email is already linked to another account."] }), formData);
     }
   }
 

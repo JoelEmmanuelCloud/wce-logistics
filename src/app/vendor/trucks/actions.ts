@@ -4,7 +4,7 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { errorState, snapshot, successState, validationErrorState, type FormState } from "@/lib/form-state";
+import { errorState, successState, validationErrorState, withValues, type FormState } from "@/lib/form-state";
 import { normalizeRegistration, truckDocumentSchema, truckSchema } from "@/lib/validation/truck";
 import { recordAudit } from "@/server/audit";
 import { requireRole } from "@/server/auth/dal";
@@ -91,7 +91,7 @@ export async function createTruckAction(_previous: FormState, formData: FormData
     truckId = truck.id;
   } catch (error) {
     if (duplicateRegistration(error)) {
-      return { ...errorState("Please correct the highlighted fields.", { registrationNumber: [DUPLICATE_MESSAGE] }), values: snapshot(formData) };
+      return withValues(errorState("Please correct the highlighted fields.", { registrationNumber: [DUPLICATE_MESSAGE] }), formData);
     }
     throw error;
   }
@@ -133,7 +133,7 @@ export async function updateTruckAction(truckId: string, _previous: FormState, f
       .where(eq(schema.trucks.id, truck.id));
   } catch (error) {
     if (duplicateRegistration(error)) {
-      return { ...errorState("Please correct the highlighted fields.", { registrationNumber: [DUPLICATE_MESSAGE] }), values: snapshot(formData) };
+      return withValues(errorState("Please correct the highlighted fields.", { registrationNumber: [DUPLICATE_MESSAGE] }), formData);
     }
     throw error;
   }
@@ -190,7 +190,7 @@ export async function uploadTruckDocumentAction(_previous: FormState, formData: 
     });
   } catch (error) {
     if (error instanceof UploadRejectedError) {
-      return { ...errorState(error.message, { file: [error.message] }), values: snapshot(formData) };
+      return withValues(errorState(error.message, { file: [error.message] }), formData);
     }
     throw error;
   }

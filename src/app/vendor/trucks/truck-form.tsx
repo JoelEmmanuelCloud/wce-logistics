@@ -5,7 +5,7 @@ import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { CheckboxGroup, Field, SelectInput, TextInput } from "@/components/ui/field";
 import { NIGERIAN_STATES } from "@/data/nigeria-states";
-import { initialFormState, valueOf, valuesOf, type FormState } from "@/lib/form-state";
+import { fieldsKey, initialFormState, valueOf, valuesOf, type FormState } from "@/lib/form-state";
 import { BODY_TYPES, CARGO_TYPES, TRUCK_CATEGORIES } from "@/lib/labels";
 
 export type TruckDefaults = {
@@ -52,7 +52,7 @@ export function TruckForm({ action, defaults, submitLabel, disabled = false }: {
   return (
     <form action={formAction} className="grid gap-8" noValidate>
       <FormMessage state={state} />
-      <fieldset disabled={disabled} className="grid gap-8">
+      <fieldset key={fieldsKey(state)} disabled={disabled} className="grid gap-8">
         <div className="grid gap-6 md:grid-cols-3">
           <Field id="registrationNumber" label="Registration number" required hint="As shown on the number plate." errors={errors.registrationNumber}>
             <TextInput

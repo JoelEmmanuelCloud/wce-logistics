@@ -5,7 +5,7 @@ import { completeOnboardingAction } from "@/app/(auth)/actions";
 import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/field";
-import { initialFormState, valueOf } from "@/lib/form-state";
+import { fieldsKey, initialFormState, valueOf } from "@/lib/form-state";
 
 const ROLES = [
   { value: "customer", title: "I want to ship goods", detail: "Book verified trucks for interstate loads from 50 kg." },
@@ -19,7 +19,7 @@ export function OnboardingForm() {
   return (
     <form action={action} className="grid gap-6" noValidate>
       <FormMessage state={state} />
-      <fieldset className="grid gap-3" aria-describedby={roleErrors?.length ? "role-error" : undefined}>
+      <fieldset key={fieldsKey(state)} className="grid gap-3" aria-describedby={roleErrors?.length ? "role-error" : undefined}>
         <legend className="mb-1 text-[14px] font-semibold text-navy">
           How will you use WCE Logistics?<span className="text-orange-ink" aria-hidden="true"> *</span>
         </legend>
