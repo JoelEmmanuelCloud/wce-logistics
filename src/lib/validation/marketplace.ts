@@ -18,26 +18,37 @@ const futureDate = (label: string) =>
     return value >= today && value <= addDays(today, MAX_BOOKING_HORIZON_DAYS);
   }, `Choose a ${label} between today and ${MAX_BOOKING_HORIZON_DAYS} days from now.`);
 
-const money = (label: string, { required, min = 0 }: { required: boolean; min?: number }) =>
+function parseNaira(value: string, label: string, min: number, context: z.RefinementCtx): number | null | typeof z.NEVER {
+  const cleaned = value.replace(/[₦,\s]/g, "");
+  if (!cleaned) {
+    return null;
+  }
+  const amount = Number(cleaned);
+  if (!Number.isFinite(amount) || amount < min || amount > 100_000_000 || !/^\d+(\.\d{1,2})?$/.test(cleaned)) {
+    context.addIssue({ code: "custom", message: `Enter a valid ${label} in naira.` });
+    return z.NEVER;
+  }
+  return nairaToKobo(amount);
+}
+
+const requiredMoney = (label: string, min = 0) =>
   z
     .string()
     .trim()
-    .transform((value, context) => {
-      const cleaned = value.replace(/[₦,\s]/g, "");
-      if (!cleaned) {
-        if (required) {
-          context.addIssue({ code: "custom", message: `Enter the ${label}.` });
-          return z.NEVER;
-        }
-        return null;
-      }
-      const amount = Number(cleaned);
-      if (!Number.isFinite(amount) || amount < min || amount > 100_000_000 || !/^\d+(\.\d{1,2})?$/.test(cleaned)) {
-        context.addIssue({ code: "custom", message: `Enter a valid ${label} in naira.` });
+    .transform((value, context): number => {
+      const kobo = parseNaira(value, label, min, context);
+      if (kobo === null) {
+        context.addIssue({ code: "custom", message: `Enter the ${label}.` });
         return z.NEVER;
       }
-      return nairaToKobo(amount);
+      return kobo;
     });
+
+const optionalMoney = (label: string, min = 0) =>
+  z
+    .string()
+    .trim()
+    .transform((value, context): number | null => parseNaira(value, label, min, context));
 
 const wholeNumber = (label: string, min: number, max: number) =>
   z.coerce
@@ -57,9 +68,9 @@ export const routeSchema = z
     transitHours: wholeNumber("estimated transit time in hours", 1, 240),
     capacityKg: wholeNumber("capacity offered", MIN_SHIPMENT_KG, 100_000),
     allowsShared: z.enum(["on"]).optional().transform((value) => value === "on"),
-    ratePerKgKobo: money("rate per kilogram", { required: true, min: 0.01 }),
-    minimumChargeKobo: money("minimum charge", { required: false }),
-    dedicatedPriceKobo: money("price for the whole truck", { required: false, min: 1 }),
+    ratePerKgKobo: requiredMoney("rate per kilogram", 0.01),
+    minimumChargeKobo: optionalMoney("minimum charge"),
+    dedicatedPriceKobo: optionalMoney("price for the whole truck", 1),
   })
   .superRefine((value, context) => {
     if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
@@ -85,7 +96,7 @@ export const shipmentSchema = z
     description: z.string().trim().min(5, "Describe the goods, for example 40 bags of cement.").max(500),
     weightKg: wholeNumber("total weight in kg", MIN_SHIPMENT_KG, 100_000),
     packageCount: wholeNumber("number of packages", 1, 100_000),
-    declaredValueKobo: money("declared value", { required: false }),
+    declaredValueKobo: optionalMoney("declared value"),
     pickupDate: futureDate("pickup date"),
     handlingNotes: z
       .string()
