@@ -1,15 +1,16 @@
 import { config } from "dotenv";
-import { parsePhoneNumberFromString } from "libphonenumber-js/max";
 import postgres from "postgres";
 import { parseArgs } from "node:util";
 
 config({ path: ".env.local" });
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function main() {
-  const { values } = parseArgs({ options: { phone: { type: "string" }, name: { type: "string" } } });
-  const phone = parsePhoneNumberFromString(values.phone ?? "", "NG");
-  if (!phone || !phone.isValid()) {
-    throw new Error("Pass a valid mobile number with --phone, for example --phone 08031234567");
+  const { values } = parseArgs({ options: { email: { type: "string" }, name: { type: "string" } } });
+  const email = values.email?.trim().toLowerCase();
+  if (!email || !EMAIL_PATTERN.test(email)) {
+    throw new Error("Pass a valid email address with --email, for example --email ada@wcelogistics.com");
   }
   const name = values.name?.trim();
   if (!name || name.length < 2) {
@@ -23,14 +24,14 @@ async function main() {
   const sql = postgres(url, { max: 1 });
   try {
     const [user] = await sql<{ id: string; created: boolean }[]>`
-      insert into users (phone, full_name, role)
-      values (${phone.number}, ${name}, 'admin')
-      on conflict (phone) do update set role = 'admin', full_name = coalesce(users.full_name, excluded.full_name), status = 'active', updated_at = now()
+      insert into users (email, full_name, role)
+      values (${email}, ${name}, 'admin')
+      on conflict (lower(email)) do update set role = 'admin', full_name = coalesce(users.full_name, excluded.full_name), status = 'active', updated_at = now()
       returning id, (xmax = 0) as created`;
     await sql`
       insert into audit_logs (actor_id, action, entity_type, entity_id, metadata)
       values (null, 'user.admin_granted', 'user', ${user.id}, ${sql.json({ via: "cli" })})`;
-    console.log(`${user.created ? "Created" : "Promoted"} administrator ${phone.formatInternational()}. They can now sign in at /sign-in.`);
+    console.log(`${user.created ? "Created" : "Promoted"} administrator ${email}. They can now sign in at /sign-in.`);
   } finally {
     await sql.end();
   }
