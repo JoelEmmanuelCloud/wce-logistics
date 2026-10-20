@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const NAV = [{ href: "/account", label: "Account", exact: true }] as const;
+const NAV = [
+  { href: "/account", label: "Overview", exact: true },
+  { href: "/account/shipments", label: "Shipments" },
+  { href: "/account/bookings", label: "Bookings" },
+] as const;
 
 export default async function AccountLayout({ children }: LayoutProps<"/account">) {
   const user = await requireRole("customer", "driver");
