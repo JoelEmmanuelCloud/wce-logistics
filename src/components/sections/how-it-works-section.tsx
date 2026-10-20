@@ -5,6 +5,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { SHIPPER_STEPS, VENDOR_STEPS, type Step } from "@/data/landing";
+import { stagger } from "@/lib/motion";
 
 const AUDIENCES: ReadonlyArray<{ key: string; label: string; intro: string; steps: ReadonlyArray<Step> }> = [
   {
@@ -39,7 +40,7 @@ export function HowItWorksSection() {
 
   return (
     <Section id="how-it-works" tone="sand" labelledBy="how-title">
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+      <div className="reveal grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <Eyebrow className="text-orange-ink">How it works</Eyebrow>
           <DisplayHeading id="how-title" className="mt-5">
@@ -76,8 +77,8 @@ export function HowItWorksSection() {
         </div>
       </div>
 
-      <figure className="relative mt-[clamp(40px,5vw,72px)] h-[clamp(220px,26vw,420px)] overflow-hidden rounded-[28px]">
-        <Image src={IMAGES.lagos.src} alt={IMAGES.lagos.alt} fill sizes="(min-width: 1760px) 1650px, 94vw" className="object-cover" />
+      <figure className="reveal relative mt-[clamp(40px,5vw,72px)] h-[clamp(220px,26vw,420px)] overflow-hidden rounded-[28px]">
+        <Image src={IMAGES.lagos.src} alt={IMAGES.lagos.alt} fill sizes="(min-width: 1760px) 1650px, 94vw" className="reveal-zoom object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-navy/70 via-navy/20 to-transparent" aria-hidden="true" />
         <figcaption className="absolute bottom-[clamp(20px,2.4vw,36px)] left-[clamp(20px,2.4vw,36px)] max-w-[14em] font-display text-[clamp(28px,3vw,52px)] uppercase leading-[0.95] text-white">
           Built for <span className="text-orange">Nigerian roads</span>
@@ -89,8 +90,8 @@ export function HowItWorksSection() {
           {audience.steps.map((step, index) => (
             <li
               key={step.title}
-              className="step-card group relative flex min-h-[220px] sm:min-h-[280px] flex-col justify-between overflow-hidden rounded-[28px] bg-white p-[clamp(24px,2.4vw,36px)] transition-colors duration-300 hover:bg-navy hover:text-white"
-              style={{ animationDelay: `${index * 90}ms` }}
+              className="step-card lift group relative flex min-h-[220px] sm:min-h-[280px] flex-col justify-between overflow-hidden rounded-[28px] bg-white p-[clamp(24px,2.4vw,36px)] transition-colors duration-300 hover:bg-navy hover:text-white"
+              style={stagger(index)}
             >
               <span className="font-display text-[clamp(72px,7vw,112px)] leading-none text-transparent [-webkit-text-stroke:2px_var(--color-orange)] transition-colors duration-300 group-hover:text-orange">
                 {String(index + 1).padStart(2, "0")}

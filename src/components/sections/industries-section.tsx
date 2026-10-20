@@ -2,12 +2,13 @@ import Image from "next/image";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { INDUSTRIES } from "@/data/landing";
+import { stagger } from "@/lib/motion";
 
 export function IndustriesSection() {
   return (
     <Section id="industries" tone="sand" labelledBy="industries-title">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
-        <div>
+        <div className="reveal">
           <Eyebrow className="text-orange-ink">Industries</Eyebrow>
           <DisplayHeading id="industries-title" className="mt-5">
             Who we
@@ -24,7 +25,8 @@ export function IndustriesSection() {
             return (
               <li
                 key={industry.key}
-                className="group grid grid-cols-[auto_1fr] items-center gap-x-[clamp(16px,2vw,32px)] gap-y-4 border-b border-navy/15 py-[clamp(18px,2vw,28px)] sm:grid-cols-[auto_1fr_auto]"
+                style={stagger(index)}
+                className="reveal group grid grid-cols-[auto_1fr] items-center gap-x-[clamp(16px,2vw,32px)] gap-y-4 border-b border-navy/15 py-[clamp(18px,2vw,28px)] sm:grid-cols-[auto_1fr_auto]"
               >
                 <div className="relative aspect-[4/3] w-[clamp(104px,11vw,176px)] overflow-hidden rounded-[18px]">
                   <Image
@@ -32,7 +34,7 @@ export function IndustriesSection() {
                     alt={image.alt}
                     fill
                     sizes="176px"
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="object-cover transition-[scale] duration-500 group-hover:scale-110"
                   />
                 </div>
                 <div>

@@ -5,6 +5,7 @@ import { ClockIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { SERVICES, type ServiceKey } from "@/data/landing";
+import { stagger } from "@/lib/motion";
 
 const CARD_STYLES: Record<ServiceKey, { card: string; tag: string; layout: string }> = {
   freight: {
@@ -43,7 +44,7 @@ const ICONS: Record<ServiceKey, ComponentType<{ className?: string }>> = {
 export function ServicesSection() {
   return (
     <Section id="services" tone="white" labelledBy="services-title">
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+      <div className="reveal grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <Eyebrow className="text-orange-ink">Services</Eyebrow>
           <DisplayHeading id="services-title" className="mt-5">
@@ -57,7 +58,7 @@ export function ServicesSection() {
       </div>
 
       <ul className="mt-[clamp(40px,5vw,72px)] grid gap-4 lg:grid-cols-12 lg:gap-5">
-        {SERVICES.map((service) => {
+        {SERVICES.map((service, index) => {
           const style = CARD_STYLES[service.key];
           const Icon = ICONS[service.key];
           const image = IMAGES[service.key];
@@ -65,7 +66,8 @@ export function ServicesSection() {
           return (
             <li
               key={service.key}
-              className={`group flex flex-col gap-[clamp(20px,2vw,32px)] rounded-[28px] p-3 pb-[clamp(24px,2.6vw,40px)] ${style.card} ${style.layout}`}
+              style={stagger(index % 2)}
+              className={`reveal lift group flex flex-col gap-[clamp(20px,2vw,32px)] rounded-[28px] p-3 pb-[clamp(24px,2.6vw,40px)] ${style.card} ${style.layout}`}
             >
               <div className="relative aspect-[16/9] overflow-hidden rounded-[20px] lg:aspect-auto lg:h-[clamp(220px,19vw,320px)]">
                 <Image
@@ -73,7 +75,7 @@ export function ServicesSection() {
                   alt={image.alt}
                   fill
                   sizes={featured || service.key === "onDemand" ? "(min-width: 1760px) 960px, (min-width: 1024px) 56vw, 94vw" : "(min-width: 1760px) 690px, (min-width: 1024px) 40vw, 94vw"}
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  className="reveal-zoom object-cover transition-[scale] duration-700 group-hover:scale-[1.04]"
                 />
                 <span className="absolute bottom-4 left-4 grid size-[clamp(56px,4.6vw,72px)] place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.3)]">
                   <Icon className="w-[66%]" />
