@@ -51,8 +51,8 @@ export function OnboardingForm() {
       <Field id="fullName" label="Full name" required errors={state.fieldErrors?.fullName}>
         <TextInput id="fullName" autoComplete="name" defaultValue={valueOf(state.values, "fullName", "")} required errors={state.fieldErrors?.fullName} />
       </Field>
-      <Field id="email" label="Email address" hint="For receipts and account notices." errors={state.fieldErrors?.email}>
-        <TextInput id="email" type="email" autoComplete="email" defaultValue={valueOf(state.values, "email", "")} hasHint errors={state.fieldErrors?.email} />
+      <Field id="phone" label="Mobile number" required hint="Shared with the other party on confirmed bookings so you can arrange pickup." errors={state.fieldErrors?.phone}>
+        <TextInput id="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="0803 123 4567" defaultValue={valueOf(state.values, "phone", "")} hasHint errors={state.fieldErrors?.phone} />
       </Field>
       <SubmitButton size="lg" pendingLabel="Saving">
         Create my account

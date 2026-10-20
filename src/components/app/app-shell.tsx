@@ -4,7 +4,6 @@ import { signOutAction } from "@/app/(auth)/actions";
 import { MobileNav } from "@/components/app/mobile-nav";
 import { NavLinks, type NavItem } from "@/components/app/nav-links";
 import { WceLogo } from "@/components/wce-logo";
-import { formatPhone } from "@/lib/phone";
 import type { User } from "@/server/db/schema";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -18,7 +17,7 @@ function AccountFooter({ user }: { user: User }) {
   return (
     <div className="grid gap-3">
       <div>
-        <p className="truncate text-[14px] font-semibold text-white">{user.fullName ?? formatPhone(user.phone)}</p>
+        <p className="truncate text-[14px] font-semibold text-white">{user.fullName ?? user.email}</p>
         <p className="text-[12px] text-white/60">{user.role ? ROLE_LABELS[user.role] : "Account"}</p>
       </div>
       <form action={signOutAction}>

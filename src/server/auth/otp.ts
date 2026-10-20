@@ -2,13 +2,13 @@ import "server-only";
 import { and, count, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { hmac, numericCode, safeEqualHex } from "@/server/crypto";
 import { db, schema } from "@/server/db";
-import { sendSms } from "@/server/sms";
+import { sendEmail } from "@/server/email";
 
 export const OTP_LENGTH = 6;
 export const OTP_TTL_MINUTES = 10;
 export const OTP_MAX_ATTEMPTS = 5;
 export const OTP_RESEND_SECONDS = 60;
-const OTP_MAX_PER_PHONE_PER_HOUR = 5;
+const OTP_MAX_PER_EMAIL_PER_HOUR = 5;
 const OTP_MAX_PER_IP_PER_HOUR = 20;
 
 export type RequestOtpResult =
@@ -18,18 +18,18 @@ export type RequestOtpResult =
 
 export type VerifyOtpResult = { ok: true } | { ok: false; reason: "invalid" | "expired" | "locked" };
 
-function codeHash(phone: string, code: string): string {
-  return hmac(`otp:${phone}:${code}`);
+function codeHash(email: string, code: string): string {
+  return hmac(`otp:${email}:${code}`);
 }
 
-export async function requestOtp(phone: string, ipAddress: string | null): Promise<RequestOtpResult> {
+export async function requestOtp(email: string, ipAddress: string | null): Promise<RequestOtpResult> {
   const database = db();
   const hourAgo = sql`now() - interval '1 hour'`;
 
   const [latest] = await database
     .select({ createdAt: schema.otpChallenges.createdAt })
     .from(schema.otpChallenges)
-    .where(eq(schema.otpChallenges.phone, phone))
+    .where(eq(schema.otpChallenges.email, email))
     .orderBy(desc(schema.otpChallenges.createdAt))
     .limit(1);
   if (latest) {
@@ -39,11 +39,11 @@ export async function requestOtp(phone: string, ipAddress: string | null): Promi
     }
   }
 
-  const [phoneCount] = await database
+  const [emailCount] = await database
     .select({ value: count() })
     .from(schema.otpChallenges)
-    .where(and(eq(schema.otpChallenges.phone, phone), gt(schema.otpChallenges.createdAt, hourAgo)));
-  if ((phoneCount?.value ?? 0) >= OTP_MAX_PER_PHONE_PER_HOUR) {
+    .where(and(eq(schema.otpChallenges.email, email), gt(schema.otpChallenges.createdAt, hourAgo)));
+  if ((emailCount?.value ?? 0) >= OTP_MAX_PER_EMAIL_PER_HOUR) {
     return { ok: false, reason: "rate_limited" };
   }
 
@@ -61,15 +61,21 @@ export async function requestOtp(phone: string, ipAddress: string | null): Promi
   const [challenge] = await database
     .insert(schema.otpChallenges)
     .values({
-      phone,
-      codeHash: codeHash(phone, code),
+      email,
+      codeHash: codeHash(email, code),
       ipAddress,
       expiresAt: new Date(Date.now() + OTP_TTL_MINUTES * 60_000),
     })
     .returning({ id: schema.otpChallenges.id });
 
   try {
-    await sendSms(phone, `Your WCE Logistics code is ${code}. It expires in ${OTP_TTL_MINUTES} minutes. Never share this code.`);
+    await sendEmail({
+      to: email,
+      subject: `${code} is your WCE Logistics sign-in code`,
+      heading: "Your sign-in code",
+      paragraphs: [`Enter this code to sign in to WCE Logistics: ${code}`, `It expires in ${OTP_TTL_MINUTES} minutes. Never share it with anyone, including our staff.`],
+      footnote: "If you did not try to sign in, you can ignore this email. Your account stays secure.",
+    });
   } catch (error) {
     await database.delete(schema.otpChallenges).where(eq(schema.otpChallenges.id, challenge.id));
     throw error;
@@ -77,12 +83,12 @@ export async function requestOtp(phone: string, ipAddress: string | null): Promi
   return { ok: true };
 }
 
-export async function verifyOtp(phone: string, code: string): Promise<VerifyOtpResult> {
+export async function verifyOtp(email: string, code: string): Promise<VerifyOtpResult> {
   return db().transaction(async (tx) => {
     const [challenge] = await tx
       .select()
       .from(schema.otpChallenges)
-      .where(and(eq(schema.otpChallenges.phone, phone), isNull(schema.otpChallenges.consumedAt)))
+      .where(and(eq(schema.otpChallenges.email, email), isNull(schema.otpChallenges.consumedAt)))
       .orderBy(desc(schema.otpChallenges.createdAt))
       .limit(1)
       .for("update");
@@ -94,7 +100,7 @@ export async function verifyOtp(phone: string, code: string): Promise<VerifyOtpR
       return { ok: false, reason: "locked" } as const;
     }
 
-    const matches = safeEqualHex(challenge.codeHash, codeHash(phone, code));
+    const matches = safeEqualHex(challenge.codeHash, codeHash(email, code));
     await tx
       .update(schema.otpChallenges)
       .set(matches ? { attempts: challenge.attempts + 1, consumedAt: new Date() } : { attempts: challenge.attempts + 1 })

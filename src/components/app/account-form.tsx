@@ -18,11 +18,11 @@ export function AccountForm({ fullName, email, phone }: { fullName: string; emai
         <Field id="fullName" label="Full name" required errors={errors.fullName}>
           <TextInput id="fullName" autoComplete="name" defaultValue={valueOf(state.values, "fullName", fullName)} errors={errors.fullName} />
         </Field>
-        <Field id="email" label="Email address" errors={errors.email}>
-          <TextInput id="email" type="email" autoComplete="email" defaultValue={valueOf(state.values, "email", email)} errors={errors.email} />
+        <Field id="phone" label="Mobile number" required errors={errors.phone}>
+          <TextInput id="phone" type="tel" autoComplete="tel" defaultValue={valueOf(state.values, "phone", phone)} errors={errors.phone} />
         </Field>
-        <Field id="phoneDisplay" label="Mobile number" required hint="Your sign-in number. Contact support to change it.">
-          <TextInput id="phoneDisplay" value={phone} readOnly disabled hasHint />
+        <Field id="emailDisplay" label="Email address" required hint="Your sign-in address. Contact support to change it.">
+          <TextInput id="emailDisplay" value={email} readOnly disabled hasHint />
         </Field>
       </div>
       <div className="flex justify-end">

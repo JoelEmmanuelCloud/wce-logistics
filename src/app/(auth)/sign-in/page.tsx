@@ -5,7 +5,7 @@ import { SignInForm } from "./sign-in-form";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to WCE Logistics with your mobile number.",
+  description: "Sign in to WCE Logistics with your email address.",
   robots: { index: false },
 };
 
@@ -20,13 +20,13 @@ export default async function SignInPage() {
       <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Sign in or create an account</p>
       <h1 className="mt-3 font-display text-[clamp(40px,5vw,60px)] uppercase leading-[0.92] text-navy">Welcome to WCE Logistics</h1>
       <p className="mt-4 text-[16px] leading-relaxed text-navy/70">
-        Use your mobile number. New here? We will set up your account after you verify your number.
+        Use your email address. New here? We will set up your account after you verify it.
       </p>
       <div className="mt-8">
         <SignInForm />
       </div>
       <p className="mt-8 text-[13px] leading-relaxed text-navy/70">
-        By continuing you agree to receive a one-time SMS code. Standard network rates may apply.
+        We only use your email to sign you in and to send booking updates.
       </p>
     </>
   );

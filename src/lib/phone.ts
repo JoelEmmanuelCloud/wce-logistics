@@ -12,14 +12,10 @@ export function normalizePhone(input: string): string | null {
   return parsed.number;
 }
 
-export function maskPhone(e164: string): string {
-  if (e164.length <= 7) {
-    return e164;
+export function formatPhone(e164: string | null | undefined): string {
+  if (!e164) {
+    return "Not provided";
   }
-  return `${e164.slice(0, 4)}${"•".repeat(e164.length - 7)}${e164.slice(-3)}`;
-}
-
-export function formatPhone(e164: string): string {
   const parsed = parsePhoneNumberFromString(e164);
   return parsed ? parsed.formatInternational() : e164;
 }

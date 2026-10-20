@@ -43,7 +43,7 @@ export default async function AccountPage() {
         )}
         <Card>
           <CardHeader title="Account details" description="Used on your bookings and receipts." />
-          <AccountForm fullName={user.fullName ?? ""} email={user.email ?? ""} phone={formatPhone(user.phone)} />
+          <AccountForm fullName={user.fullName ?? ""} email={user.email} phone={user.phone ? formatPhone(user.phone) : ""} />
         </Card>
       </div>
     </>

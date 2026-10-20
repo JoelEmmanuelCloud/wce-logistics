@@ -6,18 +6,18 @@ import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/field";
 
-const initial: SignInState = { status: "idle", step: "phone" };
+const initial: SignInState = { status: "idle", step: "email" };
 
 export function SignInForm() {
   const [requestState, requestAction] = useActionState(requestCodeAction, initial);
   const [verifyState, verifyAction] = useActionState(verifyCodeAction, initial);
-  const [editingPhone, setEditingPhone] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
   const [seenRequestState, setSeenRequestState] = useState(requestState);
   const [now, setNow] = useState(0);
 
   if (seenRequestState !== requestState) {
     setSeenRequestState(requestState);
-    setEditingPhone(false);
+    setEditingEmail(false);
   }
 
   useEffect(() => {
@@ -30,24 +30,24 @@ export function SignInForm() {
     };
   }, []);
 
-  const onCodeStep = requestState.step === "code" && Boolean(requestState.phone) && !editingPhone;
+  const onCodeStep = requestState.step === "code" && Boolean(requestState.email) && !editingEmail;
   const secondsLeft = requestState.resendAt && now > 0 ? Math.max(0, Math.ceil((requestState.resendAt - now) / 1000)) : 0;
 
   if (!onCodeStep) {
     return (
       <form action={requestAction} className="grid gap-5" noValidate>
-        <FormMessage state={requestState.step === "phone" ? requestState : { status: "idle" }} />
-        <Field id="phone" label="Mobile number" required hint="We will text you a one-time code." errors={requestState.fieldErrors?.phone}>
+        <FormMessage state={requestState.step === "email" ? requestState : { status: "idle" }} />
+        <Field id="email" label="Email address" required hint="We will email you a one-time code." errors={requestState.fieldErrors?.email}>
           <TextInput
-            id="phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="0803 123 4567"
-            defaultValue={requestState.phone ?? ""}
+            id="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="ada@company.ng"
+            defaultValue={requestState.email ?? ""}
             required
             hasHint
-            errors={requestState.fieldErrors?.phone}
+            errors={requestState.fieldErrors?.email}
           />
         </Field>
         <SubmitButton size="lg" pendingLabel="Sending code">
@@ -63,7 +63,7 @@ export function SignInForm() {
     <div className="grid gap-5">
       <form action={verifyAction} className="grid gap-5" noValidate>
         <FormMessage state={state} />
-        <input type="hidden" name="phone" value={requestState.phone} />
+        <input type="hidden" name="email" value={requestState.email} />
         <Field id="code" label="Verification code" required errors={verifyState.fieldErrors?.code}>
           <TextInput
             id="code"
@@ -83,11 +83,11 @@ export function SignInForm() {
         </SubmitButton>
       </form>
       <div className="flex flex-wrap items-center justify-between gap-3 text-[14px]">
-        <button type="button" onClick={() => setEditingPhone(true)} className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
-          Use a different number
+        <button type="button" onClick={() => setEditingEmail(true)} className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
+          Use a different email
         </button>
         <form action={requestAction}>
-          <input type="hidden" name="phone" value={requestState.phone} />
+          <input type="hidden" name="email" value={requestState.email} />
           <button
             type="submit"
             disabled={secondsLeft > 0}
