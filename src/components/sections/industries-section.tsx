@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { IMAGES } from "@/data/images";
 import { INDUSTRIES } from "@/data/landing";
 
 export function IndustriesSection() {
@@ -17,18 +19,32 @@ export function IndustriesSection() {
           </p>
         </div>
         <ul className="border-t border-navy/15">
-          {INDUSTRIES.map((industry, index) => (
-            <li
-              key={industry.title}
-              className="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-1 border-b border-navy/15 py-[clamp(22px,2.6vw,36px)] sm:grid-cols-[auto_1fr_auto]"
-            >
-              <span className="font-display text-[clamp(18px,1.4vw,22px)] text-orange">{String(index + 1).padStart(2, "0")}</span>
-              <h3 className="font-display text-[clamp(34px,3.6vw,60px)] uppercase leading-none transition-transform duration-300 group-hover:translate-x-2">
-                {industry.title}
-              </h3>
-              <p className="col-start-2 text-[15px] text-navy/65 sm:col-start-3 sm:max-w-[16em] sm:text-right">{industry.summary}</p>
-            </li>
-          ))}
+          {INDUSTRIES.map((industry, index) => {
+            const image = IMAGES[industry.key];
+            return (
+              <li
+                key={industry.key}
+                className="group grid grid-cols-[auto_1fr] items-center gap-x-[clamp(16px,2vw,32px)] gap-y-4 border-b border-navy/15 py-[clamp(18px,2vw,28px)] sm:grid-cols-[auto_1fr_auto]"
+              >
+                <div className="relative aspect-[4/3] w-[clamp(104px,11vw,176px)] overflow-hidden rounded-[18px]">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    sizes="176px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+                <div>
+                  <span className="font-display text-[clamp(16px,1.3vw,20px)] text-orange">{String(index + 1).padStart(2, "0")}</span>
+                  <h3 className="mt-1 font-display text-[clamp(30px,3.2vw,56px)] uppercase leading-none transition-transform duration-300 group-hover:translate-x-2">
+                    {industry.title}
+                  </h3>
+                </div>
+                <p className="col-span-2 text-[15px] text-navy/65 sm:col-span-1 sm:max-w-[15em] sm:text-right">{industry.summary}</p>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </Section>
