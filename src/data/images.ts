@@ -1,8 +1,11 @@
 export type SiteImage = { src: string; alt: string; credit: string };
 
-function unsplash(id: string, alt: string, slug: string): SiteImage {
+function unsplash(id: string, alt: string, slug: string, crop?: { aspect: string; focusY?: number }): SiteImage {
+  const params = crop
+    ? `?fit=crop&crop=focalpoint&fp-x=0.5&fp-y=${crop.focusY ?? 0.5}&ar=${crop.aspect}`
+    : "";
   return {
-    src: `https://images.unsplash.com/photo-${id}`,
+    src: `https://images.unsplash.com/photo-${id}${params}`,
     alt,
     credit: `https://unsplash.com/photos/${slug}`,
   };
@@ -33,6 +36,7 @@ export const IMAGES = {
     "1708674282655-3637d492dc74",
     "Aerial view of a Lagos expressway with traffic and a bus",
     "an-aerial-view-of-a-stadium-with-a-bus-on-the-road-W39f1D5hKes",
+    { aspect: "4:1", focusY: 0.6 },
   ),
   inspection: unsplash(
     "1622645916455-aa13b87438ec",
