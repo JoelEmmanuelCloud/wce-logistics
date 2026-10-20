@@ -54,7 +54,6 @@ export async function requestBookingAction(shipmentId: string, routeId: string):
     bookingId = booking.id;
   } catch (error) {
     if (error instanceof MarketplaceError) {
-      refresh();
       return errorState(error.message);
     }
     throw error;
