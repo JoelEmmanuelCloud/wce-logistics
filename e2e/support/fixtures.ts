@@ -10,6 +10,7 @@ export type TestUser = { id: string; phone: string; fullName: string };
 type Fixtures = {
   sql: postgres.Sql;
   signInAs: (role: Role | null, overrides?: { fullName?: string }) => Promise<TestUser>;
+  createUser: (role: Role | null, fullName?: string) => Promise<TestUser>;
 };
 
 export function uniquePhone(): string {
@@ -34,7 +35,7 @@ export async function createSessionFor(sql: postgres.Sql, page: Page, userId: st
   const hash = createHash("sha256").update(token).digest("hex");
   await sql`insert into sessions (user_id, token_hash, expires_at) values (${userId}, ${hash}, now() + interval '1 day')`;
   await page.context().addCookies([
-    { name: "__Host-wce_session", value: token, url: `http://localhost:${e2ePort}`, httpOnly: true, secure: true, sameSite: "Lax" },
+    { name: "__Host-wce_session", value: token, url: `https://localhost:${e2ePort}`, httpOnly: true, secure: true, sameSite: "Lax" },
   ]);
 }
 
@@ -44,15 +45,20 @@ export const test = base.extend<Fixtures>({
     await provide(sql);
     await sql.end();
   },
-  signInAs: async ({ sql, page }, provide) => {
-    await provide(async (role, overrides) => {
+  createUser: async ({ sql }, provide) => {
+    await provide(async (role, fullName = "Test User") => {
       const phone = uniquePhone();
-      const fullName = overrides?.fullName ?? "Test User";
       const [user] = await sql<{ id: string }[]>`
         insert into users (phone, full_name, role) values (${phone}, ${role === null ? null : fullName}, ${role})
         returning id`;
-      await createSessionFor(sql, page, user.id);
       return { id: user.id, phone, fullName };
+    });
+  },
+  signInAs: async ({ sql, page, createUser }, provide) => {
+    await provide(async (role, overrides) => {
+      const user = await createUser(role, overrides?.fullName);
+      await createSessionFor(sql, page, user.id);
+      return user;
     });
   },
 });

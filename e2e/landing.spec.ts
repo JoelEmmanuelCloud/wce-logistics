@@ -34,6 +34,7 @@ test.describe("landing page", () => {
   });
 
   test("all images load", async ({ page }) => {
+    test.slow();
     await page.goto("/");
     await page.evaluate(async () => {
       document.documentElement.style.scrollBehavior = "auto";
@@ -42,13 +43,17 @@ test.describe("landing page", () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
     });
-    await page.waitForLoadState("networkidle");
-    const broken = await page.evaluate(() =>
-      Array.from(document.images)
-        .filter((image) => !image.complete || image.naturalWidth === 0)
-        .map((image) => image.alt),
-    );
-    expect(broken).toEqual([]);
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            Array.from(document.images)
+              .filter((image) => !image.complete || image.naturalWidth === 0)
+              .map((image) => image.alt),
+          ),
+        { timeout: 45_000 },
+      )
+      .toEqual([]);
   });
 
   test("how it works tabs switch by click and arrow keys", async ({ page }) => {

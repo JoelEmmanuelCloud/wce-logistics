@@ -39,6 +39,7 @@ test.describe("phone sign-in", () => {
     await page.goto("/sign-in");
     await page.getByLabel("Mobile number").fill(phone);
     await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText(/We sent a 6-digit code/)).toBeVisible();
     const code = await readOtp(phone);
     const wrong = code === "000000" ? "111111" : "000000";
 
@@ -48,6 +49,7 @@ test.describe("phone sign-in", () => {
         page.waitForResponse((response) => response.request().method() === "POST" && response.url().endsWith("/sign-in")),
         page.getByRole("button", { name: "Verify and continue" }).click(),
       ]);
+      await expect(page.getByLabel("Verification code")).toHaveValue("");
     };
 
     for (let attempt = 1; attempt <= 4; attempt += 1) {
