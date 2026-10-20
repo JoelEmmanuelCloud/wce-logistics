@@ -18,6 +18,7 @@ export default defineConfig({
       EMAIL_PROVIDER: "log",
       EMAIL_FROM: "WCE Logistics <noreply@example.com>",
       PLATFORM_COMMISSION_BPS: "1000",
+      PAYSTACK_SECRET_KEY: "sk_test_unit0000000000000000000000000000",
       STORAGE_REGION: "us-east-1",
       STORAGE_BUCKET: "unit-test",
       STORAGE_ACCESS_KEY_ID: "unit",
