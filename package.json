@@ -16,7 +16,8 @@
     "test": "vitest run",
     "storage:setup": "tsx scripts/storage-setup.ts",
     "admin:create": "tsx scripts/create-admin.ts",
-    "jobs:expire-documents": "tsx scripts/expire-documents.ts"
+    "jobs:expire-documents": "tsx scripts/expire-documents.ts",
+    "jobs:expire-bookings": "tsx scripts/expire-bookings.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1153.0",
