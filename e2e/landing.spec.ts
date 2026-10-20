@@ -15,6 +15,13 @@ test.describe("landing page", () => {
     expect(errors).toEqual([]);
   });
 
+  test("header sign-in link opens the sign-in page", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("header").getByRole("link", { name: "Sign in" }).filter({ visible: true }).click();
+    await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome to WCE Logistics");
+  });
+
   test("serves security headers", async ({ request }) => {
     const response = await request.get("/");
     const headers = response.headers();
