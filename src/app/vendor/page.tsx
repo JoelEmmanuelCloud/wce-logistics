@@ -79,7 +79,7 @@ export default async function VendorOverviewPage() {
             number={2}
             title="Verification"
             description="Identity details and supporting documents, reviewed by our team."
-            status={profile ? <StatusBadge status={profile.verificationStatus} map={VERIFICATION_STATUS} /> : <span className="text-[13px] text-navy/60">Complete step 1 first</span>}
+            status={profile ? <StatusBadge status={profile.verificationStatus} map={VERIFICATION_STATUS} /> : <span className="text-[13px] text-navy/70">Complete step 1 first</span>}
             href={profile ? "/vendor/verification" : "/vendor/profile"}
             cta={profile?.verificationStatus === "draft" || profile?.verificationStatus === "info_required" ? "Continue" : "View"}
           />

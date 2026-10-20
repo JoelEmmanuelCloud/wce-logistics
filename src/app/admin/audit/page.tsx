@@ -32,7 +32,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps<"/admin
             <td className="px-4 py-3 font-semibold text-navy">{describeAction(entry.log.action)}</td>
             <td className="px-4 py-3 text-navy/70">
               {entry.log.entityType.replaceAll("_", " ")}
-              {entry.log.entityId && <span className="block font-mono text-[12px] text-navy/60">{entry.log.entityId.slice(0, 8)}</span>}
+              {entry.log.entityId && <span className="block font-mono text-[12px] text-navy/70">{entry.log.entityId.slice(0, 8)}</span>}
             </td>
             <td className="max-w-[360px] px-4 py-3 text-[13px] text-navy/70">{summarize(entry.log.metadata)}</td>
           </tr>

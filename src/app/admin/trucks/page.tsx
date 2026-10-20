@@ -27,7 +27,7 @@ export default async function AdminTrucksPage({ searchParams }: PageProps<"/admi
       <DataTable caption="Trucks" headers={["Registration", "Vendor", "Category", "Payload", "Base", "Submitted", "Status"]}>
         {result.rows.length === 0 ? (
           <tr>
-            <td colSpan={7} className="px-4 py-10 text-center text-navy/60">
+            <td colSpan={7} className="px-4 py-10 text-center text-navy/70">
               No trucks match this view.
             </td>
           </tr>
@@ -38,7 +38,7 @@ export default async function AdminTrucksPage({ searchParams }: PageProps<"/admi
                 <Link href={`/admin/trucks/${truck.id}`} className="font-semibold text-navy underline-offset-4 hover:underline">
                   {truck.registrationNumber}
                 </Link>
-                <span className="block text-[13px] text-navy/60">
+                <span className="block text-[13px] text-navy/70">
                   {truck.make} {truck.model}
                 </span>
               </td>

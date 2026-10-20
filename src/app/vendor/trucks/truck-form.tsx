@@ -117,7 +117,7 @@ export function TruckForm({ action, defaults, submitLabel, disabled = false }: {
 
         <fieldset className="grid gap-3">
           <legend className="text-[14px] font-semibold text-navy">
-            Cargo body dimensions in metres <span className="font-normal text-navy/60">(optional)</span>
+            Cargo body dimensions in metres <span className="font-normal text-navy/70">(optional)</span>
           </legend>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field id="bodyLengthM" label="Length" errors={errors.bodyLengthM}>

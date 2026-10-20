@@ -74,7 +74,7 @@ export default async function VendorVerificationPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-[16px] font-semibold text-navy">{DOCUMENT_TITLES[type]}</h3>
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/60">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/70">
                         {required.includes(type) ? "Required" : "Optional"}
                       </span>
                     </div>
@@ -90,7 +90,7 @@ export default async function VendorVerificationPage() {
                         >
                           {document.fileName}
                         </a>
-                        <span className="text-navy/60">Uploaded {formatDate(document.uploadedAt)}</span>
+                        <span className="text-navy/70">Uploaded {formatDate(document.uploadedAt)}</span>
                       </div>
                     )}
                     {document?.status === "rejected" && document.rejectionReason && (

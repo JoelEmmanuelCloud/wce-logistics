@@ -91,7 +91,7 @@ export function SignInForm() {
           <button
             type="submit"
             disabled={secondsLeft > 0}
-            className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4 disabled:text-navy/50 disabled:no-underline"
+            className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4 disabled:text-navy/70 disabled:no-underline"
           >
             {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}
           </button>

@@ -47,7 +47,7 @@ export default async function AdminOverviewPage() {
         <Card>
           <CardHeader title="Vendor queue" description="Oldest submissions are listed last." />
           {vendorQueue.rows.length === 0 ? (
-            <p className="text-[15px] text-navy/60">No vendors are waiting for review.</p>
+            <p className="text-[15px] text-navy/70">No vendors are waiting for review.</p>
           ) : (
             <ul className="divide-y divide-navy/10">
               {vendorQueue.rows.slice(0, 6).map(({ vendor }) => (
@@ -55,7 +55,7 @@ export default async function AdminOverviewPage() {
                   <Link href={`/admin/vendors/${vendor.id}`} className="flex items-center justify-between gap-4 py-3 hover:text-orange-ink">
                     <span>
                       <span className="block font-semibold text-navy">{vendor.businessName ?? vendor.legalName}</span>
-                      <span className="text-[13px] text-navy/60">Submitted {formatDateTime(vendor.submittedAt)}</span>
+                      <span className="text-[13px] text-navy/70">Submitted {formatDateTime(vendor.submittedAt)}</span>
                     </span>
                     <StatusBadge status={vendor.verificationStatus} map={VERIFICATION_STATUS} />
                   </Link>
@@ -67,7 +67,7 @@ export default async function AdminOverviewPage() {
         <Card>
           <CardHeader title="Truck queue" description="Trucks submitted for verification." />
           {truckQueue.rows.length === 0 ? (
-            <p className="text-[15px] text-navy/60">No trucks are waiting for review.</p>
+            <p className="text-[15px] text-navy/70">No trucks are waiting for review.</p>
           ) : (
             <ul className="divide-y divide-navy/10">
               {truckQueue.rows.slice(0, 6).map(({ truck, vendorName }) => (
@@ -75,7 +75,7 @@ export default async function AdminOverviewPage() {
                   <Link href={`/admin/trucks/${truck.id}`} className="flex items-center justify-between gap-4 py-3 hover:text-orange-ink">
                     <span>
                       <span className="block font-semibold text-navy">{truck.registrationNumber}</span>
-                      <span className="text-[13px] text-navy/60">
+                      <span className="text-[13px] text-navy/70">
                         {vendorName}, submitted {formatDateTime(truck.submittedAt)}
                       </span>
                     </span>

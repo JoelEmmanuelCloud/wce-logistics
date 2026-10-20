@@ -130,7 +130,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-[16px] font-semibold text-navy">{option.label}</h3>
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/60">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/70">
                         {REQUIRED_TRUCK_DOCUMENTS.includes(option.value) ? "Required" : "Optional"}
                       </span>
                     </div>
@@ -157,7 +157,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
                         )}
                       </div>
                     ) : (
-                      <p className="mt-1 text-[14px] text-navy/60">Not uploaded yet.</p>
+                      <p className="mt-1 text-[14px] text-navy/70">Not uploaded yet.</p>
                     )}
                   </div>
                   {documentsEditable && <TruckDocumentUpload truckId={truck.id} type={option.value} label={option.label} expires={option.expires} />}

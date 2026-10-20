@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 
 const CONTROL =
-  "w-full rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/45 transition-colors focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25 aria-[invalid=true]:border-[#B42318] disabled:bg-navy/[0.04] disabled:text-navy/60";
+  "w-full rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/45 transition-colors focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25 aria-[invalid=true]:border-[#B42318] disabled:bg-navy/[0.04] disabled:text-navy/70";
 
 type FieldProps = {
   id: string;
@@ -17,7 +17,7 @@ export function Field({ id, label, hint, errors, required, children }: FieldProp
     <div className="grid gap-2">
       <label htmlFor={id} className="text-[14px] font-semibold text-navy">
         {label}
-        {required ? <span className="text-orange-ink" aria-hidden="true"> *</span> : <span className="font-normal text-navy/60"> (optional)</span>}
+        {required ? <span className="text-orange-ink" aria-hidden="true"> *</span> : <span className="font-normal text-navy/70"> (optional)</span>}
       </label>
       {children}
       {hint && !errors?.length && (

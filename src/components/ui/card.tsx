@@ -51,8 +51,8 @@ export function DescriptionList({ items }: { items: ReadonlyArray<{ label: strin
     <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
       {items.map((item) => (
         <div key={item.label}>
-          <dt className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/60">{item.label}</dt>
-          <dd className="mt-1 text-[15px] text-navy">{item.value ?? <span className="text-navy/50">Not provided</span>}</dd>
+          <dt className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/70">{item.label}</dt>
+          <dd className="mt-1 text-[15px] text-navy">{item.value ?? <span className="text-navy/70">Not provided</span>}</dd>
         </div>
       ))}
     </dl>

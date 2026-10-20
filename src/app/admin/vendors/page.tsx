@@ -28,7 +28,7 @@ export default async function AdminVendorsPage({ searchParams }: PageProps<"/adm
       <DataTable caption="Vendors" headers={["Vendor", "Category", "Phone", "Operating states", "Submitted", "Status"]}>
         {result.rows.length === 0 ? (
           <tr>
-            <td colSpan={6} className="px-4 py-10 text-center text-navy/60">
+            <td colSpan={6} className="px-4 py-10 text-center text-navy/70">
               No vendors match this view.
             </td>
           </tr>
@@ -39,7 +39,7 @@ export default async function AdminVendorsPage({ searchParams }: PageProps<"/adm
                 <Link href={`/admin/vendors/${vendor.id}`} className="font-semibold text-navy underline-offset-4 hover:underline">
                   {vendor.businessName ?? vendor.legalName}
                 </Link>
-                {vendor.businessName && <span className="block text-[13px] text-navy/60">{vendor.legalName}</span>}
+                {vendor.businessName && <span className="block text-[13px] text-navy/70">{vendor.legalName}</span>}
               </td>
               <td className="px-4 py-3 text-navy/80">{labelFor(VENDOR_CATEGORIES, vendor.category)}</td>
               <td className="px-4 py-3 whitespace-nowrap text-navy/80">{formatPhone(phone)}</td>

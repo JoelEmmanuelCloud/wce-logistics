@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
           <WceLogo tone="dark" />
         </Link>
         <main className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-12">{children}</main>
-        <p className="text-[13px] text-navy/60">Move more. Build more.</p>
+        <p className="text-[13px] text-navy/70">Move more. Build more.</p>
       </div>
       <aside className="relative hidden overflow-hidden bg-navy lg:block" aria-hidden="true">
         <Image src={IMAGES.onDemand.src} alt="" fill sizes="50vw" loading="eager" className="object-cover opacity-70" />

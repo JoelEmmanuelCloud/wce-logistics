@@ -9,7 +9,7 @@ export function RevealId({ vendorId, last4 }: { vendorId: string; last4: string 
   const [pending, startTransition] = useTransition();
 
   if (!last4) {
-    return <span className="text-navy/50">Not provided</span>;
+    return <span className="text-navy/70">Not provided</span>;
   }
 
   return (
@@ -30,7 +30,7 @@ export function RevealId({ vendorId, last4 }: { vendorId: string; last4: string 
               }
             })
           }
-          className="text-[13px] font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4 disabled:text-navy/50"
+          className="text-[13px] font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4 disabled:text-navy/70"
         >
           {pending ? "Revealing" : "Reveal (logged)"}
         </button>

@@ -54,7 +54,7 @@ export function SearchForm({ base, status, query, placeholder }: { base: string;
         type="search"
         defaultValue={query}
         placeholder={placeholder}
-        className="h-11 w-full min-w-0 rounded-full border border-navy/20 bg-white px-4 text-[15px] text-navy placeholder:text-navy/50 focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25 sm:w-72"
+        className="h-11 w-full min-w-0 rounded-full border border-navy/20 bg-white px-4 text-[15px] text-navy placeholder:text-navy/70 focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25 sm:w-72"
       />
       <button type="submit" className="h-11 rounded-full bg-navy px-5 text-[14px] font-semibold text-white hover:bg-[#13335c]">
         Search
@@ -77,11 +77,11 @@ export function Pagination({
   params: Record<string, string>;
 }) {
   if (pageCount <= 1) {
-    return <p className="mt-4 text-[13px] text-navy/60">{total} result{total === 1 ? "" : "s"}</p>;
+    return <p className="mt-4 text-[13px] text-navy/70">{total} result{total === 1 ? "" : "s"}</p>;
   }
   return (
     <nav aria-label="Pagination" className="mt-4 flex items-center justify-between gap-4 text-[14px]">
-      <p className="text-navy/60">
+      <p className="text-navy/70">
         Page {page} of {pageCount}, {total} results
       </p>
       <div className="flex gap-2">

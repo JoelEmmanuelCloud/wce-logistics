@@ -55,15 +55,15 @@ export default async function VendorTrucksPage() {
                 </div>
                 <dl className="grid grid-cols-3 gap-3 border-t border-navy/10 pt-4 text-[13px]">
                   <div>
-                    <dt className="text-navy/60">Type</dt>
+                    <dt className="text-navy/70">Type</dt>
                     <dd className="mt-0.5 font-semibold text-navy">{labelFor(TRUCK_CATEGORIES, truck.category).replace(" truck", "")}</dd>
                   </div>
                   <div>
-                    <dt className="text-navy/60">Payload</dt>
+                    <dt className="text-navy/70">Payload</dt>
                     <dd className="mt-0.5 font-semibold text-navy">{formatKg(truck.maxPayloadKg)}</dd>
                   </div>
                   <div>
-                    <dt className="text-navy/60">Photos</dt>
+                    <dt className="text-navy/70">Photos</dt>
                     <dd className="mt-0.5 font-semibold text-navy">{photos.get(truck.id) ?? 0}</dd>
                   </div>
                 </dl>

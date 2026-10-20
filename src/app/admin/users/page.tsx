@@ -42,7 +42,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
       <DataTable caption="Users" headers={["Name", "Phone", "Role", "Joined", "Last sign-in", "Status", ""]}>
         {result.rows.length === 0 ? (
           <tr>
-            <td colSpan={7} className="px-4 py-10 text-center text-navy/60">
+            <td colSpan={7} className="px-4 py-10 text-center text-navy/70">
               No users match this view.
             </td>
           </tr>
@@ -51,7 +51,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
             <tr key={user.id} className="hover:bg-navy/[0.02]">
               <td className="px-4 py-3">
                 <span className="font-semibold text-navy">{user.fullName ?? "Not set"}</span>
-                {user.email && <span className="block text-[13px] text-navy/60">{user.email}</span>}
+                {user.email && <span className="block text-[13px] text-navy/70">{user.email}</span>}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-navy/80">{formatPhone(user.phone)}</td>
               <td className="px-4 py-3 text-navy/80">{user.role ? ROLE_LABELS[user.role] : "Onboarding"}</td>

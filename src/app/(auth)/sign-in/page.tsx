@@ -25,7 +25,7 @@ export default async function SignInPage() {
       <div className="mt-8">
         <SignInForm />
       </div>
-      <p className="mt-8 text-[13px] leading-relaxed text-navy/60">
+      <p className="mt-8 text-[13px] leading-relaxed text-navy/70">
         By continuing you agree to receive a one-time SMS code. Standard network rates may apply.
       </p>
     </>

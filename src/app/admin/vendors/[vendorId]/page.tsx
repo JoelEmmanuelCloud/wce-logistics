@@ -73,7 +73,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
           <Card>
             <CardHeader title="Documents" description="The latest upload for each type is shown first." />
             {documents.length === 0 ? (
-              <p className="text-[15px] text-navy/60">No documents uploaded.</p>
+              <p className="text-[15px] text-navy/70">No documents uploaded.</p>
             ) : (
               <ul className="divide-y divide-navy/10">
                 {documents.map((document) => (
@@ -81,14 +81,14 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
                     <div>
                       <p className="font-semibold text-navy">
                         {DOCUMENT_TITLES[document.type]}
-                        {required.includes(document.type) && <span className="ml-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-navy/60">Required</span>}
+                        {required.includes(document.type) && <span className="ml-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-navy/70">Required</span>}
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px]">
                         <StatusBadge status={document.status} map={DOCUMENT_STATUS} />
                         <a href={`/files/vendor-documents/${document.id}`} target="_blank" rel="noopener" className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
                           Open {document.fileName}
                         </a>
-                        <span className="text-navy/60">{formatDateTime(document.uploadedAt)}</span>
+                        <span className="text-navy/70">{formatDateTime(document.uploadedAt)}</span>
                       </div>
                       {document.rejectionReason && <p className="mt-2 text-[14px] text-[#912018]">Reason: {document.rejectionReason}</p>}
                     </div>
@@ -102,7 +102,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
           <Card>
             <CardHeader title="Trucks" description={`${trucks.length} registered`} />
             {trucks.length === 0 ? (
-              <p className="text-[15px] text-navy/60">No trucks registered.</p>
+              <p className="text-[15px] text-navy/70">No trucks registered.</p>
             ) : (
               <ul className="divide-y divide-navy/10">
                 {trucks.map((truck) => (
@@ -110,7 +110,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
                     <Link href={`/admin/trucks/${truck.id}`} className="flex items-center justify-between gap-4 py-3 hover:text-orange-ink">
                       <span className="font-semibold text-navy">
                         {truck.registrationNumber}
-                        <span className="ml-2 font-normal text-navy/60">
+                        <span className="ml-2 font-normal text-navy/70">
                           {truck.make} {truck.model}
                         </span>
                       </span>

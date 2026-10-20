@@ -84,7 +84,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
           <Card>
             <CardHeader title="Documents" description="Check each document matches the registration number and is current." />
             {documents.length === 0 ? (
-              <p className="text-[15px] text-navy/60">No documents uploaded.</p>
+              <p className="text-[15px] text-navy/70">No documents uploaded.</p>
             ) : (
               <ul className="divide-y divide-navy/10">
                 {documents.map((document) => {
@@ -95,7 +95,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
                         <p className="font-semibold text-navy">
                           {TRUCK_DOCUMENT_TITLES[document.type]}
                           {REQUIRED_TRUCK_DOCUMENTS.includes(document.type) && (
-                            <span className="ml-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-navy/60">Required</span>
+                            <span className="ml-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-navy/70">Required</span>
                           )}
                         </p>
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px]">
@@ -121,7 +121,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
           <Card>
             <CardHeader title="Photos" description={`${photos.length} uploaded`} />
             {photos.length === 0 ? (
-              <p className="text-[15px] text-navy/60">No photos uploaded.</p>
+              <p className="text-[15px] text-navy/70">No photos uploaded.</p>
             ) : (
               <ul className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {photos.map((photo, index) => (

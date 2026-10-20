@@ -20,7 +20,7 @@ export function actorLabel(entry: Pick<Entry, "actorName" | "actorPhone" | "acto
 
 export function AuditTimeline({ entries }: { entries: Entry[] }) {
   if (entries.length === 0) {
-    return <p className="text-[15px] text-navy/60">No recorded activity.</p>;
+    return <p className="text-[15px] text-navy/70">No recorded activity.</p>;
   }
   return (
     <ol className="grid gap-4">
@@ -29,7 +29,7 @@ export function AuditTimeline({ entries }: { entries: Entry[] }) {
         return (
           <li key={entry.log.id} className="relative border-l-2 border-navy/10 pl-4">
             <p className="text-[14px] font-semibold text-navy">{describeAction(entry.log.action)}</p>
-            <p className="text-[13px] text-navy/60">
+            <p className="text-[13px] text-navy/70">
               {actorLabel(entry)}, {formatDateTime(entry.log.createdAt)}
             </p>
             {note && <p className="mt-1 text-[14px] text-navy/80">{note}</p>}
