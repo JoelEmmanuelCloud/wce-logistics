@@ -89,8 +89,8 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
   }, []);
 
   return (
-    <header ref={navRef} className="relative z-30 flex items-start justify-between gap-6">
-      <Link href="/" aria-label="WCE Logistics home" className="text-[clamp(15px,1.45vw,22px)]">
+    <header ref={navRef} className="relative z-30 flex items-center justify-between gap-3 md:items-start md:gap-6">
+      <Link href="/" aria-label="WCE Logistics home" className="shrink-0 text-[clamp(14px,1.45vw,22px)]">
         <WceLogo />
       </Link>
 
@@ -121,18 +121,31 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
               </li>
             );
           })}
+          <li>
+            <Link
+              href="/sign-in"
+              className="inline-flex h-10 items-center rounded-full border border-white/50 px-5 text-[clamp(14px,1.05vw,16px)] font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
+            >
+              Sign in
+            </Link>
+          </li>
         </ul>
       </nav>
 
-      <button
-        type="button"
-        aria-expanded={mobileOpen}
-        aria-controls={`${baseId}-mobile`}
-        onClick={() => setMobileOpen((value) => !value)}
-        className="flex h-10 items-center gap-2 rounded-full border border-white/40 px-4 text-sm font-medium text-white md:hidden"
-      >
-        {mobileOpen ? "Close" : "Menu"}
-      </button>
+      <div className="flex items-center gap-2 md:hidden">
+        <Link href="/sign-in" className="flex h-10 items-center whitespace-nowrap rounded-full bg-white px-3.5 text-sm font-semibold text-navy">
+          Sign in
+        </Link>
+        <button
+          type="button"
+          aria-expanded={mobileOpen}
+          aria-controls={`${baseId}-mobile`}
+          onClick={() => setMobileOpen((value) => !value)}
+          className="flex h-10 items-center gap-2 whitespace-nowrap rounded-full border border-white/40 px-3.5 text-sm font-medium text-white"
+        >
+          {mobileOpen ? "Close" : "Menu"}
+        </button>
+      </div>
       <div
         id={`${baseId}-mobile`}
         hidden={!mobileOpen}
