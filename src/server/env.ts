@@ -15,6 +15,7 @@ const schema = z
     SMS_PROVIDER: z.enum(["termii", "log"]),
     TERMII_API_KEY: z.string().optional(),
     TERMII_SENDER_ID: z.string().optional(),
+    TERMII_BASE_URL: z.url().default("https://api.ng.termii.com"),
     STORAGE_ENDPOINT: z.url().optional().or(z.literal("")),
     STORAGE_REGION: z.string().min(1),
     STORAGE_BUCKET: z.string().min(3),
