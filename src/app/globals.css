@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-navy: #0b2545;
+  --color-orange: #ff6b00;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@utility font-display-wide {
+  font-family: var(--font-saira), ui-sans-serif, sans-serif;
+  font-stretch: 118%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-navy);
+  color: #ffffff;
+  font-family: var(--font-sans);
+}
+
+.hero-warmth {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(150 196 198 / 0.35) 0%, rgb(255 170 110 / 0.5) 52%, rgb(255 120 40 / 0.18) 66%, rgb(5 14 28 / 0.55) 100%),
+    linear-gradient(90deg, rgb(11 37 69 / 0.45) 0%, rgb(11 37 69 / 0.1) 45%, transparent 60%);
+}
+
+.route-lines path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: route-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+}
+
+.route-lines path:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.route-lines path:nth-child(3) {
+  animation-delay: 0.9s;
+}
+
+.route-lines path:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+@keyframes route-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-lines path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }
