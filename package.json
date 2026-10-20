@@ -14,7 +14,9 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
-    "storage:setup": "tsx scripts/storage-setup.ts"
+    "storage:setup": "tsx scripts/storage-setup.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
+    "jobs:expire-documents": "tsx scripts/expire-documents.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1153.0",
