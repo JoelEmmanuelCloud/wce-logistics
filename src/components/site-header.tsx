@@ -3,63 +3,48 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { WceLogo } from "@/components/wce-logo";
+import { INDUSTRIES, SERVICES } from "@/data/landing";
 
-type MenuItem = { title: string; detail: string; href?: string };
+type MenuItem = { title: string; detail: string; href: string };
 type Menu = { label: string; items: MenuItem[] };
 
 function buildMenus(contactEmail: string): Menu[] {
   return [
     {
       label: "Services",
-      items: [
-        { title: "Truck freight", detail: "Shared or dedicated loads from 50 kg between states" },
-        { title: "Heavy equipment haulage", detail: "Flatbeds and low-loaders for plant and machinery" },
-        { title: "Bus charter", detail: "Buses for staff, crews and group movement" },
-        { title: "On-demand logistics", detail: "Book verified capacity when you need it" },
-      ],
+      items: SERVICES.map((service) => ({ title: service.title, detail: service.summary, href: "#services" })),
     },
     {
       label: "Industries",
-      items: [
-        { title: "Construction", detail: "Materials, plant and site equipment" },
-        { title: "Agriculture", detail: "Produce and inputs from farm to market" },
-        { title: "Manufacturing", detail: "Raw materials in, finished goods out" },
-        { title: "Retail and distribution", detail: "Stock moved between warehouses and stores" },
-      ],
+      items: INDUSTRIES.map((industry) => ({ title: industry.title, detail: industry.summary, href: "#industries" })),
     },
     {
       label: "Company",
       items: [
-        { title: "About WCE Logistics", detail: "A marketplace connecting shippers with verified truck vendors" },
-        { title: "Become a vendor", detail: "Truck owners and fleet operators list verified trucks and routes" },
+        { title: "How it works", detail: "From booking request to proof of delivery", href: "#how-it-works" },
+        { title: "Pricing", detail: "Per-kilogram rates with every charge itemised", href: "#pricing" },
+        { title: "Become a vendor", detail: "Truck owners and fleet operators list verified trucks and routes", href: "#vendors" },
         { title: "Contact us", detail: contactEmail, href: `mailto:${contactEmail}` },
       ],
     },
   ];
 }
 
-function MenuPanel({ items }: { items: MenuItem[] }) {
+function MenuPanel({ items, onNavigate }: { items: MenuItem[]; onNavigate: () => void }) {
   return (
     <ul className="grid gap-1">
-      {items.map((item) => {
-        const body = (
-          <>
+      {items.map((item) => (
+        <li key={item.title}>
+          <a
+            href={item.href}
+            onClick={onNavigate}
+            className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none"
+          >
             <span className="block text-[15px] font-semibold text-navy">{item.title}</span>
             <span className="block text-[13px] leading-snug text-navy/65">{item.detail}</span>
-          </>
-        );
-        return (
-          <li key={item.title}>
-            {item.href ? (
-              <a href={item.href} className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none">
-                {body}
-              </a>
-            ) : (
-              <div className="rounded-xl px-3 py-2.5">{body}</div>
-            )}
-          </li>
-        );
-      })}
+          </a>
+        </li>
+      ))}
     </ul>
   );
 }
@@ -79,17 +64,20 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
   const navRef = useRef<HTMLElement>(null);
   const baseId = useId();
 
+  function closeMenus() {
+    setOpenMenu(null);
+    setMobileOpen(false);
+  }
+
   useEffect(() => {
     function onPointerDown(event: PointerEvent) {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setOpenMenu(null);
-        setMobileOpen(false);
+        closeMenus();
       }
     }
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setOpenMenu(null);
-        setMobileOpen(false);
+        closeMenus();
       }
     }
     document.addEventListener("pointerdown", onPointerDown);
@@ -128,7 +116,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
                   hidden={!open}
                   className="absolute right-0 top-full mt-3 w-80 rounded-2xl bg-white p-2 shadow-[0_24px_60px_rgba(11,37,69,0.28)]"
                 >
-                  <MenuPanel items={menu.items} />
+                  <MenuPanel items={menu.items} onNavigate={closeMenus} />
                 </div>
               </li>
             );
@@ -153,7 +141,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
         {menus.map((menu) => (
           <section key={menu.label} className="border-b border-navy/10 py-2 last:border-b-0">
             <h2 className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-[0.14em] text-orange">{menu.label}</h2>
-            <MenuPanel items={menu.items} />
+            <MenuPanel items={menu.items} onNavigate={closeMenus} />
           </section>
         ))}
       </div>
