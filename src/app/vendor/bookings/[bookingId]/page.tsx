@@ -40,7 +40,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
       <BookingHeader detail={detail} />
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
         <BookingSummary detail={detail} />
-        <div className="grid content-start gap-6">
+        <div className="order-first grid content-start gap-6 xl:order-none">
           {pending && (
             <Card tone="attention">
               <CardHeader title="Respond to this request" description={`Answer before ${formatDateTime(booking.responseDueAt)} or the request expires.`} />

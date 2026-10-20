@@ -34,7 +34,7 @@ export default async function CustomerBookingPage({ params }: PageProps<"/accoun
       <BookingHeader detail={detail} />
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
         <BookingSummary detail={detail} />
-        <div className="grid content-start gap-6">
+        <div className="order-first grid content-start gap-6 xl:order-none">
           {booking.status === "pending_vendor_acceptance" && (
             <Alert tone="info" title="Waiting for the vendor">
               {detail.vendorName} has until {formatDateTime(booking.responseDueAt)} to accept. The space on the truck is held for you until then.

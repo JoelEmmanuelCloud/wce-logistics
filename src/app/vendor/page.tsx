@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { VendorStatusBanner } from "@/components/app/vendor-status-banner";
+import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { VERIFICATION_STATUS } from "@/lib/labels";
 import { requireRole } from "@/server/auth/dal";
+import { listBookings } from "@/server/marketplace";
 import { countVendorTrucks, findVendorProfileByUser } from "@/server/vendors";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -47,6 +49,7 @@ export default async function VendorOverviewPage() {
   const user = await requireRole("vendor");
   const profile = await findVendorProfileByUser(user.id);
   const trucks = profile ? await countVendorTrucks(profile.id) : { total: 0, active: 0 };
+  const requests = profile ? await listBookings({ vendorId: profile.id, statuses: ["pending_vendor_acceptance"] }) : [];
   const firstName = user.fullName?.split(" ")[0];
 
   return (
@@ -57,6 +60,16 @@ export default async function VendorOverviewPage() {
         description="Get verified, add your trucks, and you are ready to receive bookings on the routes you run."
       />
 
+      {requests.length > 0 && (
+        <div className="mb-4">
+          <Alert tone="warning" title={`${requests.length} booking request${requests.length === 1 ? "" : "s"} waiting`}>
+            Shippers are waiting for your answer.{" "}
+            <Link href="/vendor/bookings" className="font-semibold underline decoration-orange decoration-2 underline-offset-4">
+              Review requests
+            </Link>
+          </Alert>
+        </div>
+      )}
       {profile && (
         <div className="mb-6">
           <VendorStatusBanner profile={profile} />

@@ -29,7 +29,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
       <BookingHeader detail={detail} />
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
         <BookingSummary detail={detail} />
-        <div className="grid content-start gap-6">
+        <div className="order-first grid content-start gap-6 xl:order-none">
           <Card>
             <CardHeader title="Parties" />
             <DescriptionList
