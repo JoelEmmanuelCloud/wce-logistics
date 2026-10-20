@@ -15,6 +15,27 @@
       "when": 1792482917475,
       "tag": "0001_marketplace",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792501493686,
+      "tag": "0002_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792501675632,
+      "tag": "0003_users_email_required",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792501689030,
+      "tag": "0004_otp_email",
+      "breakpoints": true
     }
   ]
 }

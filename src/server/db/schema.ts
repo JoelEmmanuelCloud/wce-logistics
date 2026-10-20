@@ -88,17 +88,17 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    phone: text("phone").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
     fullName: text("full_name"),
-    email: text("email"),
     role: userRole("role"),
     status: userStatus("status").notNull().default("active"),
     lastSignInAt: timestamp("last_sign_in_at", { withTimezone: true }),
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("users_phone_key").on(table.phone),
     uniqueIndex("users_email_key").on(sql`lower(${table.email})`),
+    index("users_phone_idx").on(table.phone),
   ],
 );
 
@@ -126,7 +126,7 @@ export const otpChallenges = pgTable(
   "otp_challenges",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    phone: text("phone").notNull(),
+    email: text("email").notNull(),
     codeHash: text("code_hash").notNull(),
     attempts: integer("attempts").notNull().default(0),
     ipAddress: inet("ip_address"),
@@ -135,7 +135,7 @@ export const otpChallenges = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    index("otp_challenges_phone_created_idx").on(table.phone, table.createdAt),
+    index("otp_challenges_email_created_idx").on(table.email, table.createdAt),
     index("otp_challenges_ip_created_idx").on(table.ipAddress, table.createdAt),
   ],
 );
@@ -441,6 +441,86 @@ export const bookingEvents = pgTable(
   (table) => [index("booking_events_booking_idx").on(table.bookingId, table.createdAt)],
 );
 
+export const paymentProvider = pgEnum("payment_provider", ["paystack", "offline"]);
+export const paymentStatus = pgEnum("payment_status", ["pending", "successful", "failed", "refunded", "partially_refunded"]);
+export const payoutStatus = pgEnum("payout_status", ["on_hold", "eligible", "paid", "cancelled"]);
+export const notificationStatus = pgEnum("notification_status", ["sent", "failed"]);
+
+export const payments = pgTable(
+  "payments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "restrict" }),
+    provider: paymentProvider("provider").notNull(),
+    reference: text("reference").notNull(),
+    providerTransactionId: text("provider_transaction_id"),
+    amountKobo: integer("amount_kobo").notNull(),
+    currency: text("currency").notNull().default("NGN"),
+    status: paymentStatus("status").notNull().default("pending"),
+    channel: text("channel"),
+    platformFeeKobo: integer("platform_fee_kobo"),
+    vendorPayableKobo: integer("vendor_payable_kobo"),
+    refundedKobo: integer("refunded_kobo").notNull().default(0),
+    failureReason: text("failure_reason"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("payments_reference_key").on(table.reference),
+    index("payments_booking_idx").on(table.bookingId, table.createdAt),
+    uniqueIndex("payments_one_successful_per_booking_key")
+      .on(table.bookingId)
+      .where(sql`${table.status} in ('successful', 'partially_refunded')`),
+    check("payments_amount_positive", sql`${table.amountKobo} > 0`),
+  ],
+);
+
+export const payouts = pgTable(
+  "payouts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "restrict" }),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    paymentId: uuid("payment_id")
+      .notNull()
+      .references(() => payments.id, { onDelete: "restrict" }),
+    amountKobo: integer("amount_kobo").notNull(),
+    status: payoutStatus("status").notNull().default("on_hold"),
+    transferReference: text("transfer_reference"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    paidBy: uuid("paid_by").references(() => users.id, { onDelete: "set null" }),
+    note: text("note"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("payouts_payment_key").on(table.paymentId),
+    index("payouts_vendor_idx").on(table.vendorId, table.status),
+    check("payouts_amount_non_negative", sql`${table.amountKobo} >= 0`),
+  ],
+);
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    channel: text("channel").notNull(),
+    recipient: text("recipient").notNull(),
+    template: text("template").notNull(),
+    body: text("body").notNull(),
+    status: notificationStatus("status").notNull(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("notifications_user_idx").on(table.userId, table.createdAt)],
+);
+
 export type User = typeof users.$inferSelect;
 export type UserRole = (typeof userRole.enumValues)[number];
 export type VendorProfile = typeof vendorProfiles.$inferSelect;
@@ -454,3 +534,5 @@ export type Shipment = typeof shipments.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type BookingEvent = typeof bookingEvents.$inferSelect;
 export type BookingStatus = (typeof bookingStatus.enumValues)[number];
+export type Payment = typeof payments.$inferSelect;
+export type Payout = typeof payouts.$inferSelect;
