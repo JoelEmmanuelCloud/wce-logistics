@@ -112,3 +112,41 @@ export function formatDateTime(value: Date | null | undefined): string {
 export function formatKg(value: number): string {
   return `${new Intl.NumberFormat("en-NG").format(value)} kg`;
 }
+
+export const BOOKING_STATUS: Record<string, { label: string; tone: Tone }> = {
+  pending_vendor_acceptance: { label: "Awaiting vendor", tone: "info" },
+  awaiting_payment: { label: "Awaiting payment", tone: "warning" },
+  confirmed: { label: "Confirmed", tone: "success" },
+  pickup_scheduled: { label: "Pickup scheduled", tone: "success" },
+  goods_collected: { label: "Goods collected", tone: "success" },
+  in_transit: { label: "In transit", tone: "info" },
+  delivery_attempted: { label: "Delivery attempted", tone: "warning" },
+  delivered: { label: "Delivered", tone: "success" },
+  completed: { label: "Completed", tone: "neutral" },
+  rejected: { label: "Declined by vendor", tone: "danger" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+  expired: { label: "Expired", tone: "neutral" },
+  disputed: { label: "Disputed", tone: "danger" },
+};
+
+export const ROUTE_STATUS: Record<string, { label: string; tone: Tone }> = {
+  active: { label: "Open for bookings", tone: "success" },
+  paused: { label: "Paused", tone: "warning" },
+  completed: { label: "Completed", tone: "neutral" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+};
+
+export const SHIPMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
+  open: { label: "Looking for a truck", tone: "info" },
+  booked: { label: "Booked", tone: "success" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+};
+
+export function formatTransit(hours: number): string {
+  if (hours < 24) {
+    return `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+  const days = Math.floor(hours / 24);
+  const rest = hours % 24;
+  return `${days} day${days === 1 ? "" : "s"}${rest ? ` ${rest} h` : ""}`;
+}
