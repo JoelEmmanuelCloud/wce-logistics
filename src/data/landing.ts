@@ -31,11 +31,13 @@ export const SERVICES: ReadonlyArray<{ key: ServiceKey; title: string; summary: 
   },
 ];
 
-export const INDUSTRIES: ReadonlyArray<{ title: string; summary: string }> = [
-  { title: "Construction", summary: "Materials, plant and site equipment" },
-  { title: "Agriculture", summary: "Produce and inputs from farm to market" },
-  { title: "Manufacturing", summary: "Raw materials in, finished goods out" },
-  { title: "Retail and distribution", summary: "Stock moved between warehouses and stores" },
+export type IndustryKey = "construction" | "agriculture" | "manufacturing" | "retail";
+
+export const INDUSTRIES: ReadonlyArray<{ key: IndustryKey; title: string; summary: string }> = [
+  { key: "construction", title: "Construction", summary: "Materials, plant and site equipment" },
+  { key: "agriculture", title: "Agriculture", summary: "Produce and inputs from farm to market" },
+  { key: "manufacturing", title: "Manufacturing", summary: "Raw materials in, finished goods out" },
+  { key: "retail", title: "Retail and distribution", summary: "Stock moved between warehouses and stores" },
 ];
 
 export type Step = { title: string; detail: string };
