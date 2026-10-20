@@ -1,5 +1,5 @@
 import { ContactButton } from "@/components/contact-button";
-import { WceLogo } from "@/components/wce-logo";
+import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
 
 const COMPANY_LINKS = [
@@ -70,6 +70,17 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
             </a>
           </div>
         </div>
+      </div>
+
+      <div aria-hidden="true" className="pointer-events-none mx-auto mt-[clamp(48px,6vw,96px)] w-full max-w-[1760px] select-none overflow-hidden px-[clamp(20px,3.2vw,56px)]">
+        <svg viewBox="0 0 1600 200" className="block h-auto w-full translate-y-[14%] text-white/[0.07]">
+          <g transform="scale(2)">
+            <WceMonogramMarks ink="currentColor" accent="rgb(255 107 0 / 0.35)" />
+          </g>
+          <text x="660" y="180" textLength="940" lengthAdjust="spacingAndGlyphs" className="font-display-wide font-bold" fontSize="196" fill="currentColor">
+            LOGISTICS
+          </text>
+        </svg>
       </div>
 
       <div className="border-t border-white/12">
