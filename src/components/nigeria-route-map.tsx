@@ -70,12 +70,20 @@ export function NigeriaRouteMap({ className }: { className?: string }) {
           </g>
         ))}
       </svg>
-      {BADGES.map(({ label, Icon, x, y }) => (
+      {Object.values(HUBS).map((hub, index) => (
+        <span
+          key={hub.name}
+          aria-hidden="true"
+          className="hub-pulse pointer-events-none absolute aspect-square w-[4.4%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-orange"
+          style={{ left: `${((hub.x + 6) / (WIDTH + 12)) * 100}%`, top: `${((hub.y + 6) / (HEIGHT + 12)) * 100}%`, animationDelay: `${1.6 + index * 0.45}s` }}
+        />
+      ))}
+      {BADGES.map(({ label, Icon, x, y }, index) => (
         <span
           key={label}
           title={label}
-          className="absolute grid aspect-square w-[17%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.25)]"
-          style={{ left: `${((x + 6) / (WIDTH + 12)) * 100}%`, top: `${((y + 6) / (HEIGHT + 12)) * 100}%` }}
+          className="badge-float absolute grid aspect-square w-[17%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.25)]"
+          style={{ left: `${((x + 6) / (WIDTH + 12)) * 100}%`, top: `${((y + 6) / (HEIGHT + 12)) * 100}%`, animationDelay: `${index * -1.7}s` }}
         >
           <Icon className="w-[74%]" />
           <span className="sr-only">{label}</span>

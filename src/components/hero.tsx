@@ -25,25 +25,25 @@ export function Hero({ contactEmail }: { contactEmail: string }) {
 
       <div className="mt-[clamp(32px,7vh,88px)] grid flex-1 content-start gap-10 lg:min-h-0 lg:content-stretch lg:grid-cols-[1fr_minmax(340px,31%)] lg:gap-6">
         <h1 className="font-display whitespace-nowrap uppercase leading-[0.86] text-white text-[clamp(60px,min(17.5vh,10.8vw),220px)]">
-          <span className="block">Across</span>
-          <span className="block pl-[0.62em] text-orange">Every State</span>
-          <span className="block">On Demand</span>
+          <span className="hero-line block [--i:0]">Across</span>
+          <span className="hero-line block pl-[0.62em] text-orange [--i:1]">Every State</span>
+          <span className="hero-line block [--i:2]">On Demand</span>
         </h1>
 
         <div className="flex flex-col lg:min-h-0 lg:pt-1">
-          <p className="text-[clamp(26px,min(4.6vh,2.9vw),56px)] leading-[1.1] tracking-[-0.01em] text-navy">
+          <p className="hero-fade text-[clamp(26px,min(4.6vh,2.9vw),56px)] leading-[1.1] tracking-[-0.01em] text-navy [--d:200ms]">
             <span className="block">Logistics</span>
             <span className="block pl-[2.6em]">built for Nigeria</span>
             <span className="block">run on verified trucks</span>
           </p>
-          <NigeriaRouteMap className="mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-540px)*1.25))] lg:max-w-none" />
-          <p className="mt-4 max-w-[19em] self-end rounded-2xl bg-white/75 px-4 py-3 text-[clamp(15px,min(2.2vh,1.15vw),19px)] leading-[1.3] text-navy backdrop-blur-sm">
+          <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-540px)*1.25))] lg:max-w-none" />
+          <p className="hero-fade [--d:620ms] mt-4 max-w-[19em] self-end rounded-2xl bg-white/75 px-4 py-3 text-[clamp(15px,min(2.2vh,1.15vw),19px)] leading-[1.3] text-navy backdrop-blur-sm">
             We verify every vendor and truck, and track every load from pickup to delivery.
           </p>
         </div>
       </div>
 
-      <div className="mt-10 flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between lg:mt-4">
+      <div className="hero-fade [--d:520ms] mt-10 flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between lg:mt-4">
         <div className="flex items-center gap-[clamp(12px,1.2vw,20px)]">
           <span className="font-display text-[clamp(56px,min(10vh,6.4vw),112px)] leading-[0.85] text-orange">50KG</span>
           <span className="text-[clamp(14px,min(2.2vh,1.2vw),19px)] leading-[1.3] text-white">
