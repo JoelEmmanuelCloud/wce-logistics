@@ -73,7 +73,7 @@ export function TrustSection() {
       <div className="reveal mt-[clamp(56px,7vw,104px)] rounded-[28px] bg-white p-[clamp(24px,3vw,48px)] text-navy">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
           <h3 className="font-display text-[clamp(28px,2.6vw,44px)] uppercase leading-none">Every booking, every status</h3>
-          <p className="text-[15px] text-navy/65">Notifications by SMS, email and in the app at each step</p>
+          <p className="text-[15px] text-navy/70">Email updates and a live booking page at each step</p>
         </div>
         <ol className="status-track mt-10 grid gap-6 sm:grid-cols-5 sm:gap-0">
           {BOOKING_STATUSES.map((status, index) => (
