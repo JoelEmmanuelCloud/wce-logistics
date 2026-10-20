@@ -1,6 +1,8 @@
+import Image from "next/image";
 import { TruckIcon } from "@/components/fleet-icons";
 import { ArrowUpRightIcon, CheckIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { IMAGES } from "@/data/images";
 import { VENDOR_DOCUMENTS } from "@/data/landing";
 
 export function VendorSection({ contactEmail }: { contactEmail: string }) {
@@ -29,22 +31,33 @@ export function VendorSection({ contactEmail }: { contactEmail: string }) {
             </span>
           </a>
         </div>
-        <div className="rounded-[28px] bg-white p-[clamp(24px,2.6vw,40px)] shadow-[0_24px_60px_rgba(11,37,69,0.18)]">
-          <h3 className="font-display text-[clamp(26px,2.2vw,36px)] uppercase leading-none">What you will need</h3>
-          <ul className="mt-6 grid gap-4">
-            {VENDOR_DOCUMENTS.map((document) => (
-              <li key={document} className="flex items-center gap-4 text-[16px]">
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-orange text-navy">
-                  <CheckIcon className="size-4" />
-                </span>
-                {document}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 border-t border-navy/10 pt-5 text-[14px] leading-relaxed text-navy/65">
-            Individual owners, registered logistics companies and authorised fleet operators are welcome. Each truck
-            is reviewed before it can take bookings.
-          </p>
+        <div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
+            <Image
+              src={IMAGES.vendor.src}
+              alt={IMAGES.vendor.alt}
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover object-[center_32%]"
+            />
+          </div>
+          <div className="relative z-10 -mt-[clamp(48px,6vw,96px)] ml-[clamp(16px,3vw,48px)] rounded-[28px] bg-white p-[clamp(24px,2.6vw,40px)] shadow-[0_24px_60px_rgba(11,37,69,0.22)]">
+            <h3 className="font-display text-[clamp(26px,2.2vw,36px)] uppercase leading-none">What you will need</h3>
+            <ul className="mt-6 grid gap-4">
+              {VENDOR_DOCUMENTS.map((document) => (
+                <li key={document} className="flex items-center gap-4 text-[16px]">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-orange text-navy">
+                    <CheckIcon className="size-4" />
+                  </span>
+                  {document}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 border-t border-navy/10 pt-5 text-[14px] leading-relaxed text-navy/65">
+              Individual owners, registered logistics companies and authorised fleet operators are welcome. Each truck
+              is reviewed before it can take bookings.
+            </p>
+          </div>
         </div>
       </div>
     </Section>
