@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/hero";
 import { FaqSection } from "@/components/sections/faq-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
@@ -9,6 +10,11 @@ import { VendorSection } from "@/components/sections/vendor-section";
 import { SiteFooter } from "@/components/site-footer";
 import { StructuredData } from "@/components/structured-data";
 import { site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/" },
+};
 
 export default function Home() {
   const contactEmail = site.contactEmail;

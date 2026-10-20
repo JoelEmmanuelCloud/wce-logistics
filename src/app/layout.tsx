@@ -29,14 +29,12 @@ export const metadata: Metadata = {
   description: site.description,
   applicationName: site.name,
   keywords: site.keywords,
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_NG",
     siteName: site.name,
     title: `${site.name} | ${site.tagline}`,
     description: site.description,
-    url: "/",
   },
   twitter: {
     card: "summary_large_image",
