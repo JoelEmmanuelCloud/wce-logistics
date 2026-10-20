@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   images: {
-    remotePatterns: [new URL("https://images.unsplash.com/reserve/**")],
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
     qualities: [75, 80],
   },
   async headers() {
