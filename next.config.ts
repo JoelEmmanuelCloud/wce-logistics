@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "11mb",
+    },
+  },
   images: {
     loader: "custom",
     loaderFile: "./src/lib/image-loader.ts",
