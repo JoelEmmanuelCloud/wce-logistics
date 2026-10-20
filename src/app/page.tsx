@@ -7,12 +7,14 @@ import { ServicesSection } from "@/components/sections/services-section";
 import { TrustSection } from "@/components/sections/trust-section";
 import { VendorSection } from "@/components/sections/vendor-section";
 import { SiteFooter } from "@/components/site-footer";
+import { StructuredData } from "@/components/structured-data";
 import { site } from "@/lib/site";
 
 export default function Home() {
   const contactEmail = site.contactEmail;
   return (
     <>
+      <StructuredData />
       <main>
         <Hero contactEmail={contactEmail} />
         <ServicesSection />
