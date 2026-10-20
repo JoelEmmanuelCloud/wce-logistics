@@ -1,0 +1,90 @@
+import { LockIcon, ReceiptIcon, ScaleIcon } from "@/components/line-icons";
+import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+
+const FORMULA = [
+  { term: "Chargeable weight", note: "Your declared load in kg" },
+  { operator: "×" },
+  { term: "Rate per kg", note: "Set for your route" },
+  { operator: "+" },
+  { term: "Itemised charges", note: "Loading, handling, extras" },
+  { operator: "=" },
+  { term: "Your total", note: "In naira, before you pay", highlight: true },
+] as const;
+
+const RULES = [
+  {
+    Icon: ScaleIcon,
+    title: "50 kg minimum",
+    detail: "Every shipment starts at 50 kg, so trucks run full enough to keep rates fair for everyone on board.",
+  },
+  {
+    Icon: LockIcon,
+    title: "Your quote is held",
+    detail: "Once your booking is confirmed, later changes to a vendor's rates never touch the price you agreed.",
+  },
+  {
+    Icon: ReceiptIcon,
+    title: "Nothing hidden",
+    detail: "Each additional charge is listed line by line, and you see the final amount before you commit.",
+  },
+];
+
+export function PricingSection() {
+  return (
+    <Section id="pricing" tone="white" labelledBy="pricing-title">
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+        <div>
+          <Eyebrow className="text-orange">Pricing</Eyebrow>
+          <DisplayHeading id="pricing-title" className="mt-5">
+            Priced by
+            <span className="block pl-[0.6em] text-orange">the kilo</span>
+          </DisplayHeading>
+        </div>
+        <p className="max-w-[32em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/75 lg:justify-self-end">
+          No haggling over the phone. Your price comes from one transparent calculation that you can check line by
+          line.
+        </p>
+      </div>
+
+      <div
+        className="mt-[clamp(40px,5vw,72px)] grid items-stretch gap-3 rounded-[28px] bg-sand p-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.15fr]"
+        role="group"
+        aria-label="Price calculation: chargeable weight times rate per kilogram, plus itemised charges, equals your total in naira"
+      >
+        {FORMULA.map((part, index) =>
+          "operator" in part ? (
+            <span
+              key={index}
+              aria-hidden="true"
+              className="grid place-items-center font-display text-[clamp(36px,3vw,52px)] leading-none text-orange lg:px-2"
+            >
+              {part.operator}
+            </span>
+          ) : (
+            <div
+              key={part.term}
+              className={`flex flex-col justify-between gap-6 rounded-[22px] p-[clamp(20px,2vw,32px)] ${"highlight" in part ? "bg-navy text-white" : "bg-white"}`}
+            >
+              <span className="font-display text-[clamp(26px,2.2vw,38px)] uppercase leading-[0.95]">{part.term}</span>
+              <span className={`text-[14px] ${"highlight" in part ? "text-white/70" : "text-navy/60"}`}>{part.note}</span>
+            </div>
+          ),
+        )}
+      </div>
+
+      <ul className="mt-4 grid gap-4 md:grid-cols-3 lg:mt-5 lg:gap-5">
+        {RULES.map(({ Icon, title, detail }) => (
+          <li key={title} className="flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange">
+              <Icon className="size-6" />
+            </span>
+            <div>
+              <h3 className="text-[19px] font-semibold">{title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-navy/70">{detail}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  );
+}
