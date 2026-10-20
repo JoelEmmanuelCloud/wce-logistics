@@ -150,3 +150,18 @@ export function formatTransit(hours: number): string {
   const rest = hours % 24;
   return `${days} day${days === 1 ? "" : "s"}${rest ? ` ${rest} h` : ""}`;
 }
+
+export const PAYMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
+  pending: { label: "Pending", tone: "info" },
+  successful: { label: "Paid", tone: "success" },
+  failed: { label: "Failed", tone: "danger" },
+  refunded: { label: "Refunded", tone: "neutral" },
+  partially_refunded: { label: "Partly refunded", tone: "warning" },
+};
+
+export const PAYOUT_STATUS: Record<string, { label: string; tone: Tone }> = {
+  on_hold: { label: "Held until delivery", tone: "info" },
+  eligible: { label: "Ready to pay", tone: "warning" },
+  paid: { label: "Paid out", tone: "success" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+};
