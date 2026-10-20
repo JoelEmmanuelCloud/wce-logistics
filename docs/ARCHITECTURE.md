@@ -82,6 +82,22 @@ any (except under review or suspended) -> archived
 - Editing an approved truck returns it to draft so it is reviewed again.
 - `npm run jobs:expire-documents` moves active trucks with expired or missing required documents to `expired_documentation`. Approving a replacement document restores them.
 
+## Marketplace
+
+| Table | Purpose |
+|---|---|
+| `routes` | A trip: one truck, origin and destination, departure date, offered capacity, reserved capacity and prices |
+| `shipments` | A shipper's load: addresses, cargo type, weight (at least 50 kg), pickup date, shared or dedicated |
+| `bookings` | A request for a shipment on a trip, with a frozen, itemised quote and a unique reference such as `WCE-7KQ2M9XA` |
+| `booking_events` | Every status change on a booking, with who made it and why |
+
+- Money is stored in kobo as integers. Quotes are chargeable weight times the trip's rate, topped up to the trip's minimum charge when needed, or the trip's whole-truck price for dedicated bookings. The quote is copied onto the booking so later price changes never affect it.
+- Search shows trips from verified vendors on active trucks, between the shipment's states, departing on the pickup date or up to 3 days after, that carry the cargo type and have room for the weight.
+- Requesting a booking locks the shipment and trip rows, rechecks eligibility and capacity, then reserves the weight in the same transaction. Two shippers racing for the last space cannot both succeed.
+- Booking statuses: `pending_vendor_acceptance` to `awaiting_payment` (vendor accepted) to `confirmed` (payment recorded). Declines, cancellations and expiry release the reserved capacity and reopen the shipment.
+- Vendors have 24 hours to answer. `npm run jobs:expire-bookings` closes unanswered requests.
+- Vendors see the shipper's contact details only after accepting.
+
 ## Documents and files
 
 - Uploads are limited to 10 MB. The file type is detected from its content (PDF, JPG, PNG, WebP), not from its name or the browser's claim.
@@ -111,3 +127,5 @@ Termii is the production provider. Messages use the DND channel so codes reach n
 | Drizzle with SQL migrations | Readable migrations that run the same way locally and in production |
 | S3-compatible storage | One code path for local SeaweedFS, AWS S3 and Cloudflare R2 |
 | Partial prefetching disabled | The experimental flag left the address bar out of sync after some redirects |
+| Kobo integers for money | Exact arithmetic with no floating point rounding |
+| Offline payment recording before Paystack | Lets the business operate bookings now, with every payment reference in the audit log |

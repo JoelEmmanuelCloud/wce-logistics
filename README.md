@@ -14,10 +14,11 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 | Authentication | Phone number sign-in with one-time SMS codes, onboarding as shipper or vendor, sessions, sign-out |
 | Vendors | Business profile, encrypted identity details, document uploads, submission for verification |
 | Trucks | Registration, document uploads with expiry dates, photos, submission for review, availability, archiving |
-| Administration | Review queues, vendor and truck decisions, document review, user suspension, audit log |
-| Operations | Daily job that flags trucks with expired documents, command to create administrators |
+| Administration | Review queues, vendor and truck decisions, document review, user suspension, booking oversight, offline payment recording, audit log |
+| Marketplace | Vendors publish trips with capacity and per-kilogram pricing. Shippers describe a load, compare verified trucks with itemised prices, and request a booking. Vendors accept or decline. Capacity is reserved safely under concurrent requests |
+| Operations | Jobs that flag trucks with expired documents and expire unanswered booking requests, command to create administrators |
 
-Booking, pricing quotes, payments (Paystack), driver management and disputes are later phases in the PRD.
+Online payments (Paystack), driver assignment, delivery tracking, ratings and disputes are later phases in the PRD. Until Paystack is connected, administrators confirm bookings by recording bank transfer references.
 
 ## Stack
 
@@ -92,11 +93,13 @@ npm run admin:create -- --phone 08031234567 --name "Ada Obi"
 | `npm run storage:setup` | Create the private documents bucket |
 | `npm run admin:create` | Create or promote an administrator |
 | `npm run jobs:expire-documents` | Flag trucks whose required documents have expired |
+| `npm run jobs:expire-bookings` | Expire booking requests the vendor did not answer within 24 hours and release their capacity |
 
 ## Production operations
 
 - Run `npm run db:migrate` before each deployment that includes new migrations.
 - Schedule `npm run jobs:expire-documents` to run daily, for example at 00:30 Africa/Lagos.
+- Schedule `npm run jobs:expire-bookings` to run every 15 minutes.
 - Keep the documents bucket private. Files are only ever served through short-lived signed links after an authorization check.
 - Serve the app behind HTTPS. Session cookies use the `__Host-` prefix and the `Secure` flag in production.
 - The app reads the client address from `X-Forwarded-For` for rate limiting and the audit log, so deploy it behind a proxy that sets that header.
