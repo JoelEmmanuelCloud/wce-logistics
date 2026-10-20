@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   check,
   date,
   index,
@@ -293,6 +294,153 @@ export const auditLogs = pgTable(
   ],
 );
 
+export const routeStatus = pgEnum("route_status", ["active", "paused", "completed", "cancelled"]);
+export const shipmentStatus = pgEnum("shipment_status", ["open", "booked", "cancelled"]);
+export const bookingType = pgEnum("booking_type", ["shared", "dedicated"]);
+export const bookingStatus = pgEnum("booking_status", [
+  "pending_vendor_acceptance",
+  "awaiting_payment",
+  "confirmed",
+  "pickup_scheduled",
+  "goods_collected",
+  "in_transit",
+  "delivery_attempted",
+  "delivered",
+  "completed",
+  "rejected",
+  "cancelled",
+  "expired",
+  "disputed",
+]);
+
+export const routes = pgTable(
+  "routes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    truckId: uuid("truck_id")
+      .notNull()
+      .references(() => trucks.id, { onDelete: "restrict" }),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    originState: text("origin_state").notNull(),
+    originCity: text("origin_city").notNull(),
+    destinationState: text("destination_state").notNull(),
+    destinationCity: text("destination_city").notNull(),
+    departureDate: date("departure_date").notNull(),
+    transitHours: integer("transit_hours").notNull(),
+    capacityKg: integer("capacity_kg").notNull(),
+    reservedKg: integer("reserved_kg").notNull().default(0),
+    allowsShared: boolean("allows_shared").notNull().default(true),
+    ratePerKgKobo: integer("rate_per_kg_kobo").notNull(),
+    minimumChargeKobo: integer("minimum_charge_kobo").notNull().default(0),
+    dedicatedPriceKobo: integer("dedicated_price_kobo"),
+    status: routeStatus("status").notNull().default("active"),
+    ...timestamps,
+  },
+  (table) => [
+    index("routes_search_idx").on(table.originState, table.destinationState, table.departureDate, table.status),
+    index("routes_truck_idx").on(table.truckId, table.departureDate),
+    index("routes_vendor_idx").on(table.vendorId),
+    check("routes_capacity_positive", sql`${table.capacityKg} > 0`),
+    check("routes_reserved_within_capacity", sql`${table.reservedKg} between 0 and ${table.capacityKg}`),
+    check("routes_rate_positive", sql`${table.ratePerKgKobo} > 0`),
+    check("routes_transit_positive", sql`${table.transitHours} between 1 and 240`),
+  ],
+);
+
+export const shipments = pgTable(
+  "shipments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    originState: text("origin_state").notNull(),
+    originCity: text("origin_city").notNull(),
+    originAddress: text("origin_address").notNull(),
+    destinationState: text("destination_state").notNull(),
+    destinationCity: text("destination_city").notNull(),
+    destinationAddress: text("destination_address").notNull(),
+    cargoType: text("cargo_type").notNull(),
+    description: text("description").notNull(),
+    weightKg: integer("weight_kg").notNull(),
+    packageCount: integer("package_count").notNull(),
+    declaredValueKobo: integer("declared_value_kobo"),
+    pickupDate: date("pickup_date").notNull(),
+    handlingNotes: text("handling_notes"),
+    bookingType: bookingType("booking_type").notNull(),
+    status: shipmentStatus("status").notNull().default("open"),
+    ...timestamps,
+  },
+  (table) => [
+    index("shipments_customer_idx").on(table.customerId, table.createdAt),
+    check("shipments_minimum_weight", sql`${table.weightKg} >= 50`),
+    check("shipments_packages_positive", sql`${table.packageCount} > 0`),
+  ],
+);
+
+export const bookings = pgTable(
+  "bookings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reference: text("reference").notNull(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "restrict" }),
+    routeId: uuid("route_id")
+      .notNull()
+      .references(() => routes.id, { onDelete: "restrict" }),
+    truckId: uuid("truck_id")
+      .notNull()
+      .references(() => trucks.id, { onDelete: "restrict" }),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    type: bookingType("type").notNull(),
+    status: bookingStatus("status").notNull().default("pending_vendor_acceptance"),
+    reservedKg: integer("reserved_kg").notNull(),
+    chargeableWeightKg: integer("chargeable_weight_kg").notNull(),
+    ratePerKgKobo: integer("rate_per_kg_kobo").notNull(),
+    lineItems: jsonb("line_items").$type<Array<{ label: string; amountKobo: number }>>().notNull(),
+    totalKobo: integer("total_kobo").notNull(),
+    currency: text("currency").notNull().default("NGN"),
+    responseDueAt: timestamp("response_due_at", { withTimezone: true }).notNull(),
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
+    statusNote: text("status_note"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("bookings_reference_key").on(table.reference),
+    index("bookings_customer_idx").on(table.customerId, table.createdAt),
+    index("bookings_vendor_idx").on(table.vendorId, table.status),
+    index("bookings_route_idx").on(table.routeId),
+    index("bookings_status_due_idx").on(table.status, table.responseDueAt),
+    uniqueIndex("bookings_one_active_per_shipment_key")
+      .on(table.shipmentId)
+      .where(sql`${table.status} not in ('rejected', 'cancelled', 'expired')`),
+    check("bookings_total_positive", sql`${table.totalKobo} > 0`),
+  ],
+);
+
+export const bookingEvents = pgTable(
+  "booking_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "cascade" }),
+    status: bookingStatus("status").notNull(),
+    actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("booking_events_booking_idx").on(table.bookingId, table.createdAt)],
+);
+
 export type User = typeof users.$inferSelect;
 export type UserRole = (typeof userRole.enumValues)[number];
 export type VendorProfile = typeof vendorProfiles.$inferSelect;
@@ -301,3 +449,8 @@ export type Truck = typeof trucks.$inferSelect;
 export type TruckDocument = typeof truckDocuments.$inferSelect;
 export type TruckPhoto = typeof truckPhotos.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
+export type Route = typeof routes.$inferSelect;
+export type Shipment = typeof shipments.$inferSelect;
+export type Booking = typeof bookings.$inferSelect;
+export type BookingEvent = typeof bookingEvents.$inferSelect;
+export type BookingStatus = (typeof bookingStatus.enumValues)[number];

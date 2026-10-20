@@ -20,7 +20,7 @@ async function ensureDatabase() {
   try {
     await migrate(drizzle(client), { migrationsFolder: "./drizzle" });
     await client.unsafe(
-      "truncate table audit_logs, truck_photos, truck_documents, trucks, vendor_documents, vendor_profiles, otp_challenges, sessions, users restart identity cascade",
+      "truncate table booking_events, bookings, shipments, routes, audit_logs, truck_photos, truck_documents, trucks, vendor_documents, vendor_profiles, otp_challenges, sessions, users restart identity cascade",
     );
   } finally {
     await client.end();
