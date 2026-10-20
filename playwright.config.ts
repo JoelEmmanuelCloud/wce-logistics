@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { e2ePort, fakeTermiiPort, testEnv } from "./e2e/support/env";
+import { e2ePort, fakeResendPort, testEnv } from "./e2e/support/env";
 
 const baseURL = `http://localhost:${e2ePort}`;
 
@@ -23,10 +23,10 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "npx tsx e2e/support/fake-termii.ts",
-      url: `http://127.0.0.1:${fakeTermiiPort}/health`,
+      command: "npx tsx e2e/support/fake-resend.ts",
+      url: `http://127.0.0.1:${fakeResendPort}/health`,
       reuseExistingServer: !process.env.CI,
-      env: { FAKE_TERMII_PORT: String(fakeTermiiPort) },
+      env: { FAKE_RESEND_PORT: String(fakeResendPort) },
     },
     {
       command: `npm run build && npm run start -- -p ${e2ePort}`,

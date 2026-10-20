@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import type postgres from "postgres";
 import { NIGERIAN_STATES } from "../src/data/nigeria-states";
-import { createSessionFor, expect, test, type TestUser } from "./support/fixtures";
+import { createSessionFor, emailsTo, expect, test, type TestUser } from "./support/fixtures";
 
 function corridor(): [string, string] {
   const from = NIGERIAN_STATES[Math.floor(Math.random() * NIGERIAN_STATES.length)];
@@ -118,6 +118,8 @@ test.describe("marketplace", () => {
 
     await shipperPage.reload();
     await expect(shipperPage.getByText("Pay ₦12,000 to confirm")).toBeVisible();
+    await expect.poll(async () => (await emailsTo(shipper.email)).map((email) => email.subject)).toContain(`Booking ${reference} accepted`);
+    await expect.poll(async () => (await emailsTo(vendorUser.email)).map((email) => email.subject)).toContain(`New booking request ${reference}`);
 
     const admin = await createUser("admin", "Finance Admin");
     const adminContext = await browser.newContext();
@@ -133,6 +135,7 @@ test.describe("marketplace", () => {
 
     await shipperPage.reload();
     await expect(shipperPage.getByText("Booking confirmed")).toBeVisible();
+    await expect.poll(async () => (await emailsTo(shipper.email)).map((email) => email.subject)).toContain(`Booking ${reference} confirmed`);
     await expect(shipperPage.getByText("Payment received offline. Reference: GTB-TRF-889201")).toBeVisible();
     await shipperContext.close();
   });

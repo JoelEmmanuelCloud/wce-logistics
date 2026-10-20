@@ -1,11 +1,11 @@
 import { test as base, expect, type Page } from "@playwright/test";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import postgres from "postgres";
-import { e2ePort, fakeTermiiPort, testEnv } from "./env";
+import { e2ePort, fakeResendPort, testEnv } from "./env";
 
 type Role = "customer" | "vendor" | "admin";
 
-export type TestUser = { id: string; phone: string; fullName: string };
+export type TestUser = { id: string; email: string; phone: string; fullName: string };
 
 type Fixtures = {
   sql: postgres.Sql;
@@ -17,17 +17,26 @@ export function uniquePhone(): string {
   return `+234803${randomInt(1_000_000, 9_999_999)}`;
 }
 
-export async function readOtp(phone: string): Promise<string> {
+export function uniqueEmail(prefix = "user"): string {
+  return `${prefix}.${Date.now()}.${randomInt(100_000, 999_999)}@example.com`;
+}
+
+export type SentEmail = { to: string[]; subject: string; text: string; html: string };
+
+export async function emailsTo(email: string): Promise<SentEmail[]> {
+  const response = await fetch(`http://127.0.0.1:${fakeResendPort}/messages?to=${encodeURIComponent(email)}`);
+  return (await response.json()) as SentEmail[];
+}
+
+export async function readOtp(email: string): Promise<string> {
   for (let attempt = 0; attempt < 20; attempt += 1) {
-    const response = await fetch(`http://127.0.0.1:${fakeTermiiPort}/messages?to=${phone.replace(/^\+/, "")}`);
-    const messages = (await response.json()) as Array<{ sms: string }>;
-    const code = messages.at(-1)?.sms.match(/code is (\d{6})/)?.[1];
+    const code = (await emailsTo(email)).at(-1)?.subject.match(/^(\d{6}) is your WCE Logistics sign-in code$/)?.[1];
     if (code) {
       return code;
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error(`No code was sent to ${phone}`);
+  throw new Error(`No code was emailed to ${email}`);
 }
 
 export async function createSessionFor(sql: postgres.Sql, page: Page, userId: string) {
@@ -47,11 +56,12 @@ export const test = base.extend<Fixtures>({
   },
   createUser: async ({ sql }, provide) => {
     await provide(async (role, fullName = "Test User") => {
+      const email = uniqueEmail(role ?? "new");
       const phone = uniquePhone();
       const [user] = await sql<{ id: string }[]>`
-        insert into users (phone, full_name, role) values (${phone}, ${role === null ? null : fullName}, ${role})
+        insert into users (email, phone, full_name, role) values (${email}, ${role === null ? null : phone}, ${role === null ? null : fullName}, ${role})
         returning id`;
-      return { id: user.id, phone, fullName };
+      return { id: user.id, email, phone, fullName };
     });
   },
   signInAs: async ({ sql, page, createUser }, provide) => {

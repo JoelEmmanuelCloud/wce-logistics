@@ -1,48 +1,58 @@
-import { expect, readOtp, test, uniquePhone } from "./support/fixtures";
+import { emailsTo, expect, readOtp, test, uniqueEmail } from "./support/fixtures";
 
-test.describe("phone sign-in", () => {
+test.describe("email sign-in", () => {
   test.skip(({ isMobile }) => isMobile, "flow is covered on desktop");
 
-  test("new user verifies a code, completes onboarding and lands on the vendor dashboard", async ({ page }) => {
+  test("new user verifies an emailed code, completes onboarding and lands on the vendor dashboard", async ({ page }) => {
     test.slow();
-    const phone = uniquePhone();
-    const local = `0${phone.slice(4)}`;
+    const email = uniqueEmail("chinedu");
 
     await page.goto("/sign-in");
-    await page.getByLabel("Mobile number").fill(local);
+    await page.getByLabel("Email address").fill(`  ${email.toUpperCase()} `);
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText(/We sent a 6-digit code/)).toBeVisible();
+    await expect(page.getByText(/We emailed a 6-digit code/)).toBeVisible();
 
-    const code = await readOtp(phone);
+    const code = await readOtp(email);
+    const [message] = await emailsTo(email);
+    expect(message.text).toContain(code);
+    expect(message.html).toContain(code);
+    expect(message.html).not.toContain("<script");
+
     await page.getByLabel("Verification code").fill(code);
     await page.getByRole("button", { name: "Verify and continue" }).click();
     await expect(page).toHaveURL(/\/onboarding$/);
+    await expect(page.getByText(email)).toBeVisible();
 
     await page.getByRole("button", { name: "Create my account" }).click();
     await expect(page.getByText("Choose how you will use WCE Logistics.")).toBeVisible();
 
     await page.getByLabel("I own or manage trucks").check();
     await page.getByLabel("Full name").fill("Chinedu Eze");
+    await page.getByLabel("Mobile number").fill("12345");
+    await page.getByRole("button", { name: "Create my account" }).click();
+    await expect(page.getByText(/Enter a valid mobile number/)).toBeVisible();
+
+    await page.getByLabel("Mobile number").fill("0803 555 0101");
     await page.getByRole("button", { name: "Create my account" }).click();
     await expect(page).toHaveURL(/\/vendor$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome, Chinedu");
   });
 
-  test("rejects an invalid phone number", async ({ page }) => {
+  test("rejects an invalid email address", async ({ page }) => {
     await page.goto("/sign-in");
-    await page.getByLabel("Mobile number").fill("12345");
+    await page.getByLabel("Email address").fill("not-an-email");
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText(/Enter a valid mobile number/)).toBeVisible();
+    await expect(page.getByText(/Enter a valid email address/)).toBeVisible();
   });
 
   test("rejects a wrong code and locks after repeated failures", async ({ page }) => {
     test.slow();
-    const phone = uniquePhone();
+    const email = uniqueEmail("locked");
     await page.goto("/sign-in");
-    await page.getByLabel("Mobile number").fill(phone);
+    await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText(/We sent a 6-digit code/)).toBeVisible();
-    const code = await readOtp(phone);
+    await expect(page.getByText(/We emailed a 6-digit code/)).toBeVisible();
+    const code = await readOtp(email);
     const wrong = code === "000000" ? "111111" : "000000";
 
     const submitCode = async (value: string) => {
@@ -67,11 +77,23 @@ test.describe("phone sign-in", () => {
   });
 
   test("limits how often a code can be resent", async ({ page }) => {
-    const phone = uniquePhone();
+    const email = uniqueEmail("resend");
     await page.goto("/sign-in");
-    await page.getByLabel("Mobile number").fill(phone);
+    await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("button", { name: /Resend code in \d+s/ })).toBeDisabled();
+  });
+
+  test("an existing user signs straight in", async ({ page, createUser }) => {
+    const existing = await createUser("customer", "Returning Shipper");
+    await page.goto("/sign-in");
+    await page.getByLabel("Email address").fill(existing.email);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText(/We emailed a 6-digit code/)).toBeVisible();
+    await page.getByLabel("Verification code").fill(await readOtp(existing.email));
+    await page.getByRole("button", { name: "Verify and continue" }).click();
+    await expect(page).toHaveURL(/\/account$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome, Returning");
   });
 });
 
@@ -120,16 +142,18 @@ test.describe("access control", () => {
 test.describe("shipper account", () => {
   test.skip(({ isMobile }) => isMobile, "covered on desktop");
 
-  test("updates account details and validates email", async ({ page, signInAs }) => {
-    await signInAs("customer", { fullName: "Bola Ade" });
+  test("updates account details and validates the phone number", async ({ page, signInAs }) => {
+    const user = await signInAs("customer", { fullName: "Bola Ade" });
     await page.goto("/account");
-    await page.getByLabel("Email address").fill("not-an-email");
+    await expect(page.getByLabel("Email address")).toHaveValue(user.email);
+    await expect(page.getByLabel("Email address")).toBeDisabled();
+    await page.getByLabel("Mobile number").fill("123");
     await page.getByRole("button", { name: "Save details" }).click();
-    await expect(page.getByText("Enter a valid email address.")).toBeVisible();
-    await expect(page.getByLabel("Email address")).toHaveValue("not-an-email");
+    await expect(page.getByText(/Enter a valid mobile number/)).toBeVisible();
+    await expect(page.getByLabel("Mobile number")).toHaveValue("123");
 
     await page.getByLabel("Full name").fill("Bolaji Adeyemi");
-    await page.getByLabel("Email address").fill(`bolaji.${Date.now()}@example.com`);
+    await page.getByLabel("Mobile number").fill("0805 222 3344");
     await page.getByRole("button", { name: "Save details" }).click();
     await expect(page.getByText("Account details saved.")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome, Bolaji");

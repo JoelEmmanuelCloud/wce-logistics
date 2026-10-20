@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { maskPhone, normalizePhone } from "@/lib/phone";
+import { formatPhone, normalizePhone } from "@/lib/phone";
 
 describe("normalizePhone", () => {
   it.each([
@@ -17,8 +17,9 @@ describe("normalizePhone", () => {
   });
 });
 
-describe("maskPhone", () => {
-  it("keeps the country code and last three digits", () => {
-    expect(maskPhone("+2348031234567")).toBe("+234•••••••567");
+describe("formatPhone", () => {
+  it("formats stored numbers and handles missing ones", () => {
+    expect(formatPhone("+2348031234567")).toBe("+234 803 123 4567");
+    expect(formatPhone(null)).toBe("Not provided");
   });
 });
