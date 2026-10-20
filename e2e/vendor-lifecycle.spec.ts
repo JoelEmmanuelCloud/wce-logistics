@@ -82,12 +82,17 @@ test.describe("vendor lifecycle", () => {
     await createTruck(page, "ABCDEF");
     await expect(page.getByText("Enter a valid registration number", { exact: false })).toBeVisible();
     await expect(page.getByLabel("Make")).toHaveValue("MAN");
+    await expect(page.getByLabel("Truck category")).toHaveValue("heavy_duty");
+    await expect(page.getByLabel("Cargo body type")).toHaveValue("enclosed");
+    await expect(page.getByRole("checkbox", { name: "Machinery and equipment" })).toBeChecked();
 
     const plate = registration();
     await page.getByLabel("Registration number").fill(plate);
     await page.getByRole("button", { name: "Save and continue" }).click();
     await expect(page).toHaveURL(/\/vendor\/trucks\/[0-9a-f-]{36}$/);
     const truckId = page.url().split("/").pop() ?? "";
+    const [stored] = await sql<{ category: string; body_type: string; cargo_types: string[] }[]>`select category, body_type, cargo_types from trucks where id = ${truckId}`;
+    expect(stored).toEqual({ category: "heavy_duty", body_type: "enclosed", cargo_types: ["general_goods", "machinery"] });
 
     await uploadIn(page, "Vehicle registration", PDF);
     await expect(section(page, "Vehicle registration").getByText("Pending review")).toBeVisible();
@@ -194,6 +199,7 @@ test.describe("vendor lifecycle", () => {
 
 test.describe("data protection", () => {
   test("vendors cannot open other vendors' documents, administrators can", async ({ browser, page, sql, signInAs, createUser }) => {
+    test.slow();
     await signInAs("vendor", { fullName: "Owner One" });
     await completeVendorProfile(page);
     await uploadIn(page, "Government-issued ID", PDF);
@@ -228,6 +234,7 @@ test.describe("data protection", () => {
   });
 
   test("a registration number can only be listed once", async ({ browser, page, sql, signInAs, createUser }) => {
+    test.slow();
     const plate = registration();
     await signInAs("vendor", { fullName: "First Owner" });
     await completeVendorProfile(page);

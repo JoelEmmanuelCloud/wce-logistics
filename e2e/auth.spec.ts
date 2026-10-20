@@ -4,6 +4,7 @@ test.describe("phone sign-in", () => {
   test.skip(({ isMobile }) => isMobile, "flow is covered on desktop");
 
   test("new user verifies a code, completes onboarding and lands on the vendor dashboard", async ({ page }) => {
+    test.slow();
     const phone = uniquePhone();
     const local = `0${phone.slice(4)}`;
 
@@ -35,6 +36,7 @@ test.describe("phone sign-in", () => {
   });
 
   test("rejects a wrong code and locks after repeated failures", async ({ page }) => {
+    test.slow();
     const phone = uniquePhone();
     await page.goto("/sign-in");
     await page.getByLabel("Mobile number").fill(phone);

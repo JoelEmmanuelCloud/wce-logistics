@@ -33,27 +33,18 @@ test.describe("landing page", () => {
     }
   });
 
-  test("all images load", async ({ page }) => {
+  test("every image resolves to a real image", async ({ page }) => {
     test.slow();
     await page.goto("/");
-    await page.evaluate(async () => {
-      document.documentElement.style.scrollBehavior = "auto";
-      for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight / 2) {
-        window.scrollTo(0, y);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    });
-    await expect
-      .poll(
-        () =>
-          page.evaluate(() =>
-            Array.from(document.images)
-              .filter((image) => !image.complete || image.naturalWidth === 0)
-              .map((image) => image.alt),
-          ),
-        { timeout: 45_000 },
-      )
-      .toEqual([]);
+    const sources = await page.evaluate(() => [...new Set(Array.from(document.images).map((image) => image.currentSrc || image.src))]);
+    expect(sources.length).toBeGreaterThan(10);
+    const results = await Promise.all(
+      sources.map(async (source) => {
+        const response = await page.request.get(source);
+        return { source, ok: response.ok(), type: response.headers()["content-type"] ?? "" };
+      }),
+    );
+    expect(results.filter((result) => !result.ok || !result.type.startsWith("image/"))).toEqual([]);
   });
 
   test("how it works tabs switch by click and arrow keys", async ({ page }) => {
