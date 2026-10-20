@@ -113,10 +113,20 @@ any (except under review or suspended) -> archived
 
 Resend delivers sign-in codes and notifications. Every email has a plain text and a branded HTML version. Notifications are sent after the response with `after()`, so a slow or failing email provider never blocks a booking, and every attempt is recorded in the `notifications` table with its outcome. The `log` provider prints emails to the server console for local development and refuses to run when `NODE_ENV` is `production`.
 
+## Payments
+
+- Paying starts from the booking page. The server creates a `payments` row with a unique reference (`<booking reference>-<6 characters>`), then sends the shopper to Paystack checkout.
+- Payment state is only ever changed after the server calls Paystack's verify endpoint. The browser callback and the `charge.success` webhook both run the same settlement, which locks the payment and booking rows, so whichever arrives first settles it and the other is a no-op.
+- Settlement checks the reference, amount and currency against the stored payment. A mismatch fails the payment and writes an audit entry.
+- A payment that succeeds after the booking was cancelled or expired is kept as successful and flagged for refund on the admin Payments page.
+- Webhooks are rejected with 401 unless the `x-paystack-signature` HMAC-SHA512 matches the secret key, compared in constant time.
+- On success the commission (`PLATFORM_COMMISSION_BPS`) and vendor share are stored on the payment, and a payout row holds the vendor share until an administrator records the bank transfer.
+- Refunds are issued from the admin Payments page through the Paystack refund API, and the related payout is cancelled.
+
 ## Testing
 
-- Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing and truck document rules.
-- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket and a local Resend-compatible email server, so the real email code path runs. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control and duplicate registration numbers, on desktop and mobile Chrome.
+- Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing, commission splits, webhook signatures and truck document rules.
+- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server, so the real email and payment code paths run. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds and payouts, on desktop and mobile Chrome.
 
 ## Decisions
 
@@ -128,4 +138,5 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 | S3-compatible storage | One code path for local SeaweedFS, AWS S3 and Cloudflare R2 |
 | Partial prefetching disabled | The experimental flag left the address bar out of sync after some redirects |
 | Kobo integers for money | Exact arithmetic with no floating point rounding |
-| Offline payment recording before Paystack | Lets the business operate bookings now, with every payment reference in the audit log |
+| Paystack with offline recording as a fallback | Card, transfer and USSD checkout for shippers, while bank transfers outside Paystack can still confirm a booking with the reference in the audit log |
+| Verify before trusting any payment signal | Callback query strings and webhooks can be replayed or forged, so only Paystack's verify response changes payment state |

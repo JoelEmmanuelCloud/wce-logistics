@@ -17,9 +17,10 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 | Trucks | Registration, document uploads with expiry dates, photos, submission for review, availability, archiving |
 | Administration | Review queues, vendor and truck decisions, document review, user suspension, booking oversight, offline payment recording, audit log |
 | Marketplace | Vendors publish trips with capacity and per-kilogram pricing. Shippers describe a load, compare verified trucks with itemised prices, and request a booking. Vendors accept or decline. Capacity is reserved safely under concurrent requests |
+| Payments | Paystack checkout for accepted bookings, verified server side through the callback and a signed webhook. A platform commission is split from each payment, vendor payouts are tracked until paid, and refunds go back through Paystack. Bank transfers can still be recorded by administrators |
 | Operations | Jobs that flag trucks with expired documents and expire unanswered booking requests, command to create administrators |
 
-Online payments (Paystack), driver assignment, delivery tracking, ratings and disputes are later phases in the PRD. Until Paystack is connected, administrators confirm bookings by recording bank transfer references.
+Driver assignment, delivery tracking, ratings and disputes are later phases in the PRD. Without a Paystack key, online checkout is hidden and administrators confirm bookings by recording bank transfer references.
 
 ## Stack
 
@@ -107,6 +108,8 @@ npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 - Schedule `npm run jobs:expire-bookings` to run every 15 minutes.
 - Keep the documents bucket private. Files are only ever served through short-lived signed links after an authorization check.
 - Serve the app behind HTTPS. Session cookies use the `__Host-` prefix and the `Secure` flag in production.
+- In the Paystack dashboard, set the webhook URL to `https://<your domain>/api/webhooks/paystack`. The callback URL is sent with each transaction, so it needs no dashboard setting.
+- Set `PLATFORM_COMMISSION_BPS` to the agreed commission in basis points (1000 is 10%).
 - The app reads the client address from `X-Forwarded-For` for rate limiting and the audit log, so deploy it behind a proxy that sets that header.
 
 ## Credits
