@@ -50,6 +50,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
               items={[
                 { label: "Legal name", value: vendor.legalName },
                 { label: "Business name", value: vendor.businessName },
+                { label: "Sign-in email", value: user.email },
                 { label: "Account phone", value: formatPhone(user.phone) },
                 { label: "Business email", value: vendor.email },
                 { label: "Address", value: `${vendor.addressLine}, ${vendor.city}, ${vendor.state}` },

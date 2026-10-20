@@ -23,7 +23,7 @@ export default async function AdminVendorsPage({ searchParams }: PageProps<"/adm
       <PageHeader eyebrow="Verification" title="Vendors" description="Review identity and business documents, then verify, request information or decline." />
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <FilterTabs base="/admin/vendors" filters={VENDOR_FILTERS} active={status} query={query} />
-        <SearchForm base="/admin/vendors" status={status} query={query} placeholder="Name, business, phone or CAC" />
+        <SearchForm base="/admin/vendors" status={status} query={query} placeholder="Name, business, email, phone or CAC" />
       </div>
       <DataTable caption="Vendors" headers={["Vendor", "Category", "Phone", "Operating states", "Submitted", "Status"]}>
         {result.rows.length === 0 ? (

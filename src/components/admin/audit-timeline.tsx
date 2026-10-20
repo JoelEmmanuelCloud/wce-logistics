@@ -1,8 +1,7 @@
 import { formatDateTime } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import type { AuditLog } from "@/server/db/schema";
 
-type Entry = { log: AuditLog; actorName: string | null; actorPhone: string | null; actorRole: string | null };
+type Entry = { log: AuditLog; actorName: string | null; actorEmail: string | null; actorRole: string | null };
 
 export function describeAction(action: string): string {
   const [subject, verb] = action.split(".");
@@ -10,11 +9,11 @@ export function describeAction(action: string): string {
   return `${subjectLabel.charAt(0).toUpperCase()}${subjectLabel.slice(1)} ${(verb ?? "").replaceAll("_", " ")}`.trim();
 }
 
-export function actorLabel(entry: Pick<Entry, "actorName" | "actorPhone" | "actorRole">): string {
-  if (!entry.actorName && !entry.actorPhone) {
+export function actorLabel(entry: Pick<Entry, "actorName" | "actorEmail" | "actorRole">): string {
+  if (!entry.actorName && !entry.actorEmail) {
     return "System";
   }
-  const who = entry.actorName ?? formatPhone(entry.actorPhone ?? "");
+  const who = entry.actorName ?? entry.actorEmail ?? "";
   return entry.actorRole === "admin" ? `${who} (admin)` : who;
 }
 

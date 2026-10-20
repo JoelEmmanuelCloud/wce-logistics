@@ -96,6 +96,7 @@ export async function listVendorsForAdmin({ filter, query, page }: { filter: Ven
         ilike(schema.vendorProfiles.legalName, pattern),
         ilike(schema.vendorProfiles.businessName, pattern),
         ilike(schema.users.phone, pattern),
+        ilike(schema.users.email, pattern),
         ilike(schema.vendorProfiles.cacNumber, pattern),
       ) as SQL,
     );
@@ -222,7 +223,7 @@ export async function listAuditLogs({ page, entityId }: { page: number; entityId
   const database = db();
   const [rows, totals] = await Promise.all([
     database
-      .select({ log: schema.auditLogs, actorName: actors.fullName, actorPhone: actors.phone, actorRole: actors.role })
+      .select({ log: schema.auditLogs, actorName: actors.fullName, actorEmail: actors.email, actorRole: actors.role })
       .from(schema.auditLogs)
       .leftJoin(actors, eq(actors.id, schema.auditLogs.actorId))
       .where(where)

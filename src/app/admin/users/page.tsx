@@ -37,7 +37,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
       <PageHeader eyebrow="Accounts" title="Users" description="Suspending a user signs them out everywhere and blocks future sign-ins." />
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <FilterTabs base="/admin/users" filters={ROLE_FILTERS} active={role} query={query} />
-        <SearchForm base="/admin/users" status={role} query={query} placeholder="Name, phone or email" />
+        <SearchForm base="/admin/users" status={role} query={query} placeholder="Name, email or phone" />
       </div>
       <DataTable caption="Users" headers={["Name", "Phone", "Role", "Joined", "Last sign-in", "Status", ""]}>
         {result.rows.length === 0 ? (
@@ -70,7 +70,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
                       className={`text-[13px] font-semibold underline underline-offset-4 ${user.status === "active" ? "text-[#912018]" : "text-navy"}`}
                     >
                       {user.status === "active" ? "Suspend" : "Reactivate"}
-                      <span className="sr-only"> {user.fullName ?? formatPhone(user.phone)}</span>
+                      <span className="sr-only"> {user.fullName ?? user.email}</span>
                     </button>
                   </form>
                 )}
