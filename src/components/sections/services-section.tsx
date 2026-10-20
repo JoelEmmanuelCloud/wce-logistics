@@ -30,7 +30,7 @@ const CARD_STYLES: Record<ServiceKey, { card: string; tag: string; layout: strin
 };
 
 function OnDemandIcon({ className }: { className?: string }) {
-  return <ClockIcon className={`${className ?? ""} text-orange`} />;
+  return <ClockIcon className={`${className ?? ""} text-orange-deep`} />;
 }
 
 const ICONS: Record<ServiceKey, ComponentType<{ className?: string }>> = {
@@ -45,9 +45,9 @@ export function ServicesSection() {
     <Section id="services" tone="white" labelledBy="services-title">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange">Services</Eyebrow>
+          <Eyebrow className="text-orange-ink">Services</Eyebrow>
           <DisplayHeading id="services-title" className="mt-5">
-            What we <span className="text-orange">move</span>
+            What we <span className="text-orange-deep">move</span>
           </DisplayHeading>
         </div>
         <p className="max-w-[34em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/75 lg:justify-self-end">
@@ -72,7 +72,7 @@ export function ServicesSection() {
                   src={image.src}
                   alt={image.alt}
                   fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes={featured || service.key === "onDemand" ? "(min-width: 1760px) 960px, (min-width: 1024px) 56vw, 94vw" : "(min-width: 1760px) 690px, (min-width: 1024px) 40vw, 94vw"}
                   className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                 />
                 <span className="absolute bottom-4 left-4 grid size-[clamp(56px,4.6vw,72px)] place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(11,37,69,0.3)]">
@@ -85,7 +85,7 @@ export function ServicesSection() {
                 >
                   {service.title}
                 </h3>
-                <p className={`mt-4 max-w-[34em] leading-relaxed ${featured ? "text-[clamp(16px,1.25vw,19px)] text-white/80" : "text-[16px] opacity-80"}`}>
+                <p className={`mt-4 max-w-[34em] leading-relaxed ${featured ? "text-[clamp(16px,1.25vw,19px)] text-white/80" : "text-[16px] opacity-90"}`}>
                   {service.detail}
                 </p>
                 <ul className="mt-6 flex flex-wrap gap-2">

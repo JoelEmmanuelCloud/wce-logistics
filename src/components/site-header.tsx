@@ -140,7 +140,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
       >
         {menus.map((menu) => (
           <section key={menu.label} className="border-b border-navy/10 py-2 last:border-b-0">
-            <h2 className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-[0.14em] text-orange">{menu.label}</h2>
+            <h2 className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">{menu.label}</h2>
             <MenuPanel items={menu.items} onNavigate={closeMenus} />
           </section>
         ))}

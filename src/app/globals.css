@@ -3,6 +3,8 @@
 @theme {
   --color-navy: #0b2545;
   --color-orange: #ff6b00;
+  --color-orange-deep: #e65c00;
+  --color-orange-ink: #b84a00;
   --color-sand: #f4f1ec;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;

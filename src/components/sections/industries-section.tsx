@@ -8,10 +8,10 @@ export function IndustriesSection() {
     <Section id="industries" tone="sand" labelledBy="industries-title">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
         <div>
-          <Eyebrow className="text-orange">Industries</Eyebrow>
+          <Eyebrow className="text-orange-ink">Industries</Eyebrow>
           <DisplayHeading id="industries-title" className="mt-5">
             Who we
-            <span className="block text-orange">move for</span>
+            <span className="block text-orange-deep">move for</span>
           </DisplayHeading>
           <p className="mt-8 max-w-[26em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/75">
             From a single pallet to a site full of plant, businesses across these sectors use WCE Logistics to move
@@ -36,7 +36,7 @@ export function IndustriesSection() {
                   />
                 </div>
                 <div>
-                  <span className="font-display text-[clamp(16px,1.3vw,20px)] text-orange">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="font-display text-[clamp(16px,1.3vw,20px)] text-orange-ink">{String(index + 1).padStart(2, "0")}</span>
                   <h3 className="mt-1 font-display text-[clamp(30px,3.2vw,56px)] uppercase leading-none transition-transform duration-300 group-hover:translate-x-2">
                     {industry.title}
                   </h3>

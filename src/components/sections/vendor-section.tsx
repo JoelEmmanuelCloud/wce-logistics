@@ -15,7 +15,7 @@ export function VendorSection({ contactEmail }: { contactEmail: string }) {
           <Eyebrow>For truck owners and fleets</Eyebrow>
           <DisplayHeading id="vendors-title" className="mt-5 text-[clamp(52px,7.4vw,128px)]">
             Own a truck?
-            <span className="block text-white">Put it to work.</span>
+            <span className="mt-[0.08em] inline-block bg-navy px-[0.14em] pb-[0.02em] text-white">Put it to work.</span>
           </DisplayHeading>
           <p className="mt-8 max-w-[32em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/85">
             List your trucks, publish the routes you already run and fill empty space on return trips with

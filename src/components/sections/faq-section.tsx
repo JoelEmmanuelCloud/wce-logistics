@@ -7,10 +7,10 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
     <Section id="faq" tone="white" labelledBy="faq-title">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
         <div>
-          <Eyebrow className="text-orange">FAQ</Eyebrow>
+          <Eyebrow className="text-orange-ink">FAQ</Eyebrow>
           <DisplayHeading id="faq-title" className="mt-5">
             Good to
-            <span className="block text-orange">know</span>
+            <span className="block text-orange-deep">know</span>
           </DisplayHeading>
           <p className="mt-8 max-w-[24em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/75">
             Still have a question? Write to us at{" "}

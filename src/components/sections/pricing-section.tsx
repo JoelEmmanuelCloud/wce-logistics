@@ -36,10 +36,10 @@ export function PricingSection() {
     <Section id="pricing" tone="white" labelledBy="pricing-title">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange">Pricing</Eyebrow>
+          <Eyebrow className="text-orange-ink">Pricing</Eyebrow>
           <DisplayHeading id="pricing-title" className="mt-5">
             Priced by
-            <span className="block pl-[0.6em] text-orange">the kilo</span>
+            <span className="block pl-[0.6em] text-orange-deep">the kilo</span>
           </DisplayHeading>
         </div>
         <p className="max-w-[32em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-navy/75 lg:justify-self-end">
@@ -58,7 +58,7 @@ export function PricingSection() {
             <span
               key={index}
               aria-hidden="true"
-              className="grid place-items-center font-display text-[clamp(36px,3vw,52px)] leading-none text-orange lg:px-2"
+              className="grid place-items-center font-display text-[clamp(36px,3vw,52px)] leading-none text-orange-deep lg:px-2"
             >
               {part.operator}
             </span>
@@ -68,7 +68,7 @@ export function PricingSection() {
               className={`flex flex-col justify-between gap-6 rounded-[22px] p-[clamp(20px,2vw,32px)] ${"highlight" in part ? "bg-navy text-white" : "bg-white"}`}
             >
               <span className="font-display text-[clamp(26px,2.2vw,38px)] uppercase leading-[0.95]">{part.term}</span>
-              <span className={`text-[14px] ${"highlight" in part ? "text-white/70" : "text-navy/60"}`}>{part.note}</span>
+              <span className={`text-[14px] ${"highlight" in part ? "text-white/70" : "text-navy/70"}`}>{part.note}</span>
             </div>
           ),
         )}
@@ -91,7 +91,7 @@ export function PricingSection() {
         <ul className="grid gap-4 lg:gap-5">
           {RULES.map(({ Icon, title, detail }) => (
             <li key={title} className="flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange-ink">
                 <Icon className="size-6" />
               </span>
               <div>
