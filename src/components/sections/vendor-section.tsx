@@ -1,12 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { TruckIcon } from "@/components/fleet-icons";
 import { ArrowUpRightIcon, CheckIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { VENDOR_DOCUMENTS } from "@/data/landing";
 
-export function VendorSection({ contactEmail }: { contactEmail: string }) {
-  const href = `mailto:${contactEmail}?subject=${encodeURIComponent("Vendor registration")}`;
+export function VendorSection() {
   return (
     <Section id="vendors" tone="orange" labelledBy="vendors-title" className="relative overflow-hidden">
       <TruckIcon className="pointer-events-none absolute -right-[6%] -bottom-[18%] w-[min(560px,60vw)] opacity-[0.13] mix-blend-multiply" />
@@ -21,15 +21,15 @@ export function VendorSection({ contactEmail }: { contactEmail: string }) {
             List your trucks, publish the routes you already run and fill empty space on return trips with
             confirmed, paid bookings.
           </p>
-          <a
-            href={href}
+          <Link
+            href="/sign-in"
             className="group mt-10 inline-flex items-center gap-4 rounded-full bg-navy py-2 pl-7 pr-2 text-[17px] font-medium text-white transition-colors hover:bg-[#13335c]"
           >
-            Register your interest
+            Register as a vendor
             <span className="grid size-12 place-items-center rounded-full bg-white text-navy transition-transform duration-300 group-hover:rotate-45">
               <ArrowUpRightIcon className="size-5" />
             </span>
-          </a>
+          </Link>
         </div>
         <div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">

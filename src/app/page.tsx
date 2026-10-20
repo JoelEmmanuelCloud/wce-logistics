@@ -22,7 +22,7 @@ export default function Home() {
         <TrustSection />
         <PricingSection />
         <IndustriesSection />
-        <VendorSection contactEmail={contactEmail} />
+        <VendorSection />
         <FaqSection contactEmail={contactEmail} />
       </main>
       <SiteFooter contactEmail={contactEmail} />
