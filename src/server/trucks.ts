@@ -1,5 +1,6 @@
 import "server-only";
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
+import { lagosToday } from "@/lib/dates";
 import { db, schema } from "@/server/db";
 import type { Truck, TruckDocument, TruckPhoto } from "@/server/db/schema";
 
@@ -20,7 +21,7 @@ export const DETAILS_EDITABLE_STATUSES: Truck["listingStatus"][] = ["draft", "ac
 export const DOCUMENTS_EDITABLE_STATUSES: Truck["listingStatus"][] = ["draft", "active", "unavailable", "expired_documentation", "pending_verification"];
 
 export function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return lagosToday();
 }
 
 export function latestTruckDocuments(documents: TruckDocument[]): Map<TruckDocument["type"], TruckDocument> {

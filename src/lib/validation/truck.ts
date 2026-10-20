@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isNigerianState } from "@/data/nigeria-states";
+import { lagosToday } from "@/lib/dates";
 import { BODY_TYPES, CARGO_TYPES, TRUCK_CATEGORIES } from "@/lib/labels";
 
 const values = <T extends ReadonlyArray<{ value: string }>>(options: T) => options.map((option) => option.value) as [T[number]["value"], ...T[number]["value"][]];
@@ -100,7 +101,7 @@ export const truckDocumentSchema = z
     if (["roadworthiness", "insurance", "vehicle_licence"].includes(value.type) && !value.expiryDate) {
       context.addIssue({ code: "custom", path: ["expiryDate"], message: "Enter the expiry date shown on the document." });
     }
-    if (value.expiryDate && dateOk(value.expiryDate) && value.expiryDate <= new Date().toISOString().slice(0, 10)) {
+    if (value.expiryDate && dateOk(value.expiryDate) && value.expiryDate <= lagosToday()) {
       context.addIssue({ code: "custom", path: ["expiryDate"], message: "This document has expired. Upload a current one." });
     }
     if (value.issueDate && value.expiryDate && value.issueDate >= value.expiryDate) {

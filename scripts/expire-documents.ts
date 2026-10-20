@@ -30,7 +30,7 @@ async function main() {
             ) latest on true
             where latest.status is null
                or latest.status = 'rejected'
-               or (latest.expiry_date is not null and latest.expiry_date <= current_date)
+               or (latest.expiry_date is not null and latest.expiry_date <= (now() at time zone 'Africa/Lagos')::date)
           )
         returning t.id, previous.listing_status as previous`;
       for (const row of rows) {
