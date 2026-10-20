@@ -12,23 +12,30 @@ const schema = z
     DATABASE_URL: z.url(),
     AUTH_SECRET: z.string().min(32, "must be at least 32 characters"),
     DATA_ENCRYPTION_KEY: base64Key,
-    SMS_PROVIDER: z.enum(["termii", "log"]),
-    TERMII_API_KEY: z.string().optional(),
-    TERMII_SENDER_ID: z.string().optional(),
-    TERMII_BASE_URL: z.url().default("https://api.ng.termii.com"),
+    EMAIL_PROVIDER: z.enum(["resend", "log"]),
+    EMAIL_FROM: z.string().min(3, "must be a sender such as WCE Logistics <noreply@wcelogistics.com>"),
+    RESEND_API_KEY: z.string().optional(),
+    RESEND_BASE_URL: z.url().default("https://api.resend.com"),
     STORAGE_ENDPOINT: z.url().optional().or(z.literal("")),
     STORAGE_REGION: z.string().min(1),
     STORAGE_BUCKET: z.string().min(3),
     STORAGE_ACCESS_KEY_ID: z.string().min(1),
     STORAGE_SECRET_ACCESS_KEY: z.string().min(1),
     STORAGE_FORCE_PATH_STYLE: z.enum(["true", "false"]).default("false"),
+    PAYSTACK_SECRET_KEY: z
+      .string()
+      .regex(/^sk_(test|live)_\w+$/, "must be a Paystack secret key starting with sk_test_ or sk_live_")
+      .optional()
+      .or(z.literal("").transform(() => undefined)),
+    PAYSTACK_BASE_URL: z.url().default("https://api.paystack.co"),
+    PLATFORM_COMMISSION_BPS: z.coerce.number().int().min(0).max(5000),
   })
   .superRefine((value, context) => {
-    if (value.SMS_PROVIDER === "termii" && (!value.TERMII_API_KEY || !value.TERMII_SENDER_ID)) {
-      context.addIssue({ code: "custom", path: ["TERMII_API_KEY"], message: "TERMII_API_KEY and TERMII_SENDER_ID are required for the termii provider" });
+    if (value.EMAIL_PROVIDER === "resend" && !value.RESEND_API_KEY) {
+      context.addIssue({ code: "custom", path: ["RESEND_API_KEY"], message: "RESEND_API_KEY is required for the resend provider" });
     }
-    if (value.SMS_PROVIDER === "log" && value.NODE_ENV === "production") {
-      context.addIssue({ code: "custom", path: ["SMS_PROVIDER"], message: "the log SMS provider cannot be used in production" });
+    if (value.EMAIL_PROVIDER === "log" && value.NODE_ENV === "production") {
+      context.addIssue({ code: "custom", path: ["EMAIL_PROVIDER"], message: "the log email provider cannot be used in production" });
     }
   });
 
