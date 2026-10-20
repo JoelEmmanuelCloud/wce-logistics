@@ -5,7 +5,7 @@ import { stagger } from "@/lib/motion";
 
 export function FaqSection({ contactEmail }: { contactEmail: string }) {
   return (
-    <Section id="faq" tone="white" labelledBy="faq-title">
+    <Section id="faq" tone="white" labelledBy="faq-title" watermark="left">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
         <div>
           <Eyebrow className="text-orange-ink">FAQ</Eyebrow>

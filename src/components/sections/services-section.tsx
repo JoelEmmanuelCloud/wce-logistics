@@ -43,7 +43,7 @@ const ICONS: Record<ServiceKey, ComponentType<{ className?: string }>> = {
 
 export function ServicesSection() {
   return (
-    <Section id="services" tone="white" labelledBy="services-title">
+    <Section id="services" tone="white" labelledBy="services-title" watermark="right">
       <div className="reveal grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <Eyebrow className="text-orange-ink">Services</Eyebrow>

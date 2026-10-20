@@ -161,6 +161,12 @@ body {
       animation-range: entry calc(10% + var(--stagger, 0) * 12%) entry calc(40% + var(--stagger, 0) * 12%);
     }
 
+    .watermark {
+      animation: watermark-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
     .step-card {
       animation: reveal linear both;
       animation-timeline: view();
@@ -200,6 +206,15 @@ body {
   }
   to {
     transform: translateY(-7px);
+  }
+}
+
+@keyframes watermark-drift {
+  from {
+    translate: -5% 0;
+  }
+  to {
+    translate: 5% 0;
   }
 }
 

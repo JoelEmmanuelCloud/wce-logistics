@@ -30,7 +30,7 @@ const CHECKS = [
 
 export function TrustSection() {
   return (
-    <Section id="trust" tone="navy" labelledBy="trust-title" className="relative overflow-hidden">
+    <Section id="trust" tone="navy" labelledBy="trust-title" watermark="right">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div className="lg:sticky lg:top-12 lg:self-start">
           <Eyebrow className="text-orange">Accountability</Eyebrow>

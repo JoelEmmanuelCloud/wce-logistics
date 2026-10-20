@@ -39,7 +39,7 @@ export function HowItWorksSection() {
   }
 
   return (
-    <Section id="how-it-works" tone="sand" labelledBy="how-title">
+    <Section id="how-it-works" tone="sand" labelledBy="how-title" watermark="left">
       <div className="reveal grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <Eyebrow className="text-orange-ink">How it works</Eyebrow>
