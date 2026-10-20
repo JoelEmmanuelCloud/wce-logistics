@@ -5,7 +5,8 @@ import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, type FormState } from "@/lib/form-state";
 import { requireRole } from "@/server/auth/dal";
-import { cancelBooking, confirmOfflinePayment, MarketplaceError } from "@/server/marketplace";
+import { cancelBooking, MarketplaceError } from "@/server/marketplace";
+import { PaymentError, recordOfflinePayment } from "@/server/payments";
 import { notifyBooking } from "@/server/notifications";
 
 const id = z.uuid();
@@ -25,10 +26,10 @@ export async function recordPaymentAction(bookingId: string, _previous: FormStat
     return errorState(reference.error.issues[0].message, { reason: [reference.error.issues[0].message] });
   }
   try {
-    const confirmed = await confirmOfflinePayment(admin.id, bookingId, reference.data);
+    const confirmed = await recordOfflinePayment(admin.id, bookingId, reference.data);
     after(() => notifyBooking("booking.confirmed", confirmed));
   } catch (error) {
-    if (error instanceof MarketplaceError) {
+    if (error instanceof PaymentError) {
       return errorState(error.message);
     }
     throw error;

@@ -353,30 +353,6 @@ export async function cancelBooking(
   });
 }
 
-export async function confirmOfflinePayment(adminId: string, bookingId: string, paymentReference: string): Promise<Booking> {
-  return db().transaction(async (tx) => {
-    const booking = await lockBooking(tx, bookingId);
-    if (!booking) {
-      throw new MarketplaceError("Booking not found.");
-    }
-    if (booking.status !== "awaiting_payment") {
-      throw new MarketplaceError("Only bookings awaiting payment can be confirmed.");
-    }
-    const note = `Payment received offline. Reference: ${paymentReference}`;
-    const [updated] = await tx
-      .update(schema.bookings)
-      .set({ status: "confirmed", statusNote: note })
-      .where(eq(schema.bookings.id, booking.id))
-      .returning();
-    await addEvent(tx, booking.id, "confirmed", adminId, note);
-    await recordAudit(
-      { actorId: adminId, action: "booking.payment_recorded", entityType: "booking", entityId: booking.id, metadata: { paymentReference, totalKobo: booking.totalKobo } },
-      tx,
-    );
-    return updated;
-  });
-}
-
 export async function getBookingDetail(bookingId: string) {
   const database = db();
   const [row] = await database
