@@ -53,7 +53,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${anton.variable} ${inter.variable} ${saira.variable} antialiased`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${anton.variable} ${inter.variable} ${saira.variable} antialiased`}>
       <body>{children}</body>
     </html>
   );
