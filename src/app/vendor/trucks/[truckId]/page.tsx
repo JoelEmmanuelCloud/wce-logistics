@@ -236,7 +236,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
         </Card>
 
         {truck.listingStatus !== "pending_verification" && truck.listingStatus !== "suspended" && (
-          <Card className="border-[#B42318]/20">
+          <Card tone="danger">
             <CardHeader title="Archive truck" description="Archived trucks are removed from your fleet and can no longer be booked. This keeps their history for our records." />
             <form action={archiveTruckAction}>
               <input type="hidden" name="truckId" value={truck.id} />

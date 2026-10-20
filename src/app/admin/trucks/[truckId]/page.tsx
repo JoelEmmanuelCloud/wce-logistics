@@ -148,7 +148,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
           </Card>
 
           {options.length > 0 && (
-            <Card className={truck.listingStatus === "pending_verification" ? "border-orange-ink/30" : undefined}>
+            <Card tone={truck.listingStatus === "pending_verification" ? "attention" : "light"}>
               <CardHeader title="Decision" description={truck.submittedAt ? `Submitted ${formatDateTime(truck.submittedAt)}.` : undefined} />
               {truck.listingStatus === "pending_verification" && (
                 <div className="mb-5 grid gap-4">

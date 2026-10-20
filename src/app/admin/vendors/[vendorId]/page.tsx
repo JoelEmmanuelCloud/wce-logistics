@@ -125,7 +125,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
 
         <div className="grid content-start gap-6">
           {awaiting && (
-            <Card className="border-orange-ink/30">
+            <Card tone="attention">
               <CardHeader title="Decision" description={`Submitted ${formatDateTime(vendor.submittedAt)}.`} />
               <DecisionPanel
                 action={decideVendorAction.bind(null, vendor.id)}
