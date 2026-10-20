@@ -11,7 +11,8 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 | Area | Status |
 |---|---|
 | Marketing site | Landing page with services, how it works, verification, pricing, industries, vendor and FAQ sections |
-| Authentication | Phone number sign-in with one-time SMS codes, onboarding as shipper or vendor, sessions, sign-out |
+| Authentication | Email sign-in with one-time codes, onboarding as shipper or vendor with a contact phone number, sessions, sign-out |
+| Notifications | Branded emails for booking requests, acceptances, declines, payments, cancellations and vendor and truck review decisions |
 | Vendors | Business profile, encrypted identity details, document uploads, submission for verification |
 | Trucks | Registration, document uploads with expiry dates, photos, submission for review, availability, archiving |
 | Administration | Review queues, vendor and truck decisions, document review, user suspension, booking oversight, offline payment recording, audit log |
@@ -26,7 +27,7 @@ Online payments (Paystack), driver assignment, delivery tracking, ratings and di
 - Tailwind CSS 4
 - PostgreSQL 16 with Drizzle ORM and SQL migrations
 - S3-compatible object storage for private documents (SeaweedFS locally, AWS S3 or Cloudflare R2 in production)
-- Termii for SMS delivery
+- Resend for email delivery
 - Playwright end-to-end tests and Vitest unit tests
 
 ## Local setup
@@ -45,7 +46,7 @@ node -e "console.log('AUTH_SECRET=' + require('crypto').randomBytes(32).toString
 node -e "console.log('DATA_ENCRYPTION_KEY=' + require('crypto').randomBytes(32).toString('base64'))"
 ```
 
-For local development set `SMS_PROVIDER=log` so codes are printed in the server console instead of being sent. Then start the services, prepare the database and storage, and run the app:
+For local development set `EMAIL_PROVIDER=log` so sign-in codes and notifications are printed in the server console instead of being sent. Then start the services, prepare the database and storage, and run the app:
 
 ```bash
 npm run services:up
@@ -57,7 +58,7 @@ npm run dev
 Create the first administrator, then sign in with that number at `/sign-in`:
 
 ```bash
-npm run admin:create -- --phone 08031234567 --name "Ada Obi"
+npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 ```
 
 ## Environment variables
@@ -70,9 +71,13 @@ npm run admin:create -- --phone 08031234567 --name "Ada Obi"
 | `POSTGRES_PASSWORD` | Local only | Password for the local Postgres container |
 | `AUTH_SECRET` | Yes | At least 32 characters. Keys the one-time code hashes |
 | `DATA_ENCRYPTION_KEY` | Yes | 32 bytes, base64. Encrypts identity numbers at rest. Changing it makes stored numbers unreadable |
-| `SMS_PROVIDER` | Yes | `termii` in production, `log` for local development only |
-| `TERMII_API_KEY`, `TERMII_SENDER_ID` | With Termii | Termii credentials and approved sender ID |
-| `TERMII_BASE_URL` | No | Your Termii account base URL. Defaults to `https://api.ng.termii.com` |
+| `EMAIL_PROVIDER` | Yes | `resend` in production, `log` for local development only |
+| `EMAIL_FROM` | Yes | Sender, for example `WCE Logistics <noreply@wcelogistics.com>`. The domain must be verified in Resend |
+| `RESEND_API_KEY` | With Resend | Resend API key |
+| `RESEND_BASE_URL` | No | Defaults to `https://api.resend.com` |
+| `PAYSTACK_SECRET_KEY` | No | Paystack secret key. Leave empty to disable online checkout |
+| `PAYSTACK_BASE_URL` | No | Defaults to `https://api.paystack.co` |
+| `PLATFORM_COMMISSION_BPS` | Yes | Platform commission in basis points, for example `1000` for 10% |
 | `STORAGE_ENDPOINT` | Non-AWS | S3 endpoint, for example the R2 or local SeaweedFS URL. Leave empty for AWS S3 |
 | `STORAGE_REGION`, `STORAGE_BUCKET` | Yes | Bucket location and name |
 | `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY` | Yes | Storage credentials |
@@ -86,7 +91,7 @@ npm run admin:create -- --phone 08031234567 --name "Ada Obi"
 | `npm run build` / `npm run start` | Production build and server |
 | `npm run lint` | ESLint |
 | `npm test` | Unit tests |
-| `npm run test:e2e` | End-to-end suite against a production build, an isolated test database and an SMS test server |
+| `npm run test:e2e` | End-to-end suite against a production build, an isolated test database and a local email test server |
 | `npm run services:up` / `services:down` | Start or stop local Postgres and object storage |
 | `npm run db:generate` | Generate a migration after changing `src/server/db/schema.ts` |
 | `npm run db:migrate` | Apply migrations |

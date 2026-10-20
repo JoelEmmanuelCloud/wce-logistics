@@ -4,7 +4,7 @@ This document records how WCE Logistics is put together and why. It covers the l
 
 ## Overview
 
-The application is a single Next.js 16 project. Server Components render pages, Server Actions handle every mutation, and a small set of server-only modules under `src/server` own data access, authentication, storage and SMS. Nothing in `src/server` can be imported into client code (`server-only` guards it).
+The application is a single Next.js 16 project. Server Components render pages, Server Actions handle every mutation, and a small set of server-only modules under `src/server` own data access, authentication, storage, email and payments. Nothing in `src/server` can be imported into client code (`server-only` guards it).
 
 ```
 src/
@@ -15,7 +15,7 @@ src/
   proxy.ts              optimistic redirect for signed-out visitors
 drizzle/                SQL migrations
 scripts/                migrate, storage setup, create admin, document expiry job
-e2e/                    Playwright tests and support (test database, SMS test server)
+e2e/                    Playwright tests and support (test database, email test server)
 tests/unit/             Vitest unit tests
 ```
 
@@ -25,7 +25,7 @@ PostgreSQL with Drizzle ORM. The schema lives in `src/server/db/schema.ts` and e
 
 | Table | Purpose |
 |---|---|
-| `users` | One row per phone number. Role is `customer`, `vendor`, `driver` or `admin`, null until onboarding |
+| `users` | One row per email address, plus a contact phone number. Role is `customer`, `vendor`, `driver` or `admin`, null until onboarding |
 | `sessions` | Server-side sessions. Only a SHA-256 hash of the session token is stored |
 | `otp_challenges` | One-time codes, stored as HMAC hashes with attempt counts and expiry |
 | `vendor_profiles` | Vendor business details and verification status. ID numbers are encrypted |
@@ -37,7 +37,7 @@ PostgreSQL with Drizzle ORM. The schema lives in `src/server/db/schema.ts` and e
 
 ## Authentication
 
-- Users sign in with a mobile number and a 6-digit code sent by SMS. There are no passwords.
+- Users sign in with their email address and a 6-digit code sent by email. There are no passwords. A mobile number is collected during onboarding so shippers and vendors can arrange pickups, but it is not used to sign in.
 - Codes are hashed with HMAC-SHA256 keyed by `AUTH_SECRET`, expire after 10 minutes and lock after 5 wrong attempts. A new code can be requested once a minute, at most 5 times per number and 20 times per network address per hour.
 - Verifying a code creates the user if needed and opens a session. The session token is 32 random bytes, stored only as a hash, and sent as an `httpOnly`, `SameSite=Lax` cookie with the `__Host-` prefix in production. Sessions last 30 days and renew while in use.
 - `src/proxy.ts` redirects visitors without a session cookie away from protected areas before rendering. This is an optimistic check only. Real authorization happens in `src/server/auth/dal.ts` (`requireUser`, `requireRole`), which every protected layout, page, Server Action and route handler calls.
@@ -109,20 +109,20 @@ any (except under review or suspended) -> archived
 - Identity numbers are encrypted with AES-256-GCM (`DATA_ENCRYPTION_KEY`). Only the last four characters are stored in plain text for display.
 - Administrators reveal a full number on demand, and each reveal is written to the audit log.
 
-## SMS
+## Email
 
-Termii is the production provider. Messages use the DND channel so codes reach numbers on the do-not-disturb register. The `log` provider prints codes to the server console for local development and refuses to run when `NODE_ENV` is `production`.
+Resend delivers sign-in codes and notifications. Every email has a plain text and a branded HTML version. Notifications are sent after the response with `after()`, so a slow or failing email provider never blocks a booking, and every attempt is recorded in the `notifications` table with its outcome. The `log` provider prints emails to the server console for local development and refuses to run when `NODE_ENV` is `production`.
 
 ## Testing
 
-- Unit tests (`npm test`) cover phone normalization, encryption, validation and truck document rules.
-- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket and a local Termii-compatible SMS server, so the real SMS code path runs. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control and duplicate registration numbers, on desktop and mobile Chrome.
+- Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing and truck document rules.
+- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket and a local Resend-compatible email server, so the real email code path runs. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control and duplicate registration numbers, on desktop and mobile Chrome.
 
 ## Decisions
 
 | Decision | Reason |
 |---|---|
-| Phone sign-in without passwords | Matches how Nigerian shippers and truck owners already work, and the PRD makes phone verification mandatory |
+| Email sign-in without passwords | No SMS costs or sender ID registration, and codes arrive reliably. Phone numbers are still collected for coordination between shippers and vendors |
 | Server-side sessions instead of signed tokens | Sessions can be revoked immediately when a user is suspended |
 | Drizzle with SQL migrations | Readable migrations that run the same way locally and in production |
 | S3-compatible storage | One code path for local SeaweedFS, AWS S3 and Cloudflare R2 |
