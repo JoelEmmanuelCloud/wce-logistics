@@ -22,7 +22,8 @@ npm run dev
 
 | Name | Required | Description |
 |---|---|---|
-| `CONTACT_EMAIL` | Yes | Address used by the "Get in touch" button and the Company menu |
+| `CONTACT_EMAIL` | Yes | Address used by contact buttons, the FAQ, the footer and structured data |
+| `SITE_URL` | Yes | Public origin of the site, for example `https://wcelogistics.com`. Used for canonical URLs, Open Graph, robots and the sitemap |
 
 ## Scripts
 
@@ -32,7 +33,8 @@ npm run dev
 | `npm run build` | Create a production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run ESLint |
+| `npm run test:e2e` | Build, serve and run the Playwright end-to-end suite on desktop and mobile Chrome |
 
 ## Credits
 
-Hero photograph from [Unsplash](https://unsplash.com/photos/gray-truck-on-asphalt-road-during-sunset-x0tEfA567gY), used under the Unsplash License.
+Photography from [Unsplash](https://unsplash.com), used under the Unsplash License. Each image's source page is listed in `src/data/images.ts`; the hero photograph is [x0tEfA567gY](https://unsplash.com/photos/gray-truck-on-asphalt-road-during-sunset-x0tEfA567gY).
