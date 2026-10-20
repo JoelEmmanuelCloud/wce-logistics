@@ -21,7 +21,7 @@ export function OnboardingForm() {
       <FormMessage state={state} />
       <fieldset className="grid gap-3" aria-describedby={roleErrors?.length ? "role-error" : undefined}>
         <legend className="mb-1 text-[14px] font-semibold text-navy">
-          How will you use WCE Logistics?<span className="text-orange-ink"> *</span>
+          How will you use WCE Logistics?<span className="text-orange-ink" aria-hidden="true"> *</span>
         </legend>
         {ROLES.map((role) => (
           <label

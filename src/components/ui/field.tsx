@@ -17,7 +17,7 @@ export function Field({ id, label, hint, errors, required, children }: FieldProp
     <div className="grid gap-2">
       <label htmlFor={id} className="text-[14px] font-semibold text-navy">
         {label}
-        {required ? <span className="text-orange-ink"> *</span> : <span className="font-normal text-navy/60"> (optional)</span>}
+        {required ? <span className="text-orange-ink" aria-hidden="true"> *</span> : <span className="font-normal text-navy/60"> (optional)</span>}
       </label>
       {children}
       {hint && !errors?.length && (
@@ -111,7 +111,7 @@ export function CheckboxGroup({
     <fieldset className="grid gap-3" aria-describedby={errors?.length ? `${name}-error` : undefined}>
       <legend className="text-[14px] font-semibold text-navy">
         {legend}
-        <span className="text-orange-ink"> *</span>
+        <span className="text-orange-ink" aria-hidden="true"> *</span>
       </legend>
       <div className={`grid grid-cols-2 gap-2 ${grid}`}>
         {options.map((option) => (

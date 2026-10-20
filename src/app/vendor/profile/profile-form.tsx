@@ -36,7 +36,7 @@ export function ProfileForm({ defaults, editable, isNew }: { defaults: ProfileDe
       <fieldset disabled={!editable} className="grid gap-8 disabled:opacity-80">
         <fieldset className="grid gap-3" aria-describedby={errors.category ? "category-error" : undefined}>
           <legend className="mb-1 text-[14px] font-semibold text-navy">
-            Vendor category<span className="text-orange-ink"> *</span>
+            Vendor category<span className="text-orange-ink" aria-hidden="true"> *</span>
           </legend>
           <div className="grid gap-3 md:grid-cols-3">
             {VENDOR_CATEGORIES.map((option) => (
