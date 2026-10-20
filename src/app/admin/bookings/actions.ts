@@ -1,10 +1,12 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, type FormState } from "@/lib/form-state";
 import { requireRole } from "@/server/auth/dal";
 import { cancelBooking, confirmOfflinePayment, MarketplaceError } from "@/server/marketplace";
+import { notifyBooking } from "@/server/notifications";
 
 const id = z.uuid();
 
@@ -23,7 +25,8 @@ export async function recordPaymentAction(bookingId: string, _previous: FormStat
     return errorState(reference.error.issues[0].message, { reason: [reference.error.issues[0].message] });
   }
   try {
-    await confirmOfflinePayment(admin.id, bookingId, reference.data);
+    const confirmed = await confirmOfflinePayment(admin.id, bookingId, reference.data);
+    after(() => notifyBooking("booking.confirmed", confirmed));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);
@@ -44,7 +47,8 @@ export async function adminCancelBookingAction(bookingId: string, _previous: For
     return errorState(reason.error.issues[0].message, { reason: [reason.error.issues[0].message] });
   }
   try {
-    await cancelBooking({ id: admin.id, role: "admin" }, bookingId, reason.data);
+    const cancelled = await cancelBooking({ id: admin.id, role: "admin" }, bookingId, reason.data);
+    after(() => notifyBooking("booking.cancelled", cancelled));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);

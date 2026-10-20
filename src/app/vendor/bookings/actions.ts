@@ -2,11 +2,13 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, type FormState } from "@/lib/form-state";
 import { requireRole } from "@/server/auth/dal";
 import { cancelBooking, MarketplaceError, respondToBooking } from "@/server/marketplace";
 import { findVendorProfileByUser } from "@/server/vendors";
+import { notifyBooking } from "@/server/notifications";
 
 const id = z.uuid();
 const reasonSchema = z.string().trim().min(5, "Give the shipper a short reason.").max(500);
@@ -26,7 +28,8 @@ export async function acceptBookingAction(bookingId: string): Promise<FormState>
     return errorState("Booking not found.");
   }
   try {
-    await respondToBooking(profile.id, user.id, bookingId, "accept", null);
+    const accepted = await respondToBooking(profile.id, user.id, bookingId, "accept", null);
+    after(() => notifyBooking("booking.accepted", accepted));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);
@@ -47,7 +50,8 @@ export async function declineBookingAction(bookingId: string, _previous: FormSta
     return errorState(reason.error.issues[0].message, { reason: [reason.error.issues[0].message] });
   }
   try {
-    await respondToBooking(profile.id, user.id, bookingId, "reject", reason.data);
+    const declined = await respondToBooking(profile.id, user.id, bookingId, "reject", reason.data);
+    after(() => notifyBooking("booking.declined", declined));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);
@@ -68,7 +72,8 @@ export async function vendorCancelBookingAction(bookingId: string, _previous: Fo
     return errorState(reason.error.issues[0].message, { reason: [reason.error.issues[0].message] });
   }
   try {
-    await cancelBooking({ id: user.id, role: "vendor", vendorId: profile.id }, bookingId, reason.data);
+    const cancelled = await cancelBooking({ id: user.id, role: "vendor", vendorId: profile.id }, bookingId, reason.data);
+    after(() => notifyBooking("booking.cancelled", cancelled));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);

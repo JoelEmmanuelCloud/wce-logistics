@@ -2,6 +2,7 @@
 
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, type FormState } from "@/lib/form-state";
 import { recordAudit } from "@/server/audit";
@@ -11,6 +12,7 @@ import { decrypt } from "@/server/crypto";
 import { db, schema } from "@/server/db";
 import { MIN_TRUCK_PHOTOS, requiredDocumentsApproved, todayIso, truckSubmissionChecks } from "@/server/trucks";
 import { latestDocumentsByType, requiredVendorDocuments } from "@/server/vendors";
+import { notifyTruckReview, notifyVendorReview } from "@/server/notifications";
 
 const id = z.uuid();
 const note = z.string().trim().max(1000);
@@ -85,6 +87,7 @@ export async function decideVendorAction(vendorId: string, _previous: FormState,
         tx,
       );
     });
+    after(() => notifyVendorReview("vendor.verified", vendor.id, null));
     refresh();
     return successState("Vendor verified.");
   }
@@ -101,6 +104,7 @@ export async function decideVendorAction(vendorId: string, _previous: FormState,
     entityId: vendor.id,
     metadata: { note: noteResult.value },
   });
+  after(() => notifyVendorReview(decision.data === "request_info" ? "vendor.info_required" : "vendor.rejected", vendor.id, noteResult.value));
   refresh();
   return successState(decision.data === "request_info" ? "Information requested from the vendor." : "Vendor application declined.");
 }
@@ -258,6 +262,7 @@ export async function decideTruckAction(truckId: string, _previous: FormState, f
         .where(eq(schema.trucks.id, truck.id));
       await recordAudit({ actorId: admin.id, action: "truck.approved", entityType: "truck", entityId: truck.id, metadata: { approvedDocuments: pendingIds.length } }, tx);
     });
+    after(() => notifyTruckReview("truck.approved", truck.vendorId, truck.id, truck.registrationNumber, null));
     refresh();
     return successState("Truck approved and active.");
   }
@@ -271,6 +276,7 @@ export async function decideTruckAction(truckId: string, _previous: FormState, f
       .set({ listingStatus: "draft", submittedAt: null, reviewNote: noteResult.value, reviewedAt: sql`now()`, reviewedBy: admin.id })
       .where(eq(schema.trucks.id, truck.id));
     await recordAudit({ actorId: admin.id, action: "truck.changes_requested", entityType: "truck", entityId: truck.id, metadata: { note: noteResult.value } });
+    after(() => notifyTruckReview("truck.changes_requested", truck.vendorId, truck.id, truck.registrationNumber, noteResult.value));
     refresh();
     return successState("Changes requested from the vendor.");
   }

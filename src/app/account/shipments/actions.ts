@@ -3,6 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, validationErrorState, type FormState } from "@/lib/form-state";
 import { shipmentSchema } from "@/lib/validation/marketplace";
@@ -10,6 +11,7 @@ import { recordAudit } from "@/server/audit";
 import { requireRole } from "@/server/auth/dal";
 import { db, schema } from "@/server/db";
 import { cancelBooking, MarketplaceError, requestBooking } from "@/server/marketplace";
+import { notifyBooking } from "@/server/notifications";
 
 const id = z.uuid();
 
@@ -52,6 +54,7 @@ export async function requestBookingAction(shipmentId: string, routeId: string):
   try {
     const booking = await requestBooking(user.id, shipmentId, routeId);
     bookingId = booking.id;
+    after(() => notifyBooking("booking.requested", booking));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);
@@ -90,7 +93,8 @@ export async function customerCancelBookingAction(bookingId: string, _previous: 
     return errorState(reason.error.issues[0].message, { reason: [reason.error.issues[0].message] });
   }
   try {
-    await cancelBooking({ id: user.id, role: "customer" }, bookingId, reason.data);
+    const cancelled = await cancelBooking({ id: user.id, role: "customer" }, bookingId, reason.data);
+    after(() => notifyBooking("booking.cancelled", cancelled));
   } catch (error) {
     if (error instanceof MarketplaceError) {
       return errorState(error.message);
