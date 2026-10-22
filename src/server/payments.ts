@@ -4,7 +4,6 @@ import { randomBytes, randomInt } from "node:crypto";
 import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
 import type { Booking, Payment, Payout } from "@/server/db/schema";
-import { serverEnv } from "@/server/env";
 import {
   initializeTransaction,
   initiateTransfer,
@@ -16,6 +15,7 @@ import {
   type PaystackTransfer,
 } from "@/server/paystack";
 import { describeAccount } from "@/server/payout-accounts";
+import { getPlatformSettings } from "@/server/settings";
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
@@ -23,7 +23,7 @@ export class PaymentError extends Error {}
 
 const INACTIVE_BOOKING_STATUSES: Booking["status"][] = ["cancelled", "rejected", "expired"];
 
-export function splitCommission(totalKobo: number, bps = serverEnv().PLATFORM_COMMISSION_BPS): { platformFeeKobo: number; vendorPayableKobo: number } {
+export function splitCommission(totalKobo: number, bps: number): { platformFeeKobo: number; vendorPayableKobo: number } {
   const platformFeeKobo = Math.round((totalKobo * bps) / 10_000);
   return { platformFeeKobo, vendorPayableKobo: totalKobo - platformFeeKobo };
 }
@@ -38,7 +38,8 @@ function paymentReference(bookingReference: string): string {
 }
 
 async function confirmPaidBooking(tx: Transaction, booking: Booking, payment: Payment, actorId: string | null, note: string): Promise<Booking> {
-  const { platformFeeKobo, vendorPayableKobo } = splitCommission(payment.amountKobo);
+  const { commissionBps } = await getPlatformSettings();
+  const { platformFeeKobo, vendorPayableKobo } = splitCommission(payment.amountKobo, commissionBps);
   await tx
     .update(schema.payments)
     .set({ status: "successful", paidAt: sql`coalesce(${schema.payments.paidAt}, now())`, platformFeeKobo, vendorPayableKobo })
@@ -152,7 +153,7 @@ export async function settlePaystackReference(reference: string, source: "callba
       .where(eq(schema.payments.id, payment.id));
 
     if (booking.status !== "awaiting_payment") {
-      const { platformFeeKobo, vendorPayableKobo } = splitCommission(payment.amountKobo);
+      const { platformFeeKobo, vendorPayableKobo } = splitCommission(payment.amountKobo, (await getPlatformSettings()).commissionBps);
       await tx
         .update(schema.payments)
         .set({ status: "successful", platformFeeKobo, vendorPayableKobo, failureReason: `Paid after the booking became ${booking.status}. Refund required.` })
