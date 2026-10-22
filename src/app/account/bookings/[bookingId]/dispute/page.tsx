@@ -6,6 +6,7 @@ import { DisputeReplyForm, OpenDisputeForm } from "@/components/disputes/dispute
 import { requireRole } from "@/server/auth/dal";
 import { canOpenDispute, disputeThread, latestDisputeForBooking } from "@/server/disputes";
 import { findBooking } from "@/server/marketplace";
+import { getPlatformSettings } from "@/server/settings";
 
 export const metadata: Metadata = { title: "Dispute" };
 
@@ -16,7 +17,7 @@ export default async function CustomerDisputePage({ params }: PageProps<"/accoun
   if (!booking || booking.customerId !== user.id) {
     notFound();
   }
-  const [dispute, canOpen] = await Promise.all([latestDisputeForBooking(booking.id), canOpenDispute(booking)]);
+  const [dispute, canOpen, settings] = await Promise.all([latestDisputeForBooking(booking.id), canOpenDispute(booking), getPlatformSettings()]);
   const thread = dispute ? await disputeThread(dispute.id) : [];
 
   return (
@@ -26,6 +27,7 @@ export default async function CustomerDisputePage({ params }: PageProps<"/accoun
       dispute={dispute}
       thread={thread}
       canOpen={canOpen}
+      windowDays={settings.disputeWindowDays}
       openForm={<OpenDisputeForm action={customerOpenDisputeAction.bind(null, booking.id)} />}
       replyForm={dispute ? <DisputeReplyForm action={customerDisputeReplyAction.bind(null, dispute.id)} /> : null}
     />

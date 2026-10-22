@@ -5,6 +5,7 @@ import { EmptyState, PageHeader } from "@/components/ui/card";
 import type { BookingStatus } from "@/server/db/schema";
 import { requireRole } from "@/server/auth/dal";
 import { listBookings } from "@/server/marketplace";
+import { getPlatformSettings } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 
 export const metadata: Metadata = { title: "Bookings" };
@@ -21,13 +22,14 @@ export default async function VendorBookingsPage({ searchParams }: PageProps<"/v
   const params = await searchParams;
   const filter = (typeof params.status === "string" && params.status in FILTERS ? params.status : "requests") as keyof typeof FILTERS;
   const rows = profile ? await listBookings({ vendorId: profile.id, statuses: [...FILTERS[filter].statuses] }) : [];
+  const { responseWindowHours } = await getPlatformSettings();
 
   return (
     <>
       <PageHeader
         eyebrow="Marketplace"
         title="Bookings"
-        description="Answer new requests within 24 hours. Requests you do not answer expire and the space is released."
+        description={`Answer new requests within ${responseWindowHours} hours. Requests you do not answer expire and the space is released.`}
       />
       <div className="mb-5">
         <FilterTabs base="/vendor/bookings" filters={FILTERS} active={filter} query="" />

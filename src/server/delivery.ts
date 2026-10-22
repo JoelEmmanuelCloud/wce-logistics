@@ -3,7 +3,6 @@ import { and, asc, desc, eq, inArray, isNull, lt, ne, notInArray, sql } from "dr
 import { addDays, lagosToday } from "@/lib/dates";
 import {
   ASSIGNABLE_STATUSES,
-  AUTO_COMPLETE_HOURS,
   canRecord,
   DELIVERY_IN_PROGRESS,
   licenceCoversTruck,
@@ -13,6 +12,7 @@ import {
 import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
 import type { Booking, Driver, Route } from "@/server/db/schema";
+import { getPlatformSettings } from "@/server/settings";
 import type { StoredFile } from "@/server/storage";
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
@@ -208,13 +208,14 @@ export async function confirmReceipt(customerId: string, bookingId: string): Pro
 }
 
 export async function autoCompleteDeliveries(): Promise<Booking[]> {
+  const { autoCompleteHours } = await getPlatformSettings();
   const due = await db()
     .select({ id: schema.bookings.id })
     .from(schema.bookings)
     .where(
       and(
         eq(schema.bookings.status, "delivered"),
-        lt(schema.bookings.deliveredAt, sql`now() - make_interval(hours => ${AUTO_COMPLETE_HOURS})`),
+        lt(schema.bookings.deliveredAt, sql`now() - make_interval(hours => ${autoCompleteHours})`),
         sql`not exists (select 1 from ${schema.disputes} where ${schema.disputes.bookingId} = ${schema.bookings.id} and ${schema.disputes.status} not in ('resolved', 'closed'))`,
       ),
     )
@@ -227,7 +228,7 @@ export async function autoCompleteDeliveries(): Promise<Booking[]> {
       if (!locked || locked.status !== "delivered" || (await hasActiveDispute(tx, id))) {
         return null;
       }
-      return completeLocked(tx, locked, null, `Completed automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`);
+      return completeLocked(tx, locked, null, `Completed automatically ${autoCompleteHours} hours after delivery.`);
     });
     if (booking) {
       completed.push(booking);

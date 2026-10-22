@@ -12,7 +12,6 @@ import { ActionButton } from "@/components/ui/action-button";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
-import { AUTO_COMPLETE_HOURS } from "@/lib/delivery";
 import { formatDateTime } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
@@ -23,6 +22,7 @@ import { ACTIVE_DISPUTE_STATUSES, canOpenDispute, latestDisputeForBooking } from
 import { CUSTOMER_CANCELLABLE, getBookingDetail } from "@/server/marketplace";
 import { paystackConfigured } from "@/server/paystack";
 import { reviewForBooking } from "@/server/reviews";
+import { getPlatformSettings } from "@/server/settings";
 import { PayButton } from "./pay-button";
 
 export const metadata: Metadata = { title: "Booking" };
@@ -36,11 +36,12 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
     notFound();
   }
   const { booking } = detail;
-  const [deliveryRows, review, dispute, disputable] = await Promise.all([
+  const [deliveryRows, review, dispute, disputable, settings] = await Promise.all([
     listDeliveryEvents(booking.id),
     reviewForBooking(booking.id),
     latestDisputeForBooking(booking.id),
     canOpenDispute(booking),
+    getPlatformSettings(),
   ]);
   const activeDispute = dispute && ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? dispute : null;
   const canDispute = !activeDispute && disputable;
@@ -112,7 +113,7 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
             <Card tone="attention">
               <CardHeader
                 title="Did everything arrive safely?"
-                description={`Confirm receipt to complete the booking. If you do nothing, it completes automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`}
+                description={`Confirm receipt to complete the booking. If you do nothing, it completes automatically ${settings.autoCompleteHours} hours after delivery.`}
               />
               <div className="grid gap-3">
                 <ActionButton action={confirmReceiptAction.bind(null, booking.id)} label="Confirm receipt" pendingLabel="Confirming" />

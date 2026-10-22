@@ -1,12 +1,12 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
-import { AUTO_COMPLETE_HOURS } from "@/lib/delivery";
 import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { db, schema } from "@/server/db";
 import type { Booking, Dispute, Payout } from "@/server/db/schema";
 import { sendEmail, type EmailMessage } from "@/server/email";
+import { getPlatformSettings } from "@/server/settings";
 
 type Template =
   | "booking.requested"
@@ -75,6 +75,7 @@ function link(path: string): string {
 
 export async function notifyBooking(event: Extract<Template, `booking.${string}` | "payment.refunded">, booking: Booking): Promise<void> {
   const amount = formatNaira(booking.totalKobo);
+  const { responseWindowHours } = await getPlatformSettings();
   const vendorUser = await vendorUserId(booking.vendorId);
   const forCustomer = { label: "View booking", url: link(`/account/bookings/${booking.id}`) };
   const forVendor = { label: "View booking", url: link(`/vendor/bookings/${booking.id}`) };
@@ -87,7 +88,7 @@ export async function notifyBooking(event: Extract<Template, `booking.${string}`
           deliver(vendorUser, event, {
             subject: `New booking request ${booking.reference}`,
             heading: "You have a new booking request",
-            paragraphs: [`A shipper wants to book ${booking.reservedKg.toLocaleString("en-NG")} kg on your trip for ${amount}.`, "Accept or decline within 24 hours, or the request expires and the space is released."],
+            paragraphs: [`A shipper wants to book ${booking.reservedKg.toLocaleString("en-NG")} kg on your trip for ${amount}.`, `Accept or decline within ${responseWindowHours} hours, or the request expires and the space is released.`],
             action: { label: "Review request", url: forVendor.url },
           }),
         );
@@ -158,7 +159,7 @@ export async function notifyBooking(event: Extract<Template, `booking.${string}`
         deliver(booking.customerId, event, {
           subject: `Booking ${booking.reference} expired`,
           heading: "The vendor did not answer in time",
-          paragraphs: ["Your request expired after 24 hours without an answer. Your shipment is open again."],
+          paragraphs: [`Your request expired after ${responseWindowHours} hours without an answer. Your shipment is open again.`],
           action: { label: "Choose another truck", url: link(`/account/shipments/${booking.shipmentId}`) },
         }),
       );
@@ -167,7 +168,7 @@ export async function notifyBooking(event: Extract<Template, `booking.${string}`
           deliver(vendorUser, event, {
             subject: `Booking request ${booking.reference} expired`,
             heading: "A booking request expired",
-            paragraphs: ["You did not answer this request within 24 hours, so it expired and the space on your trip was released.", "Answer requests quickly to win more bookings."],
+            paragraphs: [`You did not answer this request within ${responseWindowHours} hours, so it expired and the space on your trip was released.`, "Answer requests quickly to win more bookings."],
             action: forVendor,
           }),
         );
@@ -272,6 +273,7 @@ export async function notifyDelivery(
   const forVendor = { label: "View booking", url: link(`/vendor/bookings/${booking.id}`) };
   const jobs: Array<Promise<void>> = [];
   const ref = booking.reference;
+  const { autoCompleteHours } = await getPlatformSettings();
 
   switch (event) {
     case "driver_assigned":
@@ -341,7 +343,7 @@ export async function notifyDelivery(
           heading: "Your shipment was delivered",
           paragraphs: [
             `Booking ${ref} was marked as delivered.`,
-            "Please confirm you received everything in good condition. If something is wrong, report a problem from the booking page within 72 hours.",
+            `Please confirm you received everything in good condition. If something is wrong, report a problem from the booking page within ${autoCompleteHours} hours.`,
           ],
           action: { label: "Confirm receipt", url: forCustomer.url },
         }),
@@ -351,7 +353,7 @@ export async function notifyDelivery(
           deliver(vendorUser, template, {
             subject: `${ref} delivered`,
             heading: "Delivery recorded",
-            paragraphs: [`Booking ${ref} is delivered. Your payout becomes payable once the shipper confirms receipt, or automatically after 72 hours without a dispute.`],
+            paragraphs: [`Booking ${ref} is delivered. Your payout becomes payable once the shipper confirms receipt, or automatically after ${autoCompleteHours} hours without a dispute.`],
             action: forVendor,
           }),
         );
@@ -384,7 +386,7 @@ export async function notifyDelivery(
             subject: `${ref} is complete`,
             heading: "Your booking is complete",
             paragraphs: [
-              `Booking ${ref} was completed automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`,
+              `Booking ${ref} was completed automatically ${autoCompleteHours} hours after delivery.`,
               "Tell other shippers how it went by rating the vendor.",
             ],
             action: { label: "Rate this delivery", url: forCustomer.url },

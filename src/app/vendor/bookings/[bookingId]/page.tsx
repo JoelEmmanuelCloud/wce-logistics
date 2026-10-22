@@ -10,13 +10,14 @@ import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
-import { ASSIGNABLE_STATUSES, AUTO_COMPLETE_HOURS, availableUpdates } from "@/lib/delivery";
+import { ASSIGNABLE_STATUSES, availableUpdates } from "@/lib/delivery";
 import { DELIVERY_ACTIONS, formatDateTime } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
 import { driverOptions, listDeliveryEvents } from "@/server/delivery";
 import { ACTIVE_DISPUTE_STATUSES, canOpenDispute, latestDisputeForBooking } from "@/server/disputes";
 import { getBookingDetail, VENDOR_CANCELLABLE } from "@/server/marketplace";
+import { getPlatformSettings } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 import { AcceptButton } from "../accept-button";
 
@@ -39,11 +40,12 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
   const pending = booking.status === "pending_vendor_acceptance";
   const cancellable = VENDOR_CANCELLABLE.includes(booking.status);
   const assignable = ASSIGNABLE_STATUSES.includes(booking.status);
-  const [deliveryRows, drivers, dispute, disputable] = await Promise.all([
+  const [deliveryRows, drivers, dispute, disputable, settings] = await Promise.all([
     listDeliveryEvents(booking.id),
     assignable ? driverOptions(profile.id, detail.truck.category, detail.route.departureDate) : Promise.resolve([]),
     latestDisputeForBooking(booking.id),
     canOpenDispute(booking),
+    getPlatformSettings(),
   ]);
   const activeDispute = dispute && ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? dispute : null;
   const updates = booking.driverId ? availableUpdates(booking.status, deliveryRows.map((row) => row.event.kind)) : [];
@@ -125,7 +127,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
           )}
           {booking.status === "delivered" && (
             <Alert tone="info" title="Waiting for the shipper">
-              The booking completes when the shipper confirms receipt, or automatically {AUTO_COMPLETE_HOURS} hours after delivery if no problem is reported.
+              The booking completes when the shipper confirms receipt, or automatically {settings.autoCompleteHours} hours after delivery if no problem is reported.
             </Alert>
           )}
           {CONTACT_VISIBLE.includes(booking.status) && (

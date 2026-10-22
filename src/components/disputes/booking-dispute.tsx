@@ -12,6 +12,7 @@ export function BookingDispute({
   dispute,
   thread,
   canOpen,
+  windowDays,
   openForm,
   replyForm,
 }: {
@@ -20,6 +21,7 @@ export function BookingDispute({
   dispute: Dispute | null;
   thread: Awaited<ReturnType<typeof disputeThread>>;
   canOpen: boolean;
+  windowDays: number;
   openForm: ReactNode;
   replyForm: ReactNode;
 }) {
@@ -43,7 +45,7 @@ export function BookingDispute({
           )}
           {!active && !canOpen && !dispute && (
             <Alert tone="info" title="Disputes are not available for this booking">
-              A problem can be reported on a paid booking, up to 14 days after it is completed or cancelled.
+              A problem can be reported on a paid booking, up to {windowDays} days after it is completed or cancelled.
             </Alert>
           )}
           {dispute && <DisputeSummary dispute={dispute} />}

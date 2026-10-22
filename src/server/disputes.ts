@@ -4,6 +4,7 @@ import { withinDisputeWindow } from "@/lib/delivery";
 import { recordAudit } from "@/server/audit";
 import { db, schema } from "@/server/db";
 import type { Booking, Dispute, DisputeStatus, UserRole } from "@/server/db/schema";
+import { getPlatformSettings } from "@/server/settings";
 import type { StoredFile } from "@/server/storage";
 
 export class DisputeError extends Error {}
@@ -33,8 +34,9 @@ export async function openDispute(
       .from(schema.payments)
       .where(and(eq(schema.payments.bookingId, booking.id), inArray(schema.payments.status, ["successful", "partially_refunded", "refunded"])))
       .limit(1);
-    if (!paid || !withinDisputeWindow(booking.status, closedAt)) {
-      throw new DisputeError("A problem can be reported on a paid booking, up to 14 days after it is completed or cancelled.");
+    const { disputeWindowDays } = await getPlatformSettings();
+    if (!paid || !withinDisputeWindow(booking.status, closedAt, disputeWindowDays)) {
+      throw new DisputeError(`A problem can be reported on a paid booking, up to ${disputeWindowDays} days after it is completed or cancelled.`);
     }
     const [dispute] = await tx
       .insert(schema.disputes)
@@ -204,7 +206,7 @@ export function disputeRole(role: UserRole | null): string {
 
 export async function canOpenDispute(booking: Booking): Promise<boolean> {
   const closedAt = booking.status === "completed" ? booking.completedAt : booking.status === "cancelled" ? booking.updatedAt : null;
-  if (!withinDisputeWindow(booking.status, closedAt)) {
+  if (!withinDisputeWindow(booking.status, closedAt, (await getPlatformSettings()).disputeWindowDays)) {
     return false;
   }
   const [paid] = await db()

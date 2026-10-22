@@ -23,8 +23,6 @@ export const DELIVERY_UPDATE_KINDS = Object.keys(DELIVERY_STEPS) as DeliveryUpda
 
 export const ASSIGNABLE_STATUSES: readonly BookingStatus[] = ["confirmed", "pickup_scheduled"];
 export const DELIVERY_IN_PROGRESS = IN_PROGRESS;
-export const AUTO_COMPLETE_HOURS = 72;
-export const DISPUTE_WINDOW_DAYS = 14;
 export const DISPUTABLE_STATUSES: readonly BookingStatus[] = [
   "confirmed",
   "pickup_scheduled",
@@ -59,12 +57,12 @@ export function licenceCoversTruck(licenceClass: string, truckCategory: string):
   return LICENCE_COVERAGE[licenceClass]?.includes(truckCategory) ?? false;
 }
 
-export function withinDisputeWindow(status: BookingStatus, closedAt: Date | null, now = Date.now()): boolean {
+export function withinDisputeWindow(status: BookingStatus, closedAt: Date | null, windowDays: number, now = Date.now()): boolean {
   if (!DISPUTABLE_STATUSES.includes(status)) {
     return false;
   }
   if (status !== "completed" && status !== "cancelled") {
     return true;
   }
-  return closedAt !== null && now - closedAt.getTime() <= DISPUTE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+  return closedAt !== null && now - closedAt.getTime() <= windowDays * 24 * 60 * 60 * 1000;
 }
