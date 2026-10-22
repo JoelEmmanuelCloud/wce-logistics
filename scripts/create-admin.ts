@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import postgres from "postgres";
 import { parseArgs } from "node:util";
+import { connectionSettings, databaseUrl } from "../src/server/db/connection";
 
 config({ path: ".env.local" });
 
@@ -16,12 +17,13 @@ async function main() {
   if (!name || name.length < 2) {
     throw new Error('Pass the administrator name with --name, for example --name "Ada Obi"');
   }
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL is required");
+  const raw = databaseUrl(process.env, "migrations");
+  if (!raw) {
+    throw new Error("DATABASE_URL or POSTGRES_URL_NON_POOLING is required");
   }
 
-  const sql = postgres(url, { max: 1 });
+  const { url, prepare } = connectionSettings(raw);
+  const sql = postgres(url, { max: 1, prepare });
   try {
     const [user] = await sql<{ id: string; created: boolean }[]>`
       insert into users (email, full_name, role)
