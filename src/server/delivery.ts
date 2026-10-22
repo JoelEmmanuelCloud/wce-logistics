@@ -1,9 +1,8 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, isNull, lt, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, ne, notInArray, sql } from "drizzle-orm";
 import { addDays, lagosToday } from "@/lib/dates";
 import {
   ASSIGNABLE_STATUSES,
-  AUTO_COMPLETE_HOURS,
   canRecord,
   DELIVERY_IN_PROGRESS,
   licenceCoversTruck,
@@ -205,35 +204,6 @@ export async function confirmReceipt(customerId: string, bookingId: string): Pro
     await tx.insert(schema.deliveryEvents).values({ bookingId: booking.id, kind: "receipt_confirmed", actorId: customerId, note: "The shipper confirmed receipt." });
     return completeLocked(tx, booking, customerId, "The shipper confirmed receipt of the goods.");
   });
-}
-
-export async function autoCompleteDeliveries(): Promise<Booking[]> {
-  const due = await db()
-    .select({ id: schema.bookings.id })
-    .from(schema.bookings)
-    .where(
-      and(
-        eq(schema.bookings.status, "delivered"),
-        lt(schema.bookings.deliveredAt, sql`now() - make_interval(hours => ${AUTO_COMPLETE_HOURS})`),
-        sql`not exists (select 1 from ${schema.disputes} where ${schema.disputes.bookingId} = ${schema.bookings.id} and ${schema.disputes.status} not in ('resolved', 'closed'))`,
-      ),
-    )
-    .limit(500);
-
-  const completed: Booking[] = [];
-  for (const { id } of due) {
-    const booking = await db().transaction(async (tx) => {
-      const locked = await lockBooking(tx, id);
-      if (!locked || locked.status !== "delivered" || (await hasActiveDispute(tx, id))) {
-        return null;
-      }
-      return completeLocked(tx, locked, null, `Completed automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`);
-    });
-    if (booking) {
-      completed.push(booking);
-    }
-  }
-  return completed;
 }
 
 export async function listDeliveryEvents(bookingId: string) {
