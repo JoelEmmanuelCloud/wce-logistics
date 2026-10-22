@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import { ContactButton } from "@/components/contact-button";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
@@ -11,6 +12,12 @@ const COMPANY_LINKS = [
 ];
 
 const BRAND_LINE = ["Heavy equipment", "Trucks", "Buses", "Logistics", "On demand"];
+
+async function Copyright() {
+  "use cache";
+  cacheLife("days");
+  return <p>&copy; {new Date().getFullYear()} WCE Logistics. All rights reserved.</p>;
+}
 
 export function SiteFooter({ contactEmail }: { contactEmail: string }) {
   return (
@@ -85,7 +92,7 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
 
       <div className="border-t border-white/12">
         <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-4 px-[clamp(20px,3.2vw,56px)] py-7 text-[12px] font-medium uppercase tracking-[0.2em] text-white/70 lg:flex-row lg:items-center lg:justify-between">
-          <p>WCE Logistics</p>
+          <Copyright />
           <p className="flex flex-wrap gap-x-3 gap-y-1">
             {BRAND_LINE.map((item, index) => (
               <span key={item} className="flex gap-3">
