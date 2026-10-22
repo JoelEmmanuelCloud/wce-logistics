@@ -365,6 +365,10 @@ export async function getBookingDetail(bookingId: string) {
       vendorEmail: schema.vendorProfiles.email,
       customerName: schema.users.fullName,
       customerPhone: schema.users.phone,
+      vendorUserId: schema.vendorProfiles.userId,
+      driverName: schema.drivers.fullName,
+      driverPhone: schema.drivers.phone,
+      driverUserId: schema.drivers.userId,
     })
     .from(schema.bookings)
     .innerJoin(schema.shipments, eq(schema.shipments.id, schema.bookings.shipmentId))
@@ -372,6 +376,7 @@ export async function getBookingDetail(bookingId: string) {
     .innerJoin(schema.trucks, eq(schema.trucks.id, schema.bookings.truckId))
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.bookings.vendorId))
     .innerJoin(schema.users, eq(schema.users.id, schema.bookings.customerId))
+    .leftJoin(schema.drivers, eq(schema.drivers.id, schema.bookings.driverId))
     .where(eq(schema.bookings.id, bookingId))
     .limit(1);
   if (!row) {

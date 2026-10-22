@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { declineBookingAction, vendorCancelBookingAction } from "@/app/vendor/bookings/actions";
+import { assignDriverAction, declineBookingAction, vendorCancelBookingAction, vendorDeliveryUpdateAction } from "@/app/vendor/bookings/actions";
+import { AssignDriverForm } from "@/components/delivery/assign-driver-form";
+import { DeliveryTimeline } from "@/components/delivery/delivery-timeline";
+import { DeliveryUpdateForm } from "@/components/delivery/delivery-update-form";
 import { BookingHeader, BookingSummary, BookingTimeline } from "@/components/marketplace/booking-detail";
 import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
 import { Alert } from "@/components/ui/alert";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
-import { formatDateTime } from "@/lib/labels";
+import { ASSIGNABLE_STATUSES, AUTO_COMPLETE_HOURS, availableUpdates } from "@/lib/delivery";
+import { DELIVERY_ACTIONS, formatDateTime } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
+import { driverOptions, listDeliveryEvents } from "@/server/delivery";
 import { getBookingDetail, VENDOR_CANCELLABLE } from "@/server/marketplace";
 import { findVendorProfileByUser } from "@/server/vendors";
 import { AcceptButton } from "../accept-button";
@@ -31,6 +37,12 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
   const { booking } = detail;
   const pending = booking.status === "pending_vendor_acceptance";
   const cancellable = VENDOR_CANCELLABLE.includes(booking.status);
+  const assignable = ASSIGNABLE_STATUSES.includes(booking.status);
+  const [deliveryRows, drivers] = await Promise.all([
+    listDeliveryEvents(booking.id),
+    assignable ? driverOptions(profile.id, detail.truck.category, detail.route.departureDate) : Promise.resolve([]),
+  ]);
+  const updates = booking.driverId ? availableUpdates(booking.status, deliveryRows.map((row) => row.event.kind)) : [];
 
   return (
     <>
@@ -60,6 +72,50 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
               The trip space stays reserved. You will see the booking as confirmed once payment is received.
             </Alert>
           )}
+          {assignable && (
+            <Card tone={booking.driverId ? "light" : "attention"}>
+              <CardHeader
+                title={booking.driverId ? "Driver" : "Assign a driver"}
+                description={
+                  booking.driverId
+                    ? `${detail.driverName}, ${formatPhone(detail.driverPhone)}. You can change the driver until the goods are collected.`
+                    : "The shipper sees the driver's name and phone number once you assign one."
+                }
+              />
+              {drivers.length === 0 && !booking.driverId ? (
+                <Link href="/vendor/drivers/new" className={buttonClasses("secondary")}>
+                  Add a driver
+                </Link>
+              ) : (
+                <AssignDriverForm action={assignDriverAction.bind(null, booking.id)} drivers={drivers} currentDriverId={booking.driverId} />
+              )}
+            </Card>
+          )}
+          {!assignable && detail.driverName && (
+            <Card>
+              <CardHeader title="Driver" />
+              <DescriptionList
+                items={[
+                  { label: "Name", value: detail.driverName },
+                  { label: "Phone", value: formatPhone(detail.driverPhone) },
+                ]}
+              />
+            </Card>
+          )}
+          {updates.length > 0 && (
+            <Card>
+              <CardHeader title="Update delivery" description="Your driver usually records these from their phone. You can record them here too." />
+              <DeliveryUpdateForm
+                action={vendorDeliveryUpdateAction.bind(null, booking.id)}
+                options={updates.map((kind) => ({ value: kind, ...DELIVERY_ACTIONS[kind] }))}
+              />
+            </Card>
+          )}
+          {booking.status === "delivered" && (
+            <Alert tone="info" title="Waiting for the shipper">
+              The booking completes when the shipper confirms receipt, or automatically {AUTO_COMPLETE_HOURS} hours after delivery if no problem is reported.
+            </Alert>
+          )}
           {CONTACT_VISIBLE.includes(booking.status) && (
             <Card>
               <CardHeader title="Shipper" />
@@ -82,6 +138,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
               />
             </Card>
           )}
+          {(booking.driverId || deliveryRows.length > 0) && <DeliveryTimeline rows={deliveryRows} />}
           <BookingTimeline detail={detail} />
         </div>
       </div>

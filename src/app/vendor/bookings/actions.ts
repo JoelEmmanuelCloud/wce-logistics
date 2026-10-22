@@ -6,9 +6,11 @@ import { after } from "next/server";
 import { z } from "zod";
 import { errorState, successState, type FormState } from "@/lib/form-state";
 import { requireRole } from "@/server/auth/dal";
+import { assignDriver, DeliveryError } from "@/server/delivery";
+import { applyDeliveryUpdate } from "@/server/delivery-form";
 import { cancelBooking, MarketplaceError, respondToBooking } from "@/server/marketplace";
+import { notifyBooking, notifyDelivery } from "@/server/notifications";
 import { findVendorProfileByUser } from "@/server/vendors";
-import { notifyBooking } from "@/server/notifications";
 
 const id = z.uuid();
 const reasonSchema = z.string().trim().min(5, "Give the shipper a short reason.").max(500);
@@ -82,4 +84,34 @@ export async function vendorCancelBookingAction(bookingId: string, _previous: Fo
   }
   refresh();
   return successState("Booking cancelled.");
+}
+
+export async function assignDriverAction(bookingId: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  const { user, profile } = await vendorContext();
+  const driverId = id.safeParse(formData.get("driverId"));
+  if (!id.safeParse(bookingId).success) {
+    return errorState("Booking not found.");
+  }
+  if (!driverId.success) {
+    return errorState("Choose a driver.", { driverId: ["Choose a driver."] });
+  }
+  try {
+    const { booking, driver } = await assignDriver(profile.id, user.id, bookingId, driverId.data);
+    after(() => notifyDelivery("driver_assigned", booking, { driverUserId: driver.userId, driverName: driver.fullName, driverPhone: driver.phone }));
+  } catch (error) {
+    if (error instanceof DeliveryError) {
+      return errorState(error.message);
+    }
+    throw error;
+  }
+  refresh();
+  return successState("Driver assigned. The shipper and the driver have been emailed.");
+}
+
+export async function vendorDeliveryUpdateAction(bookingId: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  const { user, profile } = await vendorContext();
+  if (!id.safeParse(bookingId).success) {
+    return errorState("Booking not found.");
+  }
+  return applyDeliveryUpdate({ userId: user.id, role: "vendor", vendorId: profile.id }, bookingId, formData);
 }
