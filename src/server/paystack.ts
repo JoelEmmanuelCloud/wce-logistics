@@ -73,6 +73,57 @@ export async function refundTransaction(reference: string, amountKobo: number): 
   return call<{ id: number; status: string }>("/refund", { method: "POST", body: { transaction: reference, amount: amountKobo } });
 }
 
+export type Bank = { name: string; code: string };
+
+const globalForBanks = globalThis as unknown as { wcePaystackBanks?: { banks: Bank[]; fetchedAt: number } };
+const BANK_LIST_TTL_MS = 6 * 60 * 60 * 1000;
+
+export async function listBanks(): Promise<Bank[]> {
+  const cached = globalForBanks.wcePaystackBanks;
+  if (cached && Date.now() - cached.fetchedAt < BANK_LIST_TTL_MS) {
+    return cached.banks;
+  }
+  const data = await call<Array<{ name: string; code: string; active: boolean; is_deleted: boolean | null; type: string }>>(
+    "/bank?country=nigeria&currency=NGN&perPage=200",
+    { method: "GET" },
+  );
+  const banks = data
+    .filter((bank) => bank.active && !bank.is_deleted && bank.type === "nuban")
+    .map((bank) => ({ name: bank.name, code: bank.code }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  globalForBanks.wcePaystackBanks = { banks, fetchedAt: Date.now() };
+  return banks;
+}
+
+export async function resolveAccount(accountNumber: string, bankCode: string): Promise<{ accountName: string }> {
+  const data = await call<{ account_number: string; account_name: string }>(
+    `/bank/resolve?account_number=${encodeURIComponent(accountNumber)}&bank_code=${encodeURIComponent(bankCode)}`,
+    { method: "GET" },
+  );
+  return { accountName: data.account_name };
+}
+
+export async function createTransferRecipient(input: { name: string; accountNumber: string; bankCode: string }): Promise<{ recipientCode: string }> {
+  const data = await call<{ recipient_code: string }>("/transferrecipient", {
+    method: "POST",
+    body: { type: "nuban", name: input.name, account_number: input.accountNumber, bank_code: input.bankCode, currency: "NGN" },
+  });
+  return { recipientCode: data.recipient_code };
+}
+
+export type PaystackTransfer = { reference: string; transfer_code: string; status: string; amount: number; reason?: string | null };
+
+export async function initiateTransfer(input: { amountKobo: number; recipientCode: string; reference: string; reason: string }): Promise<PaystackTransfer> {
+  return call<PaystackTransfer>("/transfer", {
+    method: "POST",
+    body: { source: "balance", amount: input.amountKobo, recipient: input.recipientCode, reference: input.reference, reason: input.reason, currency: "NGN" },
+  });
+}
+
+export async function verifyTransfer(reference: string): Promise<PaystackTransfer> {
+  return call<PaystackTransfer>(`/transfer/verify/${encodeURIComponent(reference)}`, { method: "GET" });
+}
+
 export function validWebhookSignature(rawBody: string, signature: string | null): boolean {
   const key = serverEnv().PAYSTACK_SECRET_KEY;
   if (!key || !signature || !/^[0-9a-f]{128}$/i.test(signature)) {
