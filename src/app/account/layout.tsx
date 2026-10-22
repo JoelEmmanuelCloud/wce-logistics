@@ -16,7 +16,7 @@ const NAV = [
 ] as const;
 
 export default async function AccountLayout({ children }: LayoutProps<"/account">) {
-  const user = await requireRole("customer", "driver");
+  const user = await requireRole("customer");
   return (
     <AppShell user={user} nav={NAV}>
       {children}

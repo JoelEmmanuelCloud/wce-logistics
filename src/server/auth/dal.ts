@@ -13,8 +13,9 @@ export function homePathFor(user: Pick<User, "role">): string {
     case "vendor":
       return "/vendor";
     case "customer":
-    case "driver":
       return "/account";
+    case "driver":
+      return "/driver";
     default:
       return "/onboarding";
   }

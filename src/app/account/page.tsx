@@ -11,7 +11,7 @@ import { listBookings } from "@/server/marketplace";
 export const metadata: Metadata = { title: "Account" };
 
 export default async function AccountPage() {
-  const user = await requireRole("customer", "driver");
+  const user = await requireRole("customer");
   const firstName = user.fullName?.split(" ")[0];
   const recent = (await listBookings({ customerId: user.id })).slice(0, 3);
 
