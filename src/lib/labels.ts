@@ -213,3 +213,13 @@ export const REVIEW_STATUS: Record<string, { label: string; tone: Tone }> = {
   published: { label: "Published", tone: "success" },
   hidden: { label: "Hidden", tone: "neutral" },
 };
+
+export const DELIVERY_ACTIONS: Record<string, { label: string; hint: string }> = {
+  arrived_at_pickup: { label: "Arrived at pickup", hint: "The truck is at the pickup address." },
+  goods_collected: { label: "Goods collected", hint: "Everything is loaded. Add a photo of the loaded cargo if you can." },
+  departed: { label: "Departed for destination", hint: "The truck has left with the goods." },
+  arrived_at_destination: { label: "Arrived at destination", hint: "The truck is at the delivery address." },
+  delivery_attempted: { label: "Could not deliver", hint: "Explain why, for example the receiver was not available." },
+  delivered: { label: "Delivered", hint: "Record who received the goods. A photo is strong proof of delivery." },
+  incident_reported: { label: "Report an incident", hint: "Delays, breakdowns, accidents or anything the shipper should know." },
+};
