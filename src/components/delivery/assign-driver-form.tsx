@@ -22,7 +22,12 @@ export function AssignDriverForm({
   const firstEligible = choices.find((driver) => !driver.problem);
 
   if (currentDriverId && choices.length === 0) {
-    return <p className="text-[14px] text-navy/70">Add another driver to your fleet if you need to change who carries this booking.</p>;
+    return (
+      <div className="grid gap-3">
+        <FormMessage state={state} />
+        <p className="text-[14px] text-navy/70">Add another driver to your fleet if you need to change who carries this booking.</p>
+      </div>
+    );
   }
 
   return (
