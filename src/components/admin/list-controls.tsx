@@ -102,10 +102,10 @@ export function Pagination({
   );
 }
 
-export function DataTable({ headers, children, caption }: { headers: readonly string[]; children: ReactNode; caption: string }) {
+export function DataTable({ headers, children, caption, compact = false }: { headers: readonly string[]; children: ReactNode; caption: string; compact?: boolean }) {
   return (
     <div className="overflow-x-auto rounded-[20px] border border-navy/10 bg-white">
-      <table className="w-full min-w-[720px] border-collapse text-left text-[14px]">
+      <table className={`w-full ${compact ? "min-w-[360px]" : "min-w-[720px]"} border-collapse text-left text-[14px]`}>
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="border-b border-navy/10 bg-navy/[0.03]">

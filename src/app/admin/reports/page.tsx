@@ -138,7 +138,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps<"/adm
           <h2 id="routes-title" className="text-[19px] font-semibold text-navy">
             Top routes
           </h2>
-          <DataTable caption="Top routes by gross booking value" headers={["Route", "Paid bookings", "Value"]}>
+          <DataTable caption="Top routes by gross booking value" headers={["Route", "Bookings", "Value"]} compact>
             {routes.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-4 py-8 text-center text-navy/70">
@@ -162,7 +162,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps<"/adm
           <h2 id="vendors-title" className="text-[19px] font-semibold text-navy">
             Top vendors
           </h2>
-          <DataTable caption="Top vendors by gross booking value" headers={["Vendor", "Paid bookings", "Value"]}>
+          <DataTable caption="Top vendors by gross booking value" headers={["Vendor", "Bookings", "Value"]} compact>
             {vendors.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-4 py-8 text-center text-navy/70">

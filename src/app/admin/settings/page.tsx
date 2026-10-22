@@ -87,7 +87,7 @@ export default async function AdminSettingsPage() {
             </div>
           </Card>
         </div>
-        <Card>
+        <Card className="self-start">
           <CardHeader title="Recent changes" />
           {history.length === 0 ? (
             <p className="text-[15px] text-navy/70">No changes yet.</p>
