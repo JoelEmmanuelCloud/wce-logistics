@@ -12,15 +12,17 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 |---|---|
 | Marketing site | Landing page with services, how it works, verification, pricing, industries, vendor and FAQ sections |
 | Authentication | Email sign-in with one-time codes, onboarding as shipper or vendor with a contact phone number, sessions, sign-out |
-| Notifications | Branded emails for booking requests, acceptances, declines, payments, cancellations and vendor and truck review decisions |
+| Notifications | Branded emails for booking requests, acceptances, declines, payments, cancellations, driver assignment, delivery progress, disputes, reviews and vendor and truck review decisions |
 | Vendors | Business profile, encrypted identity details, document uploads, submission for verification |
 | Trucks | Registration, document uploads with expiry dates, photos, submission for review, availability, archiving |
 | Administration | Review queues, vendor and truck decisions, document review, user suspension, booking oversight, offline payment recording, audit log |
 | Marketplace | Vendors publish trips with capacity and per-kilogram pricing. Shippers describe a load, compare verified trucks with itemised prices, and request a booking. Vendors accept or decline. Capacity is reserved safely under concurrent requests |
 | Payments | Paystack checkout for accepted bookings, verified server side through the callback and a signed webhook. A platform commission is split from each payment, vendor payouts are tracked until paid, and refunds go back through Paystack. Bank transfers can still be recorded by administrators |
-| Operations | Jobs that flag trucks with expired documents and expire unanswered booking requests, command to create administrators |
+| Delivery | Vendors add drivers with licence details and assign them to confirmed bookings. Drivers sign in to their own area, record pickup, departure, delivery attempts, delivery and incidents with photo evidence. Shippers follow progress and confirm receipt, which releases the vendor payout |
+| Reviews and disputes | Shippers rate completed bookings, and ratings appear on truck offers. Shippers and vendors can open a dispute with evidence. Administrators work the dispute queue, and payouts stay on hold until a dispute is closed |
+| Operations | Jobs that flag trucks with expired documents, expire unanswered booking requests and complete deliveries after 72 hours, command to create administrators |
 
-Driver assignment, delivery tracking, ratings and disputes are later phases in the PRD. Without a Paystack key, online checkout is hidden and administrators confirm bookings by recording bank transfer references.
+Live GPS tracking, route optimisation and automated load matching are later phases in the PRD. Without a Paystack key, online checkout is hidden and administrators confirm bookings by recording bank transfer references.
 
 ## Stack
 
@@ -100,12 +102,14 @@ npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 | `npm run admin:create` | Create or promote an administrator |
 | `npm run jobs:expire-documents` | Flag trucks whose required documents have expired |
 | `npm run jobs:expire-bookings` | Expire booking requests the vendor did not answer within 24 hours and release their capacity |
+| `npm run jobs:complete-deliveries` | Complete bookings delivered more than 72 hours ago without an open dispute, and make their payouts payable |
 
 ## Production operations
 
 - Run `npm run db:migrate` before each deployment that includes new migrations.
 - Schedule `npm run jobs:expire-documents` to run daily, for example at 00:30 Africa/Lagos.
 - Schedule `npm run jobs:expire-bookings` to run every 15 minutes.
+- Schedule `npm run jobs:complete-deliveries` to run every hour.
 - Keep the documents bucket private. Files are only ever served through short-lived signed links after an authorization check.
 - Serve the app behind HTTPS. Session cookies use the `__Host-` prefix and the `Secure` flag in production.
 - In the Paystack dashboard, set the webhook URL to `https://<your domain>/api/webhooks/paystack`. The callback URL is sent with each transaction, so it needs no dashboard setting.

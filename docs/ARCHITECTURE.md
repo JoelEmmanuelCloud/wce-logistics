@@ -50,7 +50,7 @@ PostgreSQL with Drizzle ORM. The schema lives in `src/server/db/schema.ts` and e
 | Shipper (`customer`) | `/account` |
 | Vendor | `/vendor`, their own profile, documents and trucks |
 | Administrator | `/admin` and every document |
-| Driver | Reserved for Phase 4 |
+| Driver | `/driver`, only the bookings currently assigned to them, without prices or vendor finances |
 
 Administrators are never self-registered. They are created with `npm run admin:create`.
 
@@ -94,7 +94,7 @@ any (except under review or suspended) -> archived
 - Money is stored in kobo as integers. Quotes are chargeable weight times the trip's rate, topped up to the trip's minimum charge when needed, or the trip's whole-truck price for dedicated bookings. The quote is copied onto the booking so later price changes never affect it.
 - Search shows trips from verified vendors on active trucks, between the shipment's states, departing on the pickup date or up to 3 days after, that carry the cargo type and have room for the weight.
 - Requesting a booking locks the shipment and trip rows, rechecks eligibility and capacity, then reserves the weight in the same transaction. Two shippers racing for the last space cannot both succeed.
-- Booking statuses: `pending_vendor_acceptance` to `awaiting_payment` (vendor accepted) to `confirmed` (payment recorded). Declines, cancellations and expiry release the reserved capacity and reopen the shipment.
+- Booking statuses: `pending_vendor_acceptance` to `awaiting_payment` (vendor accepted) to `confirmed` (payment recorded), then through delivery (see below) to `completed`. Declines, cancellations and expiry release the reserved capacity and reopen the shipment. Shippers and vendors can cancel until the goods are collected; after that only an administrator can.
 - Vendors have 24 hours to answer. `npm run jobs:expire-bookings` closes unanswered requests.
 - Vendors see the shipper's contact details only after accepting.
 
@@ -120,13 +120,27 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 - Settlement checks the reference, amount and currency against the stored payment. A mismatch fails the payment and writes an audit entry.
 - A payment that succeeds after the booking was cancelled or expired is kept as successful and flagged for refund on the admin Payments page.
 - Webhooks are rejected with 401 unless the `x-paystack-signature` HMAC-SHA512 matches the secret key, compared in constant time.
-- On success the commission (`PLATFORM_COMMISSION_BPS`) and vendor share are stored on the payment, and a payout row holds the vendor share until an administrator records the bank transfer.
+- On success the commission (`PLATFORM_COMMISSION_BPS`) and vendor share are stored on the payment, and a payout row holds the vendor share (`on_hold`). It becomes `eligible` when the booking completes, and an administrator can only mark an eligible payout as paid, never while a dispute is open.
 - Refunds are issued from the admin Payments page through the Paystack refund API, and the related payout is cancelled.
+
+## Delivery operations
+
+- Vendors add drivers with name, email, phone and FRSC licence details. The licence number is encrypted (AES-256-GCM) and indexed by an HMAC so the same licence cannot be registered twice. Adding a driver creates a `driver` user that signs in with the same email codes as everyone else.
+- A driver can be assigned to a `confirmed` or `pickup_scheduled` booking when their licence is valid on the departure date, their class covers the truck (C: light trucks, E: rigid goods vehicles, G: articulated and low-loaders, see `src/lib/delivery.ts`) and they are not on another trip on overlapping dates. Assignment moves the booking to `pickup_scheduled`.
+- Delivery updates are a state machine in `src/lib/delivery.ts`: arrived at pickup, goods collected (`goods_collected`), departed (`in_transit`), arrived at destination, delivery attempted (`delivery_attempted`), delivered (`delivered`), and incidents at any stage. Out-of-order or repeated steps are refused under a row lock. Each update is a `delivery_events` row with the actor, a note, the recipient name for deliveries and an optional photo.
+- The shipper confirms receipt, or `jobs:complete-deliveries` completes the booking 72 hours after delivery when no dispute is open. Completion makes the payout `eligible`.
+- Delivery photos and dispute attachments are served through `/files/...` only to the booking's shipper, vendor, assigned driver (photos only) and administrators.
+
+## Reviews and disputes
+
+- A shipper can review a completed booking once (1 to 5 with an optional comment). Published reviews feed the vendor rating shown on offers. Administrators can hide a review with a recorded reason.
+- A shipper or vendor can open one active dispute per paid booking, while it is in progress or up to 14 days after it is completed or cancelled. Opening a dispute puts the payout back on hold.
+- Disputes move through `open`, `under_review`, `awaiting_information`, `resolved` and `closed`. A party replying to `awaiting_information` moves it back to `under_review`. Closing requires an outcome, which is emailed to both parties and releases the payout if the booking is completed. Refunds stay a separate, explicit action on the Payments page.
 
 ## Testing
 
-- Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing, commission splits, webhook signatures and truck document rules.
-- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server, so the real email and payment code paths run. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds and payouts, on desktop and mobile Chrome.
+- Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing, commission splits, webhook signatures, truck document rules, delivery steps, licence coverage and dispute windows.
+- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server, so the real email and payment code paths run. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds, drivers and licence checks, delivery updates with photos, receipt confirmation, reviews, disputes and payouts, on desktop and mobile Chrome.
 
 ## Decisions
 
@@ -139,4 +153,6 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 | Partial prefetching disabled | The experimental flag left the address bar out of sync after some redirects |
 | Kobo integers for money | Exact arithmetic with no floating point rounding |
 | Paystack with offline recording as a fallback | Card, transfer and USSD checkout for shippers, while bank transfers outside Paystack can still confirm a booking with the reference in the audit log |
+| Payouts only after completion | Vendors are paid once the shipper confirms receipt or the 72-hour window passes, so disputes can still hold the money |
+| Disputes do not change the booking status | The booking keeps its delivery status, and the dispute has its own lifecycle and audit trail |
 | Verify before trusting any payment signal | Callback query strings and webhooks can be replayed or forged, so only Paystack's verify response changes payment state |

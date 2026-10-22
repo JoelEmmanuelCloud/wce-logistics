@@ -2,7 +2,7 @@
 
 This document tracks the WCE Logistics build against the product requirements in [PRD.md](PRD.md). Technical design is described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Last updated: 22 October 2026
+Last updated: 22 October 2026 (Phase 4 complete)
 
 ## Project scope
 
@@ -35,7 +35,7 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 | 1. Foundation | Authentication, roles, vendor verification, trucks, documents, admin review | Done |
 | 2. Marketplace | Trips, shipments, search, pricing, booking workflow | Done |
 | 3. Transactions | Paystack payments, commission, payouts, refunds, cancellations, email notifications | Done, waiting on live keys |
-| 4. Delivery operations | Drivers, assignment, delivery statuses, evidence, reviews, disputes | Not started |
+| 4. Delivery operations | Drivers, assignment, delivery statuses, evidence, reviews, disputes | Done |
 | 5. Optimisation | GPS, route optimisation, automated matching, analytics | Not started |
 | Launch | Hosting, production configuration, legal and compliance | Not started |
 
@@ -103,11 +103,32 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Vendor Earnings page
 - [x] Offline bank transfer recording kept as a fallback
 
+### Phase 4: Delivery operations
+
+- [x] Vendors add drivers (name, email, phone, FRSC licence number, class, expiry); licence numbers encrypted and checked for duplicates
+- [x] Driver invitation email; drivers sign in with the same email codes and land in their own area
+- [x] Edit driver details, deactivate and reactivate (blocked while the driver has deliveries in progress)
+- [x] Assign or change a driver on confirmed bookings with licence validity, licence class and schedule clash checks
+- [x] Driver area: assigned deliveries with pickup and delivery addresses, cargo, handling notes and the shipper's phone, with no prices
+- [x] Delivery updates: arrived at pickup, goods collected, departed, arrived at destination, delivery attempted, delivered (with recipient name), incident reports
+- [x] Optional photo evidence on every update, served only to the booking's parties
+- [x] Delivery progress timeline for shippers, vendors, drivers and admins
+- [x] Shipper sees the assigned driver and confirms receipt
+- [x] Automatic completion 72 hours after delivery when no dispute is open (scheduled job)
+- [x] Payouts become payable only after completion, and never while a dispute is open
+- [x] Cancellation allowed until the goods are collected
+- [x] Ratings and reviews, one per completed booking, shown on truck offers and a vendor Reviews page
+- [x] Admin review moderation (hide and restore with a reason)
+- [x] Disputes by shipper or vendor with category, description and evidence, within 14 days of completion or cancellation
+- [x] Dispute messages with attachments between shipper, vendor and the WCE team
+- [x] Admin dispute queue: assign, under review, awaiting information, resolve or close with an outcome
+- [x] Emails for driver assignment, goods collected, departure, failed attempts, delivery, incidents, completion, reviews and every dispute change
+
 ## What has been tested
 
 All suites passed on the latest run. Two landing and sign-in tests can time out when the machine is under heavy load and pass when re-run on their own.
 
-### Unit tests (66 tests, Vitest)
+### Unit tests (75 tests, Vitest)
 
 - [x] Email address and Nigerian phone number normalisation
 - [x] Encryption and decryption of identity numbers
@@ -116,8 +137,11 @@ All suites passed on the latest run. Two landing and sign-in tests can time out 
 - [x] Truck document rules
 - [x] Commission split never loses or invents a kobo
 - [x] Paystack webhook signature acceptance and rejection
+- [x] Delivery step order, repeated steps and status changes
+- [x] Licence class coverage per truck type and the dispute window
+- [x] Driver, delivery update, review and dispute validation
 
-### End-to-end tests (37 scenarios, Playwright, desktop and mobile Chrome)
+### End-to-end tests (40 scenarios, Playwright, desktop and mobile Chrome)
 
 These run against a production build with a separate test database, a separate storage bucket, and local Resend and Paystack test servers, so the real email and payment code paths are exercised.
 
@@ -136,7 +160,11 @@ These run against a production build with a separate test database, a separate s
 - [x] Abandoned checkout leaves the booking payable
 - [x] Forged and unsigned webhooks rejected
 - [x] Cancelled paid booking refunded through Paystack and payout cancelled
-- [x] Admin marks a payout as paid and the vendor sees it
+- [x] Payout stays on hold after payment and cannot be paid early
+- [x] Vendor adds a driver, duplicate email rejected, driver signs in and records every delivery step with a photo
+- [x] Shipper sees the driver and delivery progress, photo access limited to booking parties, receipt confirmed, review submitted and shown to the vendor, admin pays the vendor
+- [x] Dispute with evidence holds the payout through completion, vendor and shipper reply, admin asks for information and resolves, payout released and both parties emailed
+- [x] Drivers cannot see other drivers' deliveries; licences that do not cover the truck or expire before departure cannot be assigned; busy drivers cannot be deactivated; deactivated drivers lose access; cancellation blocked after collection
 
 ### Manual checks
 
@@ -162,24 +190,17 @@ These run against a production build with a separate test database, a separate s
 ### Phase 3 remaining
 
 - [ ] Vendor payout bank account details, with optional Paystack transfer recipients for automatic payouts
-- [ ] Make payouts eligible only after confirmed delivery (depends on Phase 4)
 - [ ] Partial refunds
 - [ ] Reconciliation report against Paystack settlements
 - [ ] In-app notification centre
 
-### Phase 4: Delivery operations
+### Phase 4 follow-ups
 
-- [ ] Driver accounts linked to a vendor, with licence details and verification
-- [ ] Assign a driver to a confirmed booking with licence, availability and conflict checks
-- [ ] Driver view limited to assigned deliveries
-- [ ] Delivery statuses: pickup scheduled, arrived at pickup, goods collected, in transit, arrived, delivery attempted, delivered, incident reported
-- [ ] Pickup and delivery evidence (photo, recipient name, notes)
-- [ ] Shipper confirms receipt and the booking completes
-- [ ] Delivery status emails
-- [ ] Ratings and reviews, one per completed booking, with moderation
-- [ ] Disputes: categories, evidence, assigned admin, statuses, resolution notes
-- [ ] Payouts held while a dispute is open
-- [ ] End-to-end tests for each of the above
+- [ ] Admin verification of driver licences (upload of the licence photo and an admin review queue)
+- [ ] Admin driver list for oversight across vendors
+- [ ] Emails when bookings expire or complete automatically (the scheduled jobs update records but do not send email yet)
+- [ ] Email administrators when a new dispute is opened
+- [ ] Vendor replies to reviews
 
 ### Admin configuration and reporting
 
@@ -192,7 +213,7 @@ These run against a production build with a separate test database, a separate s
 - [ ] Choose hosting for the app, PostgreSQL and object storage
 - [ ] Production environment variables and secrets
 - [ ] Custom domain with HTTPS
-- [ ] Schedule the expiry jobs (documents daily, bookings every 15 minutes)
+- [ ] Schedule the jobs (documents daily, bookings every 15 minutes, deliveries hourly)
 - [ ] Database backups and a tested restore
 - [ ] Error monitoring and uptime alerts
 - [ ] Continuous integration running the unit and end-to-end tests on each push
