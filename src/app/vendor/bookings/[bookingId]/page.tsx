@@ -15,6 +15,7 @@ import { DELIVERY_ACTIONS, formatDateTime } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
 import { driverOptions, listDeliveryEvents } from "@/server/delivery";
+import { ACTIVE_DISPUTE_STATUSES, canOpenDispute, latestDisputeForBooking } from "@/server/disputes";
 import { getBookingDetail, VENDOR_CANCELLABLE } from "@/server/marketplace";
 import { findVendorProfileByUser } from "@/server/vendors";
 import { AcceptButton } from "../accept-button";
@@ -38,10 +39,13 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
   const pending = booking.status === "pending_vendor_acceptance";
   const cancellable = VENDOR_CANCELLABLE.includes(booking.status);
   const assignable = ASSIGNABLE_STATUSES.includes(booking.status);
-  const [deliveryRows, drivers] = await Promise.all([
+  const [deliveryRows, drivers, dispute, disputable] = await Promise.all([
     listDeliveryEvents(booking.id),
     assignable ? driverOptions(profile.id, detail.truck.category, detail.route.departureDate) : Promise.resolve([]),
+    latestDisputeForBooking(booking.id),
+    canOpenDispute(booking),
   ]);
+  const activeDispute = dispute && ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? dispute : null;
   const updates = booking.driverId ? availableUpdates(booking.status, deliveryRows.map((row) => row.event.kind)) : [];
 
   return (
@@ -70,6 +74,14 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
           {booking.status === "awaiting_payment" && (
             <Alert tone="info" title="Waiting for the shipper's payment">
               The trip space stays reserved. You will see the booking as confirmed once payment is received.
+            </Alert>
+          )}
+          {activeDispute && (
+            <Alert tone="warning" title="Dispute open">
+              The payout for this booking is on hold until our team resolves the dispute.{" "}
+              <Link href={`/vendor/bookings/${booking.id}/dispute`} className="font-semibold underline decoration-orange decoration-2 underline-offset-4">
+                View dispute
+              </Link>
             </Alert>
           )}
           {assignable && (
@@ -139,6 +151,11 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
             </Card>
           )}
           {(booking.driverId || deliveryRows.length > 0) && <DeliveryTimeline rows={deliveryRows} />}
+          {!activeDispute && (disputable || dispute) && (
+            <Link href={`/vendor/bookings/${booking.id}/dispute`} className="text-[14px] font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
+              {disputable ? "Report a problem with this booking" : "View the closed dispute"}
+            </Link>
+          )}
           <BookingTimeline detail={detail} />
         </div>
       </div>

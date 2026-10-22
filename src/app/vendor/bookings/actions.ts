@@ -8,6 +8,7 @@ import { errorState, successState, type FormState } from "@/lib/form-state";
 import { requireRole } from "@/server/auth/dal";
 import { assignDriver, DeliveryError } from "@/server/delivery";
 import { applyDeliveryUpdate } from "@/server/delivery-form";
+import { openDisputeFromForm, replyToDisputeFromForm } from "@/server/dispute-form";
 import { cancelBooking, MarketplaceError, respondToBooking } from "@/server/marketplace";
 import { notifyBooking, notifyDelivery } from "@/server/notifications";
 import { findVendorProfileByUser } from "@/server/vendors";
@@ -114,4 +115,20 @@ export async function vendorDeliveryUpdateAction(bookingId: string, _previous: F
     return errorState("Booking not found.");
   }
   return applyDeliveryUpdate({ userId: user.id, role: "vendor", vendorId: profile.id }, bookingId, formData);
+}
+
+export async function vendorOpenDisputeAction(bookingId: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  const { user, profile } = await vendorContext();
+  if (!id.safeParse(bookingId).success) {
+    return errorState("Booking not found.");
+  }
+  return openDisputeFromForm({ id: user.id, role: "vendor", vendorId: profile.id }, bookingId, formData);
+}
+
+export async function vendorDisputeReplyAction(disputeId: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  const { user, profile } = await vendorContext();
+  if (!id.safeParse(disputeId).success) {
+    return errorState("Dispute not found.");
+  }
+  return replyToDisputeFromForm({ id: user.id, role: "vendor", vendorId: profile.id }, disputeId, formData);
 }
