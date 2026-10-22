@@ -118,7 +118,7 @@ The test environment runs at https://wcelogistics.com:
 | DNS | Porkbun: `A wcelogistics.com 76.76.21.21` and `CNAME www cname.vercel-dns.com` |
 | Scheduled jobs | `.github/workflows/scheduled-jobs.yml` calls `/api/cron/<job>` with the `CRON_SECRET` repository secret |
 
-Production builds run `scripts/deploy-migrate.ts` first, which applies migrations only when `VERCEL_ENV` is `production`. Secrets are added with `npx vercel env add NAME production --sensitive` and never committed.
+Production builds run `scripts/deploy-migrate.ts` first, which applies migrations only when `VERCEL_ENV` is `production`. When `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_NAME` are set, the same step creates or promotes that administrator, which is how the first admin is created without copying database credentials. Secrets are added with `npx vercel env add NAME production --sensitive` and never committed.
 
 ## Production operations
 
