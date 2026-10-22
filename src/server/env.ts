@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { databaseUrl } from "@/server/db/connection";
 
 const base64Key = z
   .string()
@@ -29,6 +30,7 @@ const schema = z
       .or(z.literal("").transform(() => undefined)),
     PAYSTACK_BASE_URL: z.url().default("https://api.paystack.co"),
     PLATFORM_COMMISSION_BPS: z.coerce.number().int().min(0).max(5000),
+    CRON_SECRET: z.string().min(32, "must be at least 32 characters").optional().or(z.literal("").transform(() => undefined)),
   })
   .superRefine((value, context) => {
     if (value.EMAIL_PROVIDER === "resend" && !value.RESEND_API_KEY) {
@@ -47,7 +49,7 @@ export function serverEnv(): ServerEnv {
   if (cached) {
     return cached;
   }
-  const parsed = schema.safeParse(process.env);
+  const parsed = schema.safeParse({ ...process.env, DATABASE_URL: databaseUrl(process.env, "app") });
   if (!parsed.success) {
     const details = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");
     throw new Error(`Invalid server environment: ${details}`);
