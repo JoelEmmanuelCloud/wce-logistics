@@ -1,0 +1,48 @@
+name: Scheduled jobs
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+    - cron: "5 * * * *"
+    - cron: "30 23 * * *"
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Job to run
+        required: true
+        type: choice
+        options: [expire-bookings, complete-deliveries, expire-documents]
+
+permissions: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Choose job
+        id: pick
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_JOB: ${{ inputs.job }}
+        run: |
+          case "$SCHEDULE" in
+            "*/15 * * * *") job="expire-bookings" ;;
+            "5 * * * *") job="complete-deliveries" ;;
+            "30 23 * * *") job="expire-documents" ;;
+            *) job="$INPUT_JOB" ;;
+          esac
+          echo "job=$job" >> "$GITHUB_OUTPUT"
+      - name: Call the job endpoint
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          JOB: ${{ steps.pick.outputs.job }}
+        run: |
+          if [ -z "$SITE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "SITE_URL variable or CRON_SECRET secret is not set; skipping."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 280 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$SITE_URL/api/cron/$JOB"
