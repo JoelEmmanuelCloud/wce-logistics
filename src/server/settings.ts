@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { cache } from "react";
 import { recordAudit } from "@/server/audit";
 import { db, schema } from "@/server/db";
@@ -124,4 +124,14 @@ export async function truckFormPolicy(current?: { category: string; cargoTypes: 
     categoryOptions,
     policy: { cargoTypes: cargoOptions.map((option) => option.value), truckCategories: categoryOptions.map((option) => option.value) },
   };
+}
+
+export async function settingsHistory() {
+  return db()
+    .select({ log: schema.auditLogs, actorName: schema.users.fullName })
+    .from(schema.auditLogs)
+    .leftJoin(schema.users, eq(schema.users.id, schema.auditLogs.actorId))
+    .where(inArray(schema.auditLogs.entityType, ["platform_settings", "cargo_category"]))
+    .orderBy(desc(schema.auditLogs.createdAt))
+    .limit(20);
 }
