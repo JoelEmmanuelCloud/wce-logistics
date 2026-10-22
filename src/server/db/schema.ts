@@ -376,7 +376,7 @@ export const shipments = pgTable(
   },
   (table) => [
     index("shipments_customer_idx").on(table.customerId, table.createdAt),
-    check("shipments_minimum_weight", sql`${table.weightKg} >= 50`),
+    check("shipments_weight_positive", sql`${table.weightKg} > 0`),
     check("shipments_packages_positive", sql`${table.packageCount} > 0`),
   ],
 );
@@ -531,6 +531,41 @@ export const payoutAccounts = pgTable(
     ...timestamps,
   },
   (table) => [uniqueIndex("payout_accounts_vendor_key").on(table.vendorId)],
+);
+
+export const platformSettings = pgTable(
+  "platform_settings",
+  {
+    id: integer("id").primaryKey(),
+    commissionBps: integer("commission_bps").notNull(),
+    minShipmentKg: integer("min_shipment_kg").notNull(),
+    responseWindowHours: integer("response_window_hours").notNull(),
+    autoCompleteHours: integer("auto_complete_hours").notNull(),
+    disputeWindowDays: integer("dispute_window_days").notNull(),
+    disabledTruckCategories: text("disabled_truck_categories").array().notNull().default(sql`'{}'::text[]`),
+    updatedBy: uuid("updated_by").references(() => users.id, { onDelete: "set null" }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check("platform_settings_singleton", sql`${table.id} = 1`),
+    check("platform_settings_commission_range", sql`${table.commissionBps} between 0 and 5000`),
+    check("platform_settings_min_weight_range", sql`${table.minShipmentKg} between 1 and 10000`),
+    check("platform_settings_response_range", sql`${table.responseWindowHours} between 1 and 168`),
+    check("platform_settings_auto_complete_range", sql`${table.autoCompleteHours} between 24 and 720`),
+    check("platform_settings_dispute_range", sql`${table.disputeWindowDays} between 1 and 90`),
+  ],
+);
+
+export const cargoCategories = pgTable(
+  "cargo_categories",
+  {
+    value: text("value").primaryKey(),
+    label: text("label").notNull(),
+    active: boolean("active").notNull().default(true),
+    position: integer("position").notNull().default(0),
+    ...timestamps,
+  },
+  (table) => [index("cargo_categories_position_idx").on(table.position)],
 );
 
 export const notifications = pgTable(
@@ -719,3 +754,5 @@ export type Dispute = typeof disputes.$inferSelect;
 export type DisputeStatus = (typeof disputeStatus.enumValues)[number];
 export type DisputeMessage = typeof disputeMessages.$inferSelect;
 export type PayoutAccount = typeof payoutAccounts.$inferSelect;
+export type PlatformSettings = typeof platformSettings.$inferSelect;
+export type CargoCategory = typeof cargoCategories.$inferSelect;

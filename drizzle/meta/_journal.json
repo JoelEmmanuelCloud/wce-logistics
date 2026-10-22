@@ -50,6 +50,13 @@
       "when": 1792657918961,
       "tag": "0006_payout_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792659742833,
+      "tag": "0007_platform_settings",
+      "breakpoints": true
     }
   ]
 }
