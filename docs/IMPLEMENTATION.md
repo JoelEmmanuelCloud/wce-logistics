@@ -2,7 +2,7 @@
 
 This document tracks the WCE Logistics build against the product requirements in [PRD.md](PRD.md). Technical design is described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Last updated: 22 October 2026 (Phase 4 complete, payout accounts and job emails added)
+Last updated: 22 October 2026 (Phase 4 complete, payout accounts, job emails, admin settings and reports added)
 
 ## Project scope
 
@@ -128,11 +128,21 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Administrators emailed when a dispute is opened
 - [x] Scheduled jobs send emails: expired requests (shipper and vendor), automatic completion (shipper and vendor), trucks taken off the market for expired documents (vendor)
 
+### Admin configuration and reporting
+
+- [x] Settings page: commission, minimum shipment weight, vendor response window, automatic completion window, dispute window and accepted truck categories
+- [x] Managed cargo categories: add, rename, retire and restore, with existing records unaffected
+- [x] Settings history from the audit log
+- [x] Pages and emails show the configured windows instead of fixed numbers
+- [x] Reports by period: gross booking value, revenue, refunds, paid out, owed to vendors, booking requests, cancellation rate, declined or expired, completed deliveries, dispute rate, network size and average rating
+- [x] Value trend chart with tooltips and a screen reader table, top routes and top vendors
+- [x] CSV exports of payments, payouts and bookings, admin only, audited and safe to open in spreadsheets
+
 ## What has been tested
 
 All suites passed on the latest run. Two landing and sign-in tests can time out when the machine is under heavy load and pass when re-run on their own.
 
-### Unit tests (75 tests, Vitest)
+### Unit tests (91 tests, Vitest)
 
 - [x] Email address and Nigerian phone number normalisation
 - [x] Encryption and decryption of identity numbers
@@ -144,8 +154,10 @@ All suites passed on the latest run. Two landing and sign-in tests can time out 
 - [x] Delivery step order, repeated steps and status changes
 - [x] Licence class coverage per truck type and the dispute window
 - [x] Driver, delivery update, review and dispute validation
+- [x] Settings validation, configurable shipment, trip and truck policy, cargo category names
+- [x] CSV quoting and formula injection protection
 
-### End-to-end tests (46 scenarios, Playwright, desktop and mobile Chrome)
+### End-to-end tests (48 scenarios, Playwright, desktop and mobile Chrome)
 
 These run against a production build with a separate test database, a separate storage bucket, and local Resend and Paystack test servers, so the real email and payment code paths are exercised.
 
@@ -172,6 +184,8 @@ These run against a production build with a separate test database, a separate s
 - [x] Admin pays by Paystack transfer, webhook marks it paid, duplicate webhook sends no second email
 - [x] Failed transfer returns the payout to the queue with the reason and can be retried with a new reference
 - [x] Vendors without a bank account can only be paid manually
+- [x] Admin changes commission, minimum weight, windows, truck categories and cargo categories; shipment and truck forms, vendor pages and the commission on the next payment follow the new rules
+- [x] Reports page renders for a period, CSV exports contain the right figures, neutralise formulas and are refused to non-admins
 - [x] Scheduled jobs expire requests, complete deliveries and flag expired trucks, with the right emails
 - [x] Drivers cannot see other drivers' deliveries; licences that do not cover the truck or expire before departure cannot be assigned; busy drivers cannot be deactivated; deactivated drivers lose access; cancellation blocked after collection
 
@@ -208,11 +222,6 @@ These run against a production build with a separate test database, a separate s
 - [ ] Admin driver list for oversight across vendors
 - [ ] Vendor replies to reviews
 
-### Admin configuration and reporting
-
-- [ ] Admin settings for commission, minimum weight, cargo and truck categories (currently environment settings and code)
-- [ ] Reports: active vendors, verified trucks, bookings, completed deliveries, cancellation rate, gross booking value, revenue, payout liabilities, dispute rate
-- [ ] CSV export for finance
 
 ### Launch readiness
 

@@ -20,6 +20,7 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 | Payments | Paystack checkout for accepted bookings, verified server side through the callback and a signed webhook. A platform commission is split from each payment. Vendors register a payout bank account that Paystack verifies, and admins pay completed bookings by Paystack transfer or record a manual transfer. Refunds go back through Paystack. Bank transfers can still be recorded by administrators |
 | Delivery | Vendors add drivers with licence details and assign them to confirmed bookings. Drivers sign in to their own area, record pickup, departure, delivery attempts, delivery and incidents with photo evidence. Shippers follow progress and confirm receipt, which releases the vendor payout |
 | Reviews and disputes | Shippers rate completed bookings, and ratings appear on truck offers. Shippers and vendors can open a dispute with evidence. Administrators work the dispute queue, and payouts stay on hold until a dispute is closed |
+| Settings and reports | Admins set the commission, minimum shipment weight, response, completion and dispute windows, accepted truck categories and the cargo category list, with a change history. A reports page shows booking value, revenue, refunds, payouts, money owed to vendors, cancellation and dispute rates, a value trend chart, top routes and vendors, and CSV exports for finance |
 | Operations | Jobs that flag trucks with expired documents, expire unanswered booking requests and complete deliveries after 72 hours, each emailing the people affected. Command to create administrators |
 
 Live GPS tracking, route optimisation and automated load matching are later phases in the PRD. Without a Paystack key, online checkout is hidden and administrators confirm bookings by recording bank transfer references.
@@ -80,7 +81,7 @@ npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 | `RESEND_BASE_URL` | No | Defaults to `https://api.resend.com` |
 | `PAYSTACK_SECRET_KEY` | No | Paystack secret key. Leave empty to disable online checkout |
 | `PAYSTACK_BASE_URL` | No | Defaults to `https://api.paystack.co` |
-| `PLATFORM_COMMISSION_BPS` | Yes | Platform commission in basis points, for example `1000` for 10% |
+| `PLATFORM_COMMISSION_BPS` | Yes | Initial platform commission in basis points (1000 is 10%). Used once to create the settings; after that the commission is changed in Admin, Settings |
 | `STORAGE_ENDPOINT` | Non-AWS | S3 endpoint, for example the R2 or local SeaweedFS URL. Leave empty for AWS S3 |
 | `STORAGE_REGION`, `STORAGE_BUCKET` | Yes | Bucket location and name |
 | `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY` | Yes | Storage credentials |

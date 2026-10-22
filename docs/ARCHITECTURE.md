@@ -140,6 +140,19 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 - A shipper or vendor can open one active dispute per paid booking, while it is in progress or up to 14 days after it is completed or cancelled. Opening a dispute puts the payout back on hold.
 - Disputes move through `open`, `under_review`, `awaiting_information`, `resolved` and `closed`. A party replying to `awaiting_information` moves it back to `under_review`. Closing requires an outcome, which is emailed to both parties and releases the payout if the booking is completed. Refunds stay a separate, explicit action on the Payments page.
 
+## Settings
+
+- `platform_settings` is a single row holding the commission, minimum shipment weight, vendor response window, automatic completion window, dispute window and disabled truck categories. It is created on first use from `PLATFORM_COMMISSION_BPS` and the defaults (50 kg, 24 hours, 72 hours, 14 days), and is read once per request.
+- Validation schemas take the live policy as a parameter, so the same rules apply in forms, server actions and services. Rules apply to new records only: a booking keeps the response deadline, price and commission it started with, and a shipment created under a lower minimum can still be quoted.
+- Cargo categories live in `cargo_categories`. Retiring a category hides it from forms while existing shipments and trucks keep it; a truck that already uses a retired category or a disabled truck category can still be edited.
+- Every change is written to the audit log with the old and new values, and shown as the settings history.
+
+## Reports
+
+- Money is counted by payment date in Lagos time: gross booking value is every confirmed payment, revenue is the commission on payments that were not refunded, and refunds are counted against the period of the original payment. Money owed to vendors is a live total of payouts on hold, ready or being transferred.
+- The value trend uses daily buckets up to a month, weekly for 90 days and monthly beyond, with empty buckets filled so gaps are visible. The chart is an SVG with a hover or tap tooltip and an equivalent table for screen readers.
+- CSV exports (payments, payouts, bookings) are served only to active administrators, audited, and protected against spreadsheet formula injection by prefixing cells that start with `=`, `+`, `-` or `@`.
+
 ## Scheduled jobs
 
 The jobs in `scripts/` run with `node --conditions=react-server --import tsx`, which lets them use the same services as the app instead of their own SQL. They therefore follow the same rules, write the same audit entries and send the same emails. System actions are audited without an IP address because there is no request.
@@ -147,7 +160,7 @@ The jobs in `scripts/` run with `node --conditions=react-server --import tsx`, w
 ## Testing
 
 - Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing, commission splits, webhook signatures, truck document rules, delivery steps, licence coverage and dispute windows.
-- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server (checkout, verification, refunds, banks, account resolution, recipients and transfers), so the real email and payment code paths run. The scheduled jobs are run as real processes against the test database after the other suites finish. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds, drivers and licence checks, delivery updates with photos, receipt confirmation, reviews, disputes, payout bank accounts, Paystack transfers including failures and duplicate webhooks, and the scheduled jobs and their emails, on desktop and mobile Chrome.
+- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server (checkout, verification, refunds, banks, account resolution, recipients and transfers), so the real email and payment code paths run. The scheduled jobs are run as real processes against the test database after the other suites finish. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds, drivers and licence checks, delivery updates with photos, receipt confirmation, reviews, disputes, settings changes and their effect on forms, bookings and commission, reports and CSV exports, payout bank accounts, Paystack transfers including failures and duplicate webhooks, and the scheduled jobs and their emails, on desktop and mobile Chrome.
 
 ## Decisions
 
