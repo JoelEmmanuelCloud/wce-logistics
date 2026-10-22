@@ -1,9 +1,10 @@
 import "server-only";
 import { eq } from "drizzle-orm";
+import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { db, schema } from "@/server/db";
-import type { Booking } from "@/server/db/schema";
+import type { Booking, Dispute } from "@/server/db/schema";
 import { sendEmail, type EmailMessage } from "@/server/email";
 
 type Template =
@@ -18,7 +19,19 @@ type Template =
   | "vendor.info_required"
   | "vendor.rejected"
   | "truck.approved"
-  | "truck.changes_requested";
+  | "truck.changes_requested"
+  | "driver.invited"
+  | "delivery.driver_assigned"
+  | "delivery.goods_collected"
+  | "delivery.departed"
+  | "delivery.delivery_attempted"
+  | "delivery.delivered"
+  | "delivery.incident_reported"
+  | "delivery.completed"
+  | "review.received"
+  | "dispute.opened"
+  | "dispute.updated"
+  | "dispute.message";
 
 type Content = Omit<EmailMessage, "to">;
 
@@ -202,4 +215,194 @@ export async function notifyTruckReview(event: "truck.approved" | "truck.changes
       ? { subject: `${registration} is approved`, heading: "Your truck is approved", paragraphs: [`${registration} passed review. Schedule it on trips so shippers can book it.`], action }
       : { subject: `Changes needed for ${registration}`, heading: "Your truck needs changes", paragraphs: [note ?? "Our team requested changes.", "Update the truck and submit it for review again."], action },
   );
+}
+
+export async function notifyDriverInvited(userId: string, vendorName: string): Promise<void> {
+  await deliver(userId, "driver.invited", {
+    subject: `${vendorName} added you as a driver on WCE Logistics`,
+    heading: "You have been added as a driver",
+    paragraphs: [
+      `${vendorName} added you as a driver. You will see the deliveries they assign to you, with pickup and delivery details.`,
+      "Sign in with this email address. We send you a one-time code each time, so there is no password to remember.",
+    ],
+    action: { label: "Sign in", url: link("/sign-in") },
+  });
+}
+
+export type DeliveryNotice = "driver_assigned" | "goods_collected" | "departed" | "delivery_attempted" | "delivered" | "incident_reported" | "completed";
+
+export async function notifyDelivery(
+  event: DeliveryNotice,
+  booking: Booking,
+  details: { driverUserId?: string | null; driverName?: string | null; driverPhone?: string | null; note?: string | null; reportedByDriver?: boolean } = {},
+): Promise<void> {
+  const template: Template = `delivery.${event}`;
+  const vendorUser = await vendorUserId(booking.vendorId);
+  const forCustomer = { label: "Follow your booking", url: link(`/account/bookings/${booking.id}`) };
+  const forVendor = { label: "View booking", url: link(`/vendor/bookings/${booking.id}`) };
+  const jobs: Array<Promise<void>> = [];
+  const ref = booking.reference;
+
+  switch (event) {
+    case "driver_assigned":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `Driver assigned to ${ref}`,
+          heading: "Your driver is assigned",
+          paragraphs: [`${details.driverName ?? "A driver"} will carry booking ${ref}. You can reach them on ${formatPhone(details.driverPhone)} to coordinate pickup.`],
+          action: forCustomer,
+        }),
+      );
+      if (details.driverUserId) {
+        jobs.push(
+          deliver(details.driverUserId, template, {
+            subject: `New delivery ${ref}`,
+            heading: "You have a new delivery",
+            paragraphs: [`You were assigned to booking ${ref}. Open it for the pickup address, cargo details and the shipper's phone number.`],
+            action: { label: "Open delivery", url: link(`/driver/deliveries/${booking.id}`) },
+          }),
+        );
+      }
+      break;
+    case "goods_collected":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `Goods collected for ${ref}`,
+          heading: "Your goods have been collected",
+          paragraphs: [`The driver collected the goods for booking ${ref}.`, ...(details.note ? [`Driver's note: ${details.note}`] : [])],
+          action: forCustomer,
+        }),
+      );
+      break;
+    case "departed":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `${ref} is on the road`,
+          heading: "Your shipment is on its way",
+          paragraphs: [`Booking ${ref} has left for its destination. We will email you when it is delivered.`],
+          action: forCustomer,
+        }),
+      );
+      break;
+    case "delivery_attempted":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `Delivery attempted for ${ref}`,
+          heading: "The delivery could not be completed",
+          paragraphs: [details.note ? `What happened: ${details.note}` : `The driver could not deliver booking ${ref}.`, "Contact the driver or vendor to arrange another attempt."],
+          action: forCustomer,
+        }),
+      );
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, template, {
+            subject: `Delivery attempted for ${ref}`,
+            heading: "A delivery attempt failed",
+            paragraphs: [details.note ? `Driver's note: ${details.note}` : `The delivery of ${ref} was not completed.`],
+            action: forVendor,
+          }),
+        );
+      }
+      break;
+    case "delivered":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `${ref} delivered`,
+          heading: "Your shipment was delivered",
+          paragraphs: [
+            `Booking ${ref} was marked as delivered.`,
+            "Please confirm you received everything in good condition. If something is wrong, report a problem from the booking page within 72 hours.",
+          ],
+          action: { label: "Confirm receipt", url: forCustomer.url },
+        }),
+      );
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, template, {
+            subject: `${ref} delivered`,
+            heading: "Delivery recorded",
+            paragraphs: [`Booking ${ref} is delivered. Your payout becomes payable once the shipper confirms receipt, or automatically after 72 hours without a dispute.`],
+            action: forVendor,
+          }),
+        );
+      }
+      break;
+    case "incident_reported":
+      jobs.push(
+        deliver(booking.customerId, template, {
+          subject: `Update on ${ref}`,
+          heading: "An incident was reported on your delivery",
+          paragraphs: [details.note ?? "An incident was reported.", "The vendor will keep you updated. Contact them if you need more information."],
+          action: forCustomer,
+        }),
+      );
+      if (vendorUser && details.reportedByDriver) {
+        jobs.push(
+          deliver(vendorUser, template, {
+            subject: `Incident reported on ${ref}`,
+            heading: "Your driver reported an incident",
+            paragraphs: [details.note ?? "An incident was reported."],
+            action: forVendor,
+          }),
+        );
+      }
+      break;
+    case "completed":
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, template, {
+            subject: `${ref} completed`,
+            heading: "Booking completed",
+            paragraphs: [`Booking ${ref} is complete. Your share is ready to be paid out.`],
+            action: { label: "View earnings", url: link("/vendor/payouts") },
+          }),
+        );
+      }
+      break;
+  }
+  await Promise.all(jobs);
+}
+
+export async function notifyReviewReceived(vendorId: string, bookingReference: string, rating: number): Promise<void> {
+  const userId = await vendorUserId(vendorId);
+  if (!userId) {
+    return;
+  }
+  await deliver(userId, "review.received", {
+    subject: `New ${rating}-star review for ${bookingReference}`,
+    heading: "A shipper reviewed your service",
+    paragraphs: [`You received a rating of ${rating} out of 5 for booking ${bookingReference}.`],
+    action: { label: "View reviews", url: link("/vendor/reviews") },
+  });
+}
+
+export async function notifyDispute(event: "dispute.opened" | "dispute.updated" | "dispute.message", dispute: Dispute, booking: Booking, exceptUserId: string | null): Promise<void> {
+  const vendorUser = await vendorUserId(booking.vendorId);
+  const recipients = [
+    { userId: booking.customerId, url: link(`/account/bookings/${booking.id}/dispute`) },
+    ...(vendorUser ? [{ userId: vendorUser, url: link(`/vendor/bookings/${booking.id}/dispute`) }] : []),
+  ].filter((recipient) => recipient.userId !== exceptUserId);
+  const closed = dispute.status === "resolved" || dispute.status === "closed";
+  const content: Record<typeof event, Omit<Content, "action">> = {
+    "dispute.opened": {
+      subject: `Problem reported on ${booking.reference}`,
+      heading: "A problem was reported",
+      paragraphs: [`A dispute was opened on booking ${booking.reference}. Our team will review it and may ask both sides for information.`],
+    },
+    "dispute.updated": {
+      subject: `Dispute update for ${booking.reference}`,
+      heading: closed ? "Your dispute was closed" : "Your dispute was updated",
+      paragraphs: [
+        closed
+          ? `Our team closed the dispute on ${booking.reference}. Outcome: ${dispute.resolution ?? "see the booking page."}`
+          : `The dispute on ${booking.reference} is now ${dispute.status.replaceAll("_", " ")}.`,
+      ],
+    },
+    "dispute.message": {
+      subject: `New message on the dispute for ${booking.reference}`,
+      heading: "There is a new message on your dispute",
+      paragraphs: [`Open the dispute for booking ${booking.reference} to read and reply.`],
+    },
+  };
+  await Promise.all(recipients.map((recipient) => deliver(recipient.userId, event, { ...content[event], action: { label: "Open dispute", url: recipient.url } })));
 }
