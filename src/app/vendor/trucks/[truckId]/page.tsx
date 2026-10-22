@@ -176,7 +176,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
           {photos.length > 0 && (
             <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
               {photos.map((photo, index) => (
-                <li key={photo.id} className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-navy/5">
+                <li key={photo.id} className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-navy/5">
                   <Image
                     src={`/files/truck-photos/${photo.id}`}
                     alt={`Photo ${index + 1} of ${truck.registrationNumber}`}

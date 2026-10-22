@@ -37,7 +37,7 @@ export function Hero({ contactEmail }: { contactEmail: string }) {
             <span className="block">run on verified trucks</span>
           </p>
           <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-540px)*1.25))] lg:max-w-none" />
-          <p className="hero-fade [--d:620ms] mt-4 max-w-[19em] self-end rounded-2xl bg-white/75 px-4 py-3 text-[clamp(15px,min(2.2vh,1.15vw),19px)] leading-[1.3] text-navy backdrop-blur-sm">
+          <p className="hero-fade [--d:620ms] mt-4 max-w-[19em] self-end rounded-md bg-white px-4 py-3 text-[clamp(15px,min(2.2vh,1.15vw),19px)] leading-[1.3] text-navy">
             We verify every vendor and truck, and track every load from pickup to delivery.
           </p>
         </div>

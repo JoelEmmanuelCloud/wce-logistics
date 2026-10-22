@@ -74,7 +74,7 @@ export default async function VendorDriverPage({ params }: PageProps<"/vendor/dr
             ) : (
               <ul className="grid gap-3">
                 {deliveries.map((delivery) => (
-                  <li key={delivery.booking.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-navy/10 p-4">
+                  <li key={delivery.booking.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-navy/10 p-4">
                     <div>
                       <Link href={`/vendor/bookings/${delivery.booking.id}`} className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
                         {delivery.booking.reference}

@@ -63,7 +63,7 @@ export default async function VendorPayoutsPage({ searchParams }: PageProps<"/ve
       ) : (
         <ul className="grid gap-3">
           {rows.map(({ payout, bookingReference }) => (
-            <li key={payout.id} className="flex flex-col gap-3 rounded-[20px] border border-navy/10 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+            <li key={payout.id} className="flex flex-col gap-3 rounded-lg border border-navy/10 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <Link href={`/vendor/bookings/${payout.bookingId}`} className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
                   {bookingReference}

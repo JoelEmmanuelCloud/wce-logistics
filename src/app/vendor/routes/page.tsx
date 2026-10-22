@@ -38,7 +38,7 @@ export default async function VendorRoutesPage() {
             const usedPercent = Math.round((route.reservedKg / route.capacityKg) * 100);
             const editable = route.status === "active" || route.status === "paused";
             return (
-              <li key={route.id} className="grid gap-5 rounded-[24px] border border-navy/10 bg-white p-6 lg:grid-cols-[1.4fr_1fr_auto] lg:items-center">
+              <li key={route.id} className="grid gap-5 rounded-lg border border-navy/10 bg-white p-6 lg:grid-cols-[1.4fr_1fr_auto] lg:items-center">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="font-display text-[26px] uppercase leading-none text-navy">

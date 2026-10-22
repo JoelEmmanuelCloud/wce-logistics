@@ -41,7 +41,7 @@ export default async function VendorTrucksPage() {
             <li key={truck.id}>
               <Link
                 href={`/vendor/trucks/${truck.id}`}
-                className="group flex h-full flex-col justify-between gap-6 rounded-[24px] border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+                className="group flex h-full flex-col justify-between gap-6 rounded-lg border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">

@@ -60,7 +60,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
               ) : (
                 <ul className="grid gap-4">
                   {offers.map((offer) => (
-                    <li key={offer.route.id} className="grid gap-5 rounded-[24px] border border-navy/10 bg-white p-6 lg:grid-cols-[1.5fr_1fr] lg:items-center">
+                    <li key={offer.route.id} className="grid gap-5 rounded-lg border border-navy/10 bg-white p-6 lg:grid-cols-[1.5fr_1fr] lg:items-center">
                       <div>
                         <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-navy/70">Departs {formatDate(offer.route.departureDate)}</p>
                         <p className="mt-1 text-[18px] font-semibold text-navy">

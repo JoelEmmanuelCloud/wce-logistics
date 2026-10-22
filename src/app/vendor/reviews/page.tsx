@@ -26,7 +26,7 @@ export default async function VendorReviewsPage() {
       ) : (
         <ul className="grid gap-3">
           {rows.map(({ review, bookingReference, customerName }) => (
-            <li key={review.id} className="rounded-[20px] border border-navy/10 bg-white p-5">
+            <li key={review.id} className="rounded-lg border border-navy/10 bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-2 text-[14px] font-semibold text-navy">
                   <Stars value={review.rating} /> {review.rating} out of 5

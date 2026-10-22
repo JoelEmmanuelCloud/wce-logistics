@@ -126,7 +126,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
             ) : (
               <ul className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {photos.map((photo, index) => (
-                  <li key={photo.id} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-navy/5">
+                  <li key={photo.id} className="relative aspect-[4/3] overflow-hidden rounded-lg bg-navy/5">
                     <a href={`/files/truck-photos/${photo.id}`} target="_blank" rel="noopener" className="block size-full">
                       <Image src={`/files/truck-photos/${photo.id}`} alt={`Photo ${index + 1} of ${truck.registrationNumber}`} fill sizes="(min-width: 768px) 20vw, 50vw" className="object-cover" />
                     </a>

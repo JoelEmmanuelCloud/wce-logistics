@@ -38,7 +38,7 @@ function MenuPanel({ items, onNavigate }: { items: MenuItem[]; onNavigate: () =>
           <a
             href={item.href}
             onClick={onNavigate}
-            className="block rounded-xl px-3 py-2.5 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none"
+            className="block rounded-md px-3 py-2.5 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none"
           >
             <span className="block text-[15px] font-semibold text-navy">{item.title}</span>
             <span className="block text-[13px] leading-snug text-navy/65">{item.detail}</span>
@@ -114,7 +114,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
                 <div
                   id={panelId}
                   hidden={!open}
-                  className="absolute right-0 top-full mt-3 w-80 rounded-2xl bg-white p-2 shadow-[0_24px_60px_rgba(11,37,69,0.28)]"
+                  className="absolute right-0 top-full mt-3 w-80 rounded-lg bg-white p-2 shadow-[0_24px_60px_rgba(11,37,69,0.28)]"
                 >
                   <MenuPanel items={menu.items} onNavigate={closeMenus} />
                 </div>
@@ -124,7 +124,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
           <li>
             <Link
               href="/sign-in"
-              className="inline-flex h-10 items-center rounded-full border border-white/50 px-5 text-[clamp(14px,1.05vw,16px)] font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
+              className="inline-flex h-10 items-center rounded-md border border-white/50 px-5 text-[clamp(14px,1.05vw,16px)] font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
             >
               Sign in
             </Link>
@@ -133,7 +133,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
       </nav>
 
       <div className="flex items-center gap-2 md:hidden">
-        <Link href="/sign-in" className="flex h-10 items-center whitespace-nowrap rounded-full bg-white px-3.5 text-sm font-semibold text-navy">
+        <Link href="/sign-in" className="flex h-10 items-center whitespace-nowrap rounded-md bg-white px-3.5 text-sm font-semibold text-navy">
           Sign in
         </Link>
         <button
@@ -141,7 +141,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
           aria-expanded={mobileOpen}
           aria-controls={`${baseId}-mobile`}
           onClick={() => setMobileOpen((value) => !value)}
-          className="flex h-10 items-center gap-2 whitespace-nowrap rounded-full border border-white/40 px-3.5 text-sm font-medium text-white"
+          className="flex h-10 items-center gap-2 whitespace-nowrap rounded-md border border-white/40 px-3.5 text-sm font-medium text-white"
         >
           {mobileOpen ? "Close" : "Menu"}
         </button>
@@ -149,7 +149,7 @@ export function SiteHeader({ contactEmail }: { contactEmail: string }) {
       <div
         id={`${baseId}-mobile`}
         hidden={!mobileOpen}
-        className="absolute inset-x-0 top-full mt-3 max-h-[75svh] overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_24px_60px_rgba(11,37,69,0.35)] md:hidden"
+        className="absolute inset-x-0 top-full mt-3 max-h-[75svh] overflow-y-auto rounded-lg bg-white p-3 shadow-[0_24px_60px_rgba(11,37,69,0.35)] md:hidden"
       >
         {menus.map((menu) => (
           <section key={menu.label} className="border-b border-navy/10 py-2 last:border-b-0">

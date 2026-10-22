@@ -29,7 +29,7 @@ export default async function AdminPayoutsPage() {
         title="Vendor payouts"
         description="Each paid booking creates a payout of the vendor's share. It becomes ready to pay when the booking is completed and no dispute is open."
         action={
-          <div className="rounded-2xl bg-white px-5 py-3 text-right">
+          <div className="rounded-lg bg-white px-5 py-3 text-right">
             <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/70">Outstanding</p>
             <p className="font-display text-[30px] leading-none text-navy">{formatNaira(outstanding)}</p>
           </div>

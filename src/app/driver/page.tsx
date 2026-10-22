@@ -16,7 +16,7 @@ function DeliveryCard({ delivery }: { delivery: Delivery }) {
   return (
     <Link
       href={`/driver/deliveries/${delivery.booking.id}`}
-      className="flex h-full flex-col gap-4 rounded-[24px] border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+      className="flex h-full flex-col gap-4 rounded-lg border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
     >
       <div className="flex items-start justify-between gap-3">
         <p className="font-display text-[24px] uppercase leading-none text-navy">{delivery.booking.reference}</p>
