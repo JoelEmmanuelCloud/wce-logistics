@@ -5,7 +5,7 @@ import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { db, schema } from "@/server/db";
-import type { Booking, Dispute } from "@/server/db/schema";
+import type { Booking, Dispute, Payout } from "@/server/db/schema";
 import { sendEmail, type EmailMessage } from "@/server/email";
 
 type Template =
@@ -22,6 +22,8 @@ type Template =
   | "truck.approved"
   | "truck.changes_requested"
   | "truck.documents_expired"
+  | "payout.sent"
+  | "payout_account.changed"
   | "driver.invited"
   | "delivery.driver_assigned"
   | "delivery.goods_collected"
@@ -463,4 +465,33 @@ export async function notifyDispute(event: "dispute.opened" | "dispute.updated" 
       }),
     ),
   ]);
+}
+
+export async function notifyPayoutSent(payout: Payout, bookingReference: string): Promise<void> {
+  const userId = await vendorUserId(payout.vendorId);
+  if (!userId) {
+    return;
+  }
+  await deliver(userId, "payout.sent", {
+    subject: `${formatNaira(payout.amountKobo)} paid for ${bookingReference}`,
+    heading: "Your payout is on its way",
+    paragraphs: [
+      `We paid ${formatNaira(payout.amountKobo)} for booking ${bookingReference}${payout.destination ? ` to ${payout.destination}` : ""}.`,
+      payout.transferReference ? `Transfer reference: ${payout.transferReference}.` : "Bank transfers usually arrive within minutes.",
+    ],
+    action: { label: "View earnings", url: link("/vendor/payouts") },
+  });
+}
+
+export async function notifyPayoutAccountChanged(vendorId: string, description: string): Promise<void> {
+  const userId = await vendorUserId(vendorId);
+  if (!userId) {
+    return;
+  }
+  await deliver(userId, "payout_account.changed", {
+    subject: "Your payout bank account was updated",
+    heading: "Payout bank account updated",
+    paragraphs: [`Future payouts will go to ${description}.`, "If you did not make this change, sign in and update it immediately, then contact WCE Logistics support."],
+    action: { label: "Review bank account", url: link("/vendor/payouts/account") },
+  });
 }
