@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RatingSummary } from "@/components/reviews/star-rating";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList, EmptyState, PageHeader } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { BODY_TYPES, CARGO_TYPES, formatDate, formatKg, formatTransit, labelFor,
 import { formatNaira } from "@/lib/pricing";
 import { requireRole } from "@/server/auth/dal";
 import { activeBookingForShipment, findCustomerShipment, searchOffers, SEARCH_WINDOW_DAYS } from "@/server/marketplace";
+import { vendorRatings } from "@/server/reviews";
 import { CancelShipmentButton, RequestOfferButton } from "./offer-actions";
 
 export const metadata: Metadata = { title: "Shipment" };
@@ -22,6 +24,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
   }
   const booking = shipment.status === "booked" ? await activeBookingForShipment(shipment.id) : null;
   const offers = shipment.status === "open" ? await searchOffers(shipment) : [];
+  const ratings = await vendorRatings(offers.map((offer) => offer.route.vendorId));
 
   return (
     <>
@@ -66,6 +69,9 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
                           {offer.vendorName}, verified vendor. {labelFor(TRUCK_CATEGORIES, offer.truck.category)}, {labelFor(BODY_TYPES, offer.truck.bodyType).toLowerCase()}.
                           About {formatTransit(offer.route.transitHours)} in transit. {formatKg(offer.remainingKg)} available.
                         </p>
+                        <div className="mt-2">
+                          <RatingSummary average={ratings.get(offer.route.vendorId)?.average ?? 0} count={ratings.get(offer.route.vendorId)?.count ?? 0} />
+                        </div>
                         <ul className="mt-3 grid gap-1 text-[13px] text-navy/70">
                           {offer.quote.lineItems.map((item) => (
                             <li key={item.label} className="flex justify-between gap-4">
