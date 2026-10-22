@@ -8,13 +8,13 @@ const CARD_TONES = {
 } as const;
 
 export function Card({ children, className, tone = "light" }: { children: ReactNode; className?: string; tone?: keyof typeof CARD_TONES }) {
-  return <section className={`rounded-lg border p-[clamp(20px,2.4vw,32px)] ${CARD_TONES[tone]} ${className ?? ""}`}>{children}</section>;
+  return <section className={`min-w-0 rounded-lg border p-[clamp(20px,2.4vw,32px)] ${CARD_TONES[tone]} ${className ?? ""}`}>{children}</section>;
 }
 
 export function CardHeader({ title, description, action }: { title: string; description?: ReactNode; action?: ReactNode }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <div>
+      <div className="min-w-0">
         <h2 className="text-[19px] font-semibold text-navy">{title}</h2>
         {description && <p className="mt-1 text-[14px] leading-relaxed text-navy/70">{description}</p>}
       </div>
@@ -49,9 +49,9 @@ export function DescriptionList({ items }: { items: ReadonlyArray<{ label: strin
   return (
     <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label}>
+        <div key={item.label} className="min-w-0">
           <dt className="text-[12px] font-semibold uppercase tracking-[0.12em] text-navy/70">{item.label}</dt>
-          <dd className="mt-1 text-[15px] text-navy">{item.value ?? <span className="text-navy/70">Not provided</span>}</dd>
+          <dd className="mt-1 text-[15px] text-navy [overflow-wrap:anywhere]">{item.value ?? <span className="text-navy/70">Not provided</span>}</dd>
         </div>
       ))}
     </dl>
