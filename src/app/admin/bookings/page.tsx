@@ -11,8 +11,8 @@ export const metadata: Metadata = { title: "Bookings" };
 const FILTERS = {
   payment: { label: "Awaiting payment", statuses: ["awaiting_payment"] },
   pending: { label: "Awaiting vendor", statuses: ["pending_vendor_acceptance"] },
-  active: { label: "Confirmed and moving", statuses: ["confirmed", "pickup_scheduled", "goods_collected", "in_transit", "delivery_attempted"] },
-  closed: { label: "Closed", statuses: ["delivered", "completed", "rejected", "cancelled", "expired", "disputed"] },
+  active: { label: "Confirmed and moving", statuses: ["confirmed", "pickup_scheduled", "goods_collected", "in_transit", "delivery_attempted", "delivered"] },
+  closed: { label: "Closed", statuses: ["completed", "rejected", "cancelled", "expired", "disputed"] },
   all: { label: "All", statuses: [] },
 } as const satisfies Record<string, { label: string; statuses: readonly BookingStatus[] }>;
 

@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminCancelBookingAction, recordPaymentAction } from "@/app/admin/bookings/actions";
+import { DeliveryTimeline } from "@/components/delivery/delivery-timeline";
 import { BookingHeader, BookingSummary, BookingTimeline } from "@/components/marketplace/booking-detail";
 import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
+import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
 import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { requireRole } from "@/server/auth/dal";
+import { listDeliveryEvents } from "@/server/delivery";
+import { ACTIVE_DISPUTE_STATUSES, latestDisputeForBooking } from "@/server/disputes";
 import { getBookingDetail, OPEN_BOOKING_STATUSES } from "@/server/marketplace";
 
 export const metadata: Metadata = { title: "Booking" };
@@ -20,6 +24,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
     notFound();
   }
   const { booking } = detail;
+  const [deliveryRows, dispute] = await Promise.all([listDeliveryEvents(booking.id), latestDisputeForBooking(booking.id)]);
 
   return (
     <>
@@ -45,9 +50,17 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
                   ),
                 },
                 { label: "Vendor email", value: detail.vendorEmail },
+                ...(detail.driverName ? [{ label: "Driver", value: `${detail.driverName}, ${formatPhone(detail.driverPhone)}` }] : []),
               ]}
             />
           </Card>
+          {dispute && (
+            <Alert tone={ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? "warning" : "info"} title={ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? "Dispute open" : "Dispute closed"}>
+              <Link href={`/admin/disputes/${dispute.id}`} className="font-semibold underline decoration-orange decoration-2 underline-offset-4">
+                Open the dispute
+              </Link>
+            </Alert>
+          )}
           {booking.status === "awaiting_payment" && (
             <Card tone="attention">
               <CardHeader title="Record payment" description={`Confirm once ${formatNaira(booking.totalKobo)} has reached the company account.`} />
@@ -72,6 +85,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
               />
             </Card>
           )}
+          {(booking.driverId || deliveryRows.length > 0) && <DeliveryTimeline rows={deliveryRows} />}
           <BookingTimeline detail={detail} />
         </div>
       </div>
