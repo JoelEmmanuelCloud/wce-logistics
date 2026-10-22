@@ -1,0 +1,5 @@
+import { CardGridSkeleton } from "@/components/app/page-skeleton";
+
+export default function Loading() {
+  return <CardGridSkeleton />;
+}
