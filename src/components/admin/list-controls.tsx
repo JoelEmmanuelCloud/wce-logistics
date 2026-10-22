@@ -17,18 +17,20 @@ export function FilterTabs({
   filters,
   active,
   query,
+  param = "status",
 }: {
   base: string;
   filters: Record<string, { label: string }>;
   active: string;
   query: string;
+  param?: string;
 }) {
   return (
     <nav aria-label="Filter" className="-mx-1 flex gap-1 overflow-x-auto pb-1">
       {Object.entries(filters).map(([key, filter]) => (
         <Link
           key={key}
-          href={hrefWith(base, { status: key, q: query })}
+          href={hrefWith(base, { [param]: key, q: query })}
           aria-current={key === active ? "page" : undefined}
           className={`whitespace-nowrap rounded-full px-4 py-2 text-[14px] font-semibold transition-colors ${
             key === active ? "bg-navy text-white" : "text-navy/70 hover:bg-navy/5 hover:text-navy"

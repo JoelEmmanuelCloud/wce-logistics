@@ -60,3 +60,9 @@ export function quoteFor(input: QuoteInput): Quote | null {
     totalKobo: lineItems.reduce((sum, item) => sum + item.amountKobo, 0),
   };
 }
+
+const compactNaira = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", notation: "compact", maximumFractionDigits: 1 });
+
+export function formatCompactNaira(kobo: number): string {
+  return compactNaira.format(kobo / KOBO_PER_NAIRA);
+}
