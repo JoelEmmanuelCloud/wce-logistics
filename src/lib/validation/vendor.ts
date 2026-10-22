@@ -53,3 +53,11 @@ export const identitySchema = z
   });
 
 export const vendorDocumentTypeSchema = z.enum(["government_id", "cac_certificate", "proof_of_address", "operating_authority"]);
+
+export const payoutAccountSchema = z.object({
+  bankCode: z.string().trim().regex(/^[0-9A-Za-z]{2,12}$/, "Choose your bank."),
+  accountNumber: z
+    .string()
+    .transform((value) => value.replace(/\s/g, ""))
+    .refine((value) => /^\d{10}$/.test(value), "Enter your 10-digit NUBAN account number."),
+});
