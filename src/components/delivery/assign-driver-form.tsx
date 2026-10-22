@@ -21,6 +21,10 @@ export function AssignDriverForm({
   const choices = drivers.filter((driver) => driver.id !== currentDriverId);
   const firstEligible = choices.find((driver) => !driver.problem);
 
+  if (currentDriverId && choices.length === 0) {
+    return <p className="text-[14px] text-navy/70">Add another driver to your fleet if you need to change who carries this booking.</p>;
+  }
+
   return (
     <form action={formAction} className="grid gap-4">
       <FormMessage state={state} />
