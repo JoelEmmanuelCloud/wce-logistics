@@ -162,6 +162,7 @@ export const PAYMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
 export const PAYOUT_STATUS: Record<string, { label: string; tone: Tone }> = {
   on_hold: { label: "On hold", tone: "info" },
   eligible: { label: "Ready to pay", tone: "warning" },
+  processing: { label: "Transfer in progress", tone: "info" },
   paid: { label: "Paid out", tone: "success" },
   cancelled: { label: "Cancelled", tone: "neutral" },
 };
