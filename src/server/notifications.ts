@@ -1,5 +1,6 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { AUTO_COMPLETE_HOURS } from "@/lib/delivery";
 import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
@@ -20,6 +21,7 @@ type Template =
   | "vendor.rejected"
   | "truck.approved"
   | "truck.changes_requested"
+  | "truck.documents_expired"
   | "driver.invited"
   | "delivery.driver_assigned"
   | "delivery.goods_collected"
@@ -158,6 +160,16 @@ export async function notifyBooking(event: Extract<Template, `booking.${string}`
           action: { label: "Choose another truck", url: link(`/account/shipments/${booking.shipmentId}`) },
         }),
       );
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, event, {
+            subject: `Booking request ${booking.reference} expired`,
+            heading: "A booking request expired",
+            paragraphs: ["You did not answer this request within 24 hours, so it expired and the space on your trip was released.", "Answer requests quickly to win more bookings."],
+            action: forVendor,
+          }),
+        );
+      }
       break;
     case "payment.refunded":
       jobs.push(
@@ -202,6 +214,22 @@ export async function notifyVendorReview(event: "vendor.verified" | "vendor.info
   await deliver(userId, event, content[event]);
 }
 
+export async function notifyTruckDocumentsExpired(vendorId: string, truckId: string, registration: string): Promise<void> {
+  const userId = await vendorUserId(vendorId);
+  if (!userId) {
+    return;
+  }
+  await deliver(userId, "truck.documents_expired", {
+    subject: `${registration} is off the market`,
+    heading: "A truck document has expired",
+    paragraphs: [
+      `A required document for ${registration} has expired or is missing, so the truck can no longer be booked.`,
+      "Upload the renewed document and submit the truck for review to list it again. Existing bookings are not affected.",
+    ],
+    action: { label: "Update documents", url: link(`/vendor/trucks/${truckId}`) },
+  });
+}
+
 export async function notifyTruckReview(event: "truck.approved" | "truck.changes_requested", vendorId: string, truckId: string, registration: string, note: string | null): Promise<void> {
   const userId = await vendorUserId(vendorId);
   if (!userId) {
@@ -234,7 +262,7 @@ export type DeliveryNotice = "driver_assigned" | "goods_collected" | "departed" 
 export async function notifyDelivery(
   event: DeliveryNotice,
   booking: Booking,
-  details: { driverUserId?: string | null; driverName?: string | null; driverPhone?: string | null; note?: string | null; reportedByDriver?: boolean } = {},
+  details: { driverUserId?: string | null; driverName?: string | null; driverPhone?: string | null; note?: string | null; reportedByDriver?: boolean; automatic?: boolean } = {},
 ): Promise<void> {
   const template: Template = `delivery.${event}`;
   const vendorUser = await vendorUserId(booking.vendorId);
@@ -348,6 +376,19 @@ export async function notifyDelivery(
       }
       break;
     case "completed":
+      if (details.automatic) {
+        jobs.push(
+          deliver(booking.customerId, template, {
+            subject: `${ref} is complete`,
+            heading: "Your booking is complete",
+            paragraphs: [
+              `Booking ${ref} was completed automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`,
+              "Tell other shippers how it went by rating the vendor.",
+            ],
+            action: { label: "Rate this delivery", url: forCustomer.url },
+          }),
+        );
+      }
       if (vendorUser) {
         jobs.push(
           deliver(vendorUser, template, {
@@ -404,5 +445,22 @@ export async function notifyDispute(event: "dispute.opened" | "dispute.updated" 
       paragraphs: [`Open the dispute for booking ${booking.reference} to read and reply.`],
     },
   };
-  await Promise.all(recipients.map((recipient) => deliver(recipient.userId, event, { ...content[event], action: { label: "Open dispute", url: recipient.url } })));
+  const admins =
+    event === "dispute.opened"
+      ? await db()
+          .select({ id: schema.users.id })
+          .from(schema.users)
+          .where(and(eq(schema.users.role, "admin"), eq(schema.users.status, "active")))
+      : [];
+  await Promise.all([
+    ...recipients.map((recipient) => deliver(recipient.userId, event, { ...content[event], action: { label: "Open dispute", url: recipient.url } })),
+    ...admins.map((admin) =>
+      deliver(admin.id, event, {
+        subject: `New dispute on ${booking.reference}`,
+        heading: "A dispute needs attention",
+        paragraphs: [`A ${dispute.openedByRole === "vendor" ? "vendor" : "shipper"} opened a dispute on booking ${booking.reference}. The vendor payout is on hold until it is closed.`],
+        action: { label: "Open dispute", url: link(`/admin/disputes/${dispute.id}`) },
+      }),
+    ),
+  ]);
 }
