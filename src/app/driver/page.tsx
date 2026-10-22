@@ -8,7 +8,7 @@ import { listDriverDeliveries } from "@/server/delivery";
 import { activeDriverFor } from "@/server/drivers";
 import { InactiveDriverNotice } from "./inactive-notice";
 
-export const metadata: Metadata = { title: "Deliveries" };
+export const metadata: Metadata = { title: { absolute: "Deliveries | WCE Logistics driver" } };
 
 type Delivery = Awaited<ReturnType<typeof listDriverDeliveries>>[number];
 

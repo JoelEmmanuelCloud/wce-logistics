@@ -11,7 +11,7 @@ import { requireRole } from "@/server/auth/dal";
 import { listBookings } from "@/server/marketplace";
 import { countVendorTrucks, findVendorProfileByUser } from "@/server/vendors";
 
-export const metadata: Metadata = { title: "Overview" };
+export const metadata: Metadata = { title: { absolute: "Overview | WCE Logistics vendor" } };
 
 function Step({
   number,

@@ -6,7 +6,7 @@ import { formatDateTime, TRUCK_STATUS, VERIFICATION_STATUS } from "@/lib/labels"
 import { adminStats, listTrucksForAdmin, listVendorsForAdmin } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 
-export const metadata: Metadata = { title: "Overview" };
+export const metadata: Metadata = { title: { absolute: "Overview | WCE Logistics admin" } };
 
 function Stat({ label, value, href, tone = "default" }: { label: string; value: number; href: string; tone?: "default" | "attention" }) {
   return (
