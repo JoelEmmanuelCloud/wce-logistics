@@ -50,7 +50,7 @@ export function ReasonActionForm({
         maxLength={500}
         required
         aria-invalid={state.fieldErrors?.reason ? true : undefined}
-        className="w-full rounded-xl border border-navy/20 bg-white px-4 py-3 text-[15px] text-navy focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25"
+        className="w-full rounded-md border border-navy/20 bg-white px-4 py-3 text-[15px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
       />
       <div className="flex flex-wrap gap-2">
         <button type="submit" disabled={pending} className={buttonClasses(variant, "md")}>

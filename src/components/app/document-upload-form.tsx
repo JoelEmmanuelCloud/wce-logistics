@@ -43,7 +43,7 @@ export function DocumentUploadForm({
           accept={accept}
           required
           aria-invalid={errors?.length ? true : undefined}
-          className="block w-full text-[14px] text-navy file:mr-4 file:rounded-full file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]"
+          className="block w-full text-[14px] text-navy file:mr-4 file:rounded-md file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]"
         />
         <SubmitButton variant="secondary" size="sm" pendingLabel="Uploading" className="shrink-0">
           Upload

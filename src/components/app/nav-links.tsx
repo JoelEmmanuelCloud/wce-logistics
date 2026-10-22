@@ -17,7 +17,7 @@ export function NavLinks({ items, onNavigate }: { items: readonly NavItem[]; onN
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[15px] font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-md px-3.5 py-2.5 text-[15px] font-medium transition-colors ${
                 active ? "bg-white/10 text-white" : "text-white/75 hover:bg-white/5 hover:text-white"
               }`}
             >

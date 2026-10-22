@@ -25,7 +25,7 @@ export function ReviewForm({ action }: { action: (state: FormState, formData: Fo
             {LABELS.map((label, index) => (
               <label
                 key={label}
-                className="flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-navy/15 bg-white px-2 py-3 text-[13px] text-navy transition-colors has-checked:border-orange-ink has-checked:bg-orange/[0.08] has-focus-visible:ring-3 has-focus-visible:ring-orange/25"
+                className="flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-navy/15 bg-white px-2 py-3 text-[13px] text-navy transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
               >
                 <input type="radio" name="rating" value={index + 1} defaultChecked={valueOf(state.values, "rating", "") === String(index + 1)} className="sr-only" />
                 <Stars value={index + 1} className="size-3.5" />

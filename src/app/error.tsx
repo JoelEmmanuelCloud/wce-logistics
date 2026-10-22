@@ -21,11 +21,11 @@ export default function ErrorPage({ reset }: { error: Error & { digest?: string 
           <button
             type="button"
             onClick={reset}
-            className="rounded-full bg-orange px-7 py-4 text-[17px] font-medium text-navy transition-colors hover:bg-[#FF7F24]"
+            className="rounded-md bg-orange px-7 py-4 text-[17px] font-medium text-navy transition-colors hover:bg-[#FF7F24]"
           >
             Try again
           </button>
-          <Link href="/" className="rounded-full border border-white/30 px-7 py-4 text-[17px] font-medium text-white hover:border-white">
+          <Link href="/" className="rounded-md border border-white/30 px-7 py-4 text-[17px] font-medium text-white hover:border-white">
             Back to the homepage
           </Link>
         </div>

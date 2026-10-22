@@ -88,7 +88,7 @@ export function CargoCategoryRow({ category }: { category: { value: string; labe
   const inputId = `cargo-${category.value}`;
 
   return (
-    <li className="grid gap-3 rounded-2xl border border-navy/10 bg-white p-4">
+    <li className="grid gap-3 rounded-lg border border-navy/10 bg-white p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-end">
         <form action={renameAction} className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-end">
           <div className="flex-1">
@@ -101,7 +101,7 @@ export function CargoCategoryRow({ category }: { category: { value: string; labe
               key={renameState.attempt ?? "initial"}
               defaultValue={category.label}
               maxLength={60}
-              className="mt-1 h-11 w-full rounded-xl border border-navy/20 bg-white px-3 text-[15px] text-navy focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25"
+              className="mt-1 h-11 w-full rounded-md border border-navy/20 bg-white px-3 text-[15px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
             />
           </div>
           <SubmitButton variant="outline" size="sm" pendingLabel="Saving">

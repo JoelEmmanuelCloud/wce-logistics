@@ -27,7 +27,7 @@ export function DocumentReview({ action, documentId, status }: { action: Action;
             rows={2}
             maxLength={1000}
             required
-            className="w-full rounded-xl border border-navy/20 bg-white px-3 py-2 text-[14px] text-navy focus:border-orange-ink focus:outline-none focus:ring-3 focus:ring-orange/25"
+            className="w-full rounded-md border border-navy/20 bg-white px-3 py-2 text-[14px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
           />
         </div>
       )}

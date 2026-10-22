@@ -8,7 +8,7 @@ const CARD_TONES = {
 } as const;
 
 export function Card({ children, className, tone = "light" }: { children: ReactNode; className?: string; tone?: keyof typeof CARD_TONES }) {
-  return <section className={`rounded-[24px] border p-[clamp(20px,2.4vw,32px)] ${CARD_TONES[tone]} ${className ?? ""}`}>{children}</section>;
+  return <section className={`rounded-lg border p-[clamp(20px,2.4vw,32px)] ${CARD_TONES[tone]} ${className ?? ""}`}>{children}</section>;
 }
 
 export function CardHeader({ title, description, action }: { title: string; description?: ReactNode; action?: ReactNode }) {
@@ -38,7 +38,7 @@ export function PageHeader({ eyebrow, title, description, action }: { eyebrow?: 
 
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-[24px] border border-dashed border-navy/20 bg-white px-6 py-14 text-center">
+    <div className="flex flex-col items-center rounded-lg border border-dashed border-navy/20 bg-white px-6 py-14 text-center">
       <h2 className="font-display text-[28px] uppercase leading-none text-navy">{title}</h2>
       <p className="mt-3 max-w-[30em] text-[15px] leading-relaxed text-navy/70">{description}</p>
       {action && <div className="mt-6">{action}</div>}
