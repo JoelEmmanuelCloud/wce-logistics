@@ -14,6 +14,7 @@ const NAV = [
   { href: "/vendor/profile", label: "Business profile" },
   { href: "/vendor/verification", label: "Verification" },
   { href: "/vendor/trucks", label: "Trucks" },
+  { href: "/vendor/drivers", label: "Drivers" },
   { href: "/vendor/routes", label: "Trips" },
   { href: "/vendor/bookings", label: "Bookings" },
   { href: "/vendor/payouts", label: "Earnings" },
