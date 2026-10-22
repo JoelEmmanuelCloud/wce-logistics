@@ -2,7 +2,7 @@
 
 This document tracks the WCE Logistics build against the product requirements in [PRD.md](PRD.md). Technical design is described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Last updated: 22 October 2026 (Phase 4 complete, payout accounts, job emails, admin settings and reports added)
+Last updated: 22 October 2026 (test deployment live at wcelogistics.com, UI and UX cleanup, loading skeletons)
 
 ## Project scope
 
@@ -37,7 +37,7 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 | 3. Transactions | Paystack payments, commission, payouts, refunds, cancellations, email notifications | Done, waiting on live keys |
 | 4. Delivery operations | Drivers, assignment, delivery statuses, evidence, reviews, disputes | Done |
 | 5. Optimisation | GPS, route optimisation, automated matching, analytics | Not started |
-| Launch | Hosting, production configuration, legal and compliance | Not started |
+| Launch | Hosting, production configuration, legal and compliance | Test deployment live, production launch not started |
 
 ## What is done
 
@@ -46,7 +46,7 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Landing page modelled on the approved design: hero with Nigeria route map, services, how it works (shipper and vendor tabs), verification, pricing, industries, vendor call to action, FAQ, footer
 - [x] Real photography with an image registry and attribution
 - [x] Header with dropdown menus and mobile menu
-- [x] Scroll reveal and hover motion that respects reduced-motion settings
+- [x] Hero entrance, route map and watermark motion that respects reduced-motion settings
 - [x] WCE logo watermark behind sections and oversized footer wordmark
 - [x] SEO: metadata, Open Graph image, structured data, sitemap, robots, web manifest
 - [x] Custom 404 and error pages
@@ -138,11 +138,36 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Value trend chart with tooltips and a screen reader table, top routes and top vendors
 - [x] CSV exports of payments, payouts and bookings, admin only, audited and safe to open in spreadsheets
 
+### UI and UX cleanup
+
+- [x] Body typeface changed from Inter to Archivo; Anton and Saira kept for display type
+- [x] Buttons, inputs, dropdowns, checkboxes and option tiles use small corner radii and a plain navy focus outline instead of pill shapes and an orange glow
+- [x] Cards and list rows use consistent, tighter radii across the shipper, vendor, driver and admin areas
+- [x] Removed scroll-triggered fade-ins, hover lifts and the frosted-glass hero caption
+- [x] Removed the small uppercase labels above page and section headings; useful context such as onboarding steps moved into the page description
+- [x] Attention and danger cards use neutral borders instead of coloured ones
+- [x] Phone numbers and email addresses are tap-to-call and tap-to-email links on booking, driver, vendor and user pages
+- [x] Long emails and values wrap inside cards; tables scroll inside their own container on phones
+- [x] Consistent page titles on the vendor, admin and driver overview pages
+- [x] Footer copyright line with the current year
+- [x] Loading skeletons shaped like each page (overview, table, list, card grid, detail and form) on every shipper, vendor, driver and admin route
+- [x] Pending spinners on truck availability and archive buttons
+
+### Test deployment
+
+- [x] Hosted on Vercel at https://wcelogistics.com with HTTPS (DNS on Porkbun)
+- [x] Supabase PostgreSQL (London) connected through the Vercel integration; migrations run on each production build
+- [x] Private AWS S3 bucket for documents and photos (eu-west-2) with a least-privilege IAM policy
+- [x] Resend email from the verified wcelogistics.com domain with a cleaned-up branded template and a code block for sign-in codes
+- [x] Scheduled jobs called by GitHub Actions through a secret-protected endpoint (bookings every 15 minutes, deliveries hourly, documents daily)
+- [x] Continuous integration on each push: lint, type check, unit tests and production build
+- [x] Admin account created; test data seeded on the live site (2 verified vendors, 3 trucks, 4 trips, 3 drivers, 3 shippers, 6 bookings across every main status, payments, a payout, a review and an open dispute)
+
 ## What has been tested
 
-All suites passed on the latest run. Two landing and sign-in tests can time out when the machine is under heavy load and pass when re-run on their own.
+All suites passed on the latest run. A few landing page tests can time out under heavy parallel load because the landing photos load from Unsplash; they pass when re-run on their own.
 
-### Unit tests (91 tests, Vitest)
+### Unit tests (98 tests, Vitest)
 
 - [x] Email address and Nigerian phone number normalisation
 - [x] Encryption and decryption of identity numbers
@@ -156,6 +181,7 @@ All suites passed on the latest run. Two landing and sign-in tests can time out 
 - [x] Driver, delivery update, review and dispute validation
 - [x] Settings validation, configurable shipment, trip and truck policy, cargo category names
 - [x] CSV quoting and formula injection protection
+- [x] Email template rendering, sign-in code block, fallback link and HTML escaping
 
 ### End-to-end tests (48 scenarios, Playwright, desktop and mobile Chrome)
 
@@ -193,8 +219,11 @@ These run against a production build with a separate test database, a separate s
 
 - [x] Lighthouse audits on the landing page (accessibility, best practices, SEO at 100)
 - [x] Visual review of every page on desktop and mobile widths
+- [x] Automated page audit of every public, shipper, vendor, driver and admin page at 360, 768 and 1440 px: no horizontal overflow, no broken internal links, no console errors, one h1 and a title and description on every page, phone numbers and emails clickable
+- [x] Loading skeletons checked at phone and desktop widths with no overflow
+- [x] Shipper, vendor, driver and admin flows exercised on the live test site with seeded data, 51 emails sent and none failed
 - [ ] Test with a real Paystack test account (needs keys)
-- [ ] Test real email delivery from a verified Resend domain (needs keys)
+- [x] Test real email delivery from a verified Resend domain
 - [ ] Test on physical Android and iOS phones and on slow networks
 
 ## What is left to do
@@ -202,7 +231,7 @@ These run against a production build with a separate test database, a separate s
 ### Needed from the business before launch
 
 - [ ] Paystack secret key and the webhook URL set in the Paystack dashboard
-- [ ] Resend API key and a verified sending domain
+- [x] Resend API key and a verified sending domain
 - [ ] Confirmed platform commission rate (10% is a placeholder)
 - [ ] Real contact email address (`info@wcelogistics.com` is a placeholder)
 - [ ] Payout policy: when a vendor share becomes payable
@@ -222,16 +251,20 @@ These run against a production build with a separate test database, a separate s
 - [ ] Admin driver list for oversight across vendors
 - [ ] Vendor replies to reviews
 
+### UI follow-ups
+
+- [ ] Serve landing photos from our own storage instead of Unsplash, compressed and resized, so the page loads faster and tests do not depend on an outside CDN
 
 ### Launch readiness
 
-- [ ] Choose hosting for the app, PostgreSQL and object storage
-- [ ] Production environment variables and secrets
-- [ ] Custom domain with HTTPS
-- [ ] Schedule the jobs (documents daily, bookings every 15 minutes, deliveries hourly)
+- [x] Choose hosting for the app, PostgreSQL and object storage (Vercel, Supabase, AWS S3)
+- [x] Environment variables and secrets for the test deployment
+- [x] Custom domain with HTTPS
+- [x] Schedule the jobs (documents daily, bookings every 15 minutes, deliveries hourly)
 - [ ] Database backups and a tested restore
 - [ ] Error monitoring and uptime alerts
-- [ ] Continuous integration running the unit and end-to-end tests on each push
+- [x] Continuous integration running lint, type check, unit tests and build on each push
+- [ ] Run the end-to-end suite in continuous integration
 - [ ] Load test search and booking against the PRD targets (API p95 under 500 ms, search under 2 s)
 - [ ] Security review and penetration test
 - [ ] Data retention rules for documents and identity data
