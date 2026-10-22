@@ -449,7 +449,7 @@ export const bookingEvents = pgTable(
 
 export const paymentProvider = pgEnum("payment_provider", ["paystack", "offline"]);
 export const paymentStatus = pgEnum("payment_status", ["pending", "successful", "failed", "refunded", "partially_refunded"]);
-export const payoutStatus = pgEnum("payout_status", ["on_hold", "eligible", "paid", "cancelled"]);
+export const payoutStatus = pgEnum("payout_status", ["on_hold", "eligible", "processing", "paid", "cancelled"]);
 export const notificationStatus = pgEnum("notification_status", ["sent", "failed"]);
 
 export const payments = pgTable(
@@ -499,6 +499,9 @@ export const payouts = pgTable(
     amountKobo: integer("amount_kobo").notNull(),
     status: payoutStatus("status").notNull().default("on_hold"),
     transferReference: text("transfer_reference"),
+    providerReference: text("provider_reference"),
+    destination: text("destination"),
+    failureReason: text("failure_reason"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     paidBy: uuid("paid_by").references(() => users.id, { onDelete: "set null" }),
     note: text("note"),
@@ -506,9 +509,28 @@ export const payouts = pgTable(
   },
   (table) => [
     uniqueIndex("payouts_payment_key").on(table.paymentId),
+    uniqueIndex("payouts_provider_reference_key").on(table.providerReference),
     index("payouts_vendor_idx").on(table.vendorId, table.status),
     check("payouts_amount_non_negative", sql`${table.amountKobo} >= 0`),
   ],
+);
+
+export const payoutAccounts = pgTable(
+  "payout_accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    bankCode: text("bank_code").notNull(),
+    bankName: text("bank_name").notNull(),
+    accountNumberEncrypted: text("account_number_encrypted").notNull(),
+    accountNumberLast4: text("account_number_last4").notNull(),
+    accountName: text("account_name").notNull(),
+    recipientCode: text("recipient_code").notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("payout_accounts_vendor_key").on(table.vendorId)],
 );
 
 export const notifications = pgTable(
@@ -696,3 +718,4 @@ export type Review = typeof reviews.$inferSelect;
 export type Dispute = typeof disputes.$inferSelect;
 export type DisputeStatus = (typeof disputeStatus.enumValues)[number];
 export type DisputeMessage = typeof disputeMessages.$inferSelect;
+export type PayoutAccount = typeof payoutAccounts.$inferSelect;
