@@ -12,12 +12,14 @@ import { requireRole } from "@/server/auth/dal";
 import { db, schema } from "@/server/db";
 import { cancelBooking, MarketplaceError, requestBooking } from "@/server/marketplace";
 import { notifyBooking } from "@/server/notifications";
+import { activeCargoCategories, getPlatformSettings } from "@/server/settings";
 
 const id = z.uuid();
 
 export async function createShipmentAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const user = await requireRole("customer");
-  const parsed = shipmentSchema.safeParse({
+  const [settings, cargo] = await Promise.all([getPlatformSettings(), activeCargoCategories()]);
+  const parsed = shipmentSchema({ minWeightKg: settings.minShipmentKg, cargoTypes: cargo.map((category) => category.value) }).safeParse({
     originState: formData.get("originState") ?? "",
     originCity: formData.get("originCity") ?? "",
     originAddress: formData.get("originAddress") ?? "",

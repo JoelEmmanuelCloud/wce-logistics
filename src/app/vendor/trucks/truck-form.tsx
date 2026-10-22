@@ -6,7 +6,7 @@ import { SubmitButton } from "@/components/ui/button";
 import { CheckboxGroup, Field, SelectInput, TextInput } from "@/components/ui/field";
 import { NIGERIAN_STATES } from "@/data/nigeria-states";
 import { fieldsKey, initialFormState, valueOf, valuesOf, type FormState } from "@/lib/form-state";
-import { BODY_TYPES, CARGO_TYPES, TRUCK_CATEGORIES } from "@/lib/labels";
+import { BODY_TYPES } from "@/lib/labels";
 
 export type TruckDefaults = {
   registrationNumber: string;
@@ -44,7 +44,23 @@ export const EMPTY_TRUCK: TruckDefaults = {
 
 type Action = (state: FormState, formData: FormData) => Promise<FormState>;
 
-export function TruckForm({ action, defaults, submitLabel, disabled = false }: { action: Action; defaults: TruckDefaults; submitLabel: string; disabled?: boolean }) {
+type Option = { value: string; label: string };
+
+export function TruckForm({
+  action,
+  defaults,
+  submitLabel,
+  categoryOptions,
+  cargoOptions,
+  disabled = false,
+}: {
+  action: Action;
+  defaults: TruckDefaults;
+  submitLabel: string;
+  categoryOptions: Option[];
+  cargoOptions: Option[];
+  disabled?: boolean;
+}) {
   const [state, formAction] = useActionState(action, initialFormState);
   const errors = state.fieldErrors ?? {};
   const value = (key: Exclude<keyof TruckDefaults, "cargoTypes">) => valueOf(state.values, key, defaults[key]);
@@ -79,7 +95,7 @@ export function TruckForm({ action, defaults, submitLabel, disabled = false }: {
               <option value="" disabled>
                 Choose a category
               </option>
-              {TRUCK_CATEGORIES.map((option) => (
+              {categoryOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -135,7 +151,7 @@ export function TruckForm({ action, defaults, submitLabel, disabled = false }: {
         <CheckboxGroup
           name="cargoTypes"
           legend="Cargo this truck can carry"
-          options={CARGO_TYPES}
+          options={cargoOptions}
           defaultValues={valuesOf(state.values, "cargoTypes", defaults.cargoTypes)}
           errors={errors.cargoTypes}
           columns={4}

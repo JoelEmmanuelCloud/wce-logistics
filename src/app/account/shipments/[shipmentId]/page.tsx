@@ -6,11 +6,12 @@ import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList, EmptyState, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { BODY_TYPES, CARGO_TYPES, formatDate, formatKg, formatTransit, labelFor, SHIPMENT_STATUS, TRUCK_CATEGORIES } from "@/lib/labels";
+import { BODY_TYPES, formatDate, formatKg, formatTransit, labelFor, SHIPMENT_STATUS, TRUCK_CATEGORIES } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
 import { requireRole } from "@/server/auth/dal";
 import { activeBookingForShipment, findCustomerShipment, searchOffers, SEARCH_WINDOW_DAYS } from "@/server/marketplace";
 import { vendorRatings } from "@/server/reviews";
+import { cargoLabels } from "@/server/settings";
 import { CancelShipmentButton, RequestOfferButton } from "./offer-actions";
 
 export const metadata: Metadata = { title: "Shipment" };
@@ -24,7 +25,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
   }
   const booking = shipment.status === "booked" ? await activeBookingForShipment(shipment.id) : null;
   const offers = shipment.status === "open" ? await searchOffers(shipment) : [];
-  const ratings = await vendorRatings(offers.map((offer) => offer.route.vendorId));
+  const [ratings, cargo] = await Promise.all([vendorRatings(offers.map((offer) => offer.route.vendorId)), cargoLabels()]);
 
   return (
     <>
@@ -102,7 +103,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
             <CardHeader title="Shipment details" />
             <DescriptionList
               items={[
-                { label: "Cargo", value: labelFor(CARGO_TYPES, shipment.cargoType) },
+                { label: "Cargo", value: cargo.get(shipment.cargoType) ?? labelFor([], shipment.cargoType) },
                 { label: "Description", value: shipment.description },
                 { label: "Packages", value: shipment.packageCount },
                 { label: "Pickup date", value: formatDate(shipment.pickupDate) },

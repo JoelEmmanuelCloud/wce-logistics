@@ -5,6 +5,7 @@ import { createTruckAction } from "@/app/vendor/trucks/actions";
 import { EMPTY_TRUCK, TruckForm } from "@/app/vendor/trucks/truck-form";
 import { Card, PageHeader } from "@/components/ui/card";
 import { requireRole } from "@/server/auth/dal";
+import { truckFormPolicy } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 
 export const metadata: Metadata = { title: "Add a truck" };
@@ -15,6 +16,7 @@ export default async function NewTruckPage() {
   if (!profile) {
     redirect("/vendor/profile");
   }
+  const { categoryOptions, cargoOptions } = await truckFormPolicy();
 
   return (
     <>
@@ -27,7 +29,13 @@ export default async function NewTruckPage() {
         description="Enter the details exactly as they appear on the vehicle documents. Next you will upload documents and photos."
       />
       <Card>
-        <TruckForm action={createTruckAction} defaults={{ ...EMPTY_TRUCK, baseState: profile.state, baseCity: profile.city }} submitLabel="Save and continue" />
+        <TruckForm
+          action={createTruckAction}
+          categoryOptions={categoryOptions}
+          cargoOptions={cargoOptions}
+          defaults={{ ...EMPTY_TRUCK, baseState: profile.state, baseCity: profile.city }}
+          submitLabel="Save and continue"
+        />
       </Card>
     </>
   );

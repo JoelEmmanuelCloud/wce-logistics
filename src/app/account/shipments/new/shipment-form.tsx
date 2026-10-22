@@ -7,8 +7,6 @@ import { SubmitButton } from "@/components/ui/button";
 import { Field, SelectInput, TextArea, TextInput } from "@/components/ui/field";
 import { NIGERIAN_STATES } from "@/data/nigeria-states";
 import { fieldsKey, initialFormState, valueOf } from "@/lib/form-state";
-import { CARGO_TYPES } from "@/lib/labels";
-import { MIN_SHIPMENT_KG } from "@/lib/pricing";
 
 function StateSelect({ id, value, errors }: { id: string; value: string; errors?: string[] }) {
   return (
@@ -30,7 +28,17 @@ const BOOKING_TYPES = [
   { value: "dedicated", title: "Dedicated truck", detail: "Book the whole truck for your goods alone." },
 ] as const;
 
-export function ShipmentForm({ minDate, maxDate }: { minDate: string; maxDate: string }) {
+export function ShipmentForm({
+  minDate,
+  maxDate,
+  minWeightKg,
+  cargoTypes,
+}: {
+  minDate: string;
+  maxDate: string;
+  minWeightKg: number;
+  cargoTypes: ReadonlyArray<{ value: string; label: string }>;
+}) {
   const [state, action] = useActionState(createShipmentAction, initialFormState);
   const errors = state.fieldErrors ?? {};
   const value = (key: string, fallback = "") => valueOf(state.values, key, fallback);
@@ -77,14 +85,14 @@ export function ShipmentForm({ minDate, maxDate }: { minDate: string; maxDate: s
                 <option value="" disabled>
                   Choose a cargo type
                 </option>
-                {CARGO_TYPES.map((option) => (
+                {cargoTypes.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </SelectInput>
             </Field>
-            <Field id="weightKg" label="Total weight (kg)" required hint={`Minimum ${MIN_SHIPMENT_KG} kg.`} errors={errors.weightKg}>
+            <Field id="weightKg" label="Total weight (kg)" required hint={`Minimum ${minWeightKg.toLocaleString("en-NG")} kg.`} errors={errors.weightKg}>
               <TextInput id="weightKg" inputMode="numeric" defaultValue={value("weightKg")} hasHint errors={errors.weightKg} />
             </Field>
             <Field id="packageCount" label="Number of packages" required errors={errors.packageCount}>

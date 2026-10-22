@@ -6,10 +6,10 @@ import { quoteFor, type Quote } from "@/lib/pricing";
 import type { RouteInput } from "@/lib/validation/marketplace";
 import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
+import { getPlatformSettings } from "@/server/settings";
 import type { Booking, BookingStatus, Route, Shipment } from "@/server/db/schema";
 
 export const SEARCH_WINDOW_DAYS = 3;
-export const RESPONSE_WINDOW_HOURS = 24;
 
 export const OPEN_BOOKING_STATUSES: BookingStatus[] = [
   "pending_vendor_acceptance",
@@ -165,6 +165,7 @@ function eligibilityConditions(shipment: Shipment) {
 }
 
 export async function searchOffers(shipment: Shipment) {
+  const { minShipmentKg } = await getPlatformSettings();
   const rows = await db()
     .select({
       route: schema.routes,
@@ -191,6 +192,7 @@ export async function searchOffers(shipment: Shipment) {
       const quote: Quote | null = quoteFor({
         type: shipment.bookingType,
         weightKg: shipment.weightKg,
+        minWeightKg: Math.min(minShipmentKg, shipment.weightKg),
         ratePerKgKobo: row.route.ratePerKgKobo,
         minimumChargeKobo: row.route.minimumChargeKobo,
         dedicatedPriceKobo: row.route.dedicatedPriceKobo,
@@ -212,6 +214,7 @@ async function releaseCapacity(tx: Transaction, booking: Booking) {
 }
 
 export async function requestBooking(customerId: string, shipmentId: string, routeId: string): Promise<Booking> {
+  const settings = await getPlatformSettings();
   return db().transaction(async (tx) => {
     const [shipment] = await tx
       .select()
@@ -242,6 +245,7 @@ export async function requestBooking(customerId: string, shipmentId: string, rou
     const quote = quoteFor({
       type: shipment.bookingType,
       weightKg: shipment.weightKg,
+      minWeightKg: Math.min(settings.minShipmentKg, shipment.weightKg),
       ratePerKgKobo: route.ratePerKgKobo,
       minimumChargeKobo: route.minimumChargeKobo,
       dedicatedPriceKobo: route.dedicatedPriceKobo,
@@ -271,7 +275,7 @@ export async function requestBooking(customerId: string, shipmentId: string, rou
         ratePerKgKobo: quote.ratePerKgKobo,
         lineItems: quote.lineItems,
         totalKobo: quote.totalKobo,
-        responseDueAt: sql`now() + make_interval(hours => ${RESPONSE_WINDOW_HOURS})`,
+        responseDueAt: sql`now() + make_interval(hours => ${settings.responseWindowHours})`,
       })
       .returning();
 
@@ -366,6 +370,7 @@ export async function getBookingDetail(bookingId: string) {
       customerName: schema.users.fullName,
       customerPhone: schema.users.phone,
       vendorUserId: schema.vendorProfiles.userId,
+      cargoLabel: schema.cargoCategories.label,
       driverName: schema.drivers.fullName,
       driverPhone: schema.drivers.phone,
       driverUserId: schema.drivers.userId,
@@ -377,6 +382,7 @@ export async function getBookingDetail(bookingId: string) {
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.bookings.vendorId))
     .innerJoin(schema.users, eq(schema.users.id, schema.bookings.customerId))
     .leftJoin(schema.drivers, eq(schema.drivers.id, schema.bookings.driverId))
+    .leftJoin(schema.cargoCategories, eq(schema.cargoCategories.value, schema.shipments.cargoType))
     .where(eq(schema.bookings.id, bookingId))
     .limit(1);
   if (!row) {

@@ -21,6 +21,7 @@ import {
   MIN_TRUCK_PHOTOS,
   truckSubmissionChecks,
 } from "@/server/trucks";
+import { truckFormPolicy } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 
 const truckIdSchema = z.uuid();
@@ -77,7 +78,8 @@ export async function createTruckAction(_previous: FormState, formData: FormData
     return errorState("Your vendor account cannot register trucks right now. Check your verification status.");
   }
 
-  const parsed = truckSchema.safeParse(readTruckForm(formData));
+  const { policy } = await truckFormPolicy();
+  const parsed = truckSchema(policy).safeParse(readTruckForm(formData));
   if (!parsed.success) {
     return validationErrorState(parsed.error, formData);
   }
@@ -112,7 +114,8 @@ export async function updateTruckAction(truckId: string, _previous: FormState, f
     return errorState("This truck cannot be edited while it is being reviewed or suspended.");
   }
 
-  const parsed = truckSchema.safeParse(readTruckForm(formData));
+  const { policy } = await truckFormPolicy(truck);
+  const parsed = truckSchema(policy).safeParse(readTruckForm(formData));
   if (!parsed.success) {
     return validationErrorState(parsed.error, formData);
   }

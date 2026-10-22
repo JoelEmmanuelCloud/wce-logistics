@@ -7,6 +7,7 @@ import { errorState, validationErrorState, withValues, type FormState } from "@/
 import { routeSchema } from "@/lib/validation/marketplace";
 import { requireRole } from "@/server/auth/dal";
 import { createRoute, MarketplaceError, setRouteStatus } from "@/server/marketplace";
+import { getPlatformSettings } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 
 async function requireVerifiedVendor() {
@@ -24,7 +25,8 @@ export async function createRouteAction(_previous: FormState, formData: FormData
     return errorState("Your vendor account must be verified before you can schedule trips.");
   }
 
-  const parsed = routeSchema.safeParse({
+  const settings = await getPlatformSettings();
+  const parsed = routeSchema(settings.minShipmentKg).safeParse({
     truckId: formData.get("truckId") ?? "",
     originState: formData.get("originState") ?? "",
     originCity: formData.get("originCity") ?? "",

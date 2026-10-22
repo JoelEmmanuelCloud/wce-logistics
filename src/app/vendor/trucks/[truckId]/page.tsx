@@ -25,6 +25,7 @@ import {
   todayIso,
   truckSubmissionChecks,
 } from "@/server/trucks";
+import { truckFormPolicy } from "@/server/settings";
 import { findVendorProfileByUser } from "@/server/vendors";
 import { SubmitTruckForm, TruckDocumentUpload, TruckPhotoUpload } from "./truck-uploads";
 
@@ -74,7 +75,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
     redirect("/vendor/trucks");
   }
 
-  const [documents, photos] = await Promise.all([listTruckDocuments(truck.id), listTruckPhotos(truck.id)]);
+  const [documents, photos, formPolicy] = await Promise.all([listTruckDocuments(truck.id), listTruckPhotos(truck.id), truckFormPolicy(truck)]);
   const latest = latestTruckDocuments(documents);
   const today = todayIso();
   const checks = truckSubmissionChecks(documents, photos);
@@ -214,6 +215,8 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
           />
           <TruckForm
             action={updateTruckAction.bind(null, truck.id)}
+            categoryOptions={formPolicy.categoryOptions}
+            cargoOptions={formPolicy.cargoOptions}
             disabled={!detailsEditable}
             submitLabel="Save details"
             defaults={{
