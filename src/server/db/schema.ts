@@ -14,6 +14,7 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum("user_role", ["customer", "vendor", "driver", "admin"]);
@@ -411,10 +412,15 @@ export const bookings = pgTable(
     responseDueAt: timestamp("response_due_at", { withTimezone: true }).notNull(),
     respondedAt: timestamp("responded_at", { withTimezone: true }),
     statusNote: text("status_note"),
+    driverId: uuid("driver_id").references((): AnyPgColumn => drivers.id, { onDelete: "restrict" }),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
     ...timestamps,
   },
   (table) => [
     uniqueIndex("bookings_reference_key").on(table.reference),
+    index("bookings_driver_idx").on(table.driverId, table.status),
+    index("bookings_delivered_idx").on(table.status, table.deliveredAt),
     index("bookings_customer_idx").on(table.customerId, table.createdAt),
     index("bookings_vendor_idx").on(table.vendorId, table.status),
     index("bookings_route_idx").on(table.routeId),
@@ -521,6 +527,153 @@ export const notifications = pgTable(
   (table) => [index("notifications_user_idx").on(table.userId, table.createdAt)],
 );
 
+export const driverStatus = pgEnum("driver_status", ["active", "inactive"]);
+export const deliveryEventKind = pgEnum("delivery_event_kind", [
+  "driver_assigned",
+  "arrived_at_pickup",
+  "goods_collected",
+  "departed",
+  "arrived_at_destination",
+  "delivery_attempted",
+  "delivered",
+  "incident_reported",
+  "receipt_confirmed",
+]);
+export const reviewStatus = pgEnum("review_status", ["published", "hidden"]);
+export const disputeCategory = pgEnum("dispute_category", [
+  "non_delivery",
+  "late_delivery",
+  "damaged_goods",
+  "missing_goods",
+  "unexpected_charges",
+  "incorrect_details",
+  "cancellation",
+  "payment_or_refund",
+  "other",
+]);
+export const disputeStatus = pgEnum("dispute_status", ["open", "under_review", "awaiting_information", "resolved", "closed"]);
+
+export const drivers = pgTable(
+  "drivers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    fullName: text("full_name").notNull(),
+    phone: text("phone").notNull(),
+    licenceNumberEncrypted: text("licence_number_encrypted").notNull(),
+    licenceNumberHash: text("licence_number_hash").notNull(),
+    licenceNumberLast4: text("licence_number_last4").notNull(),
+    licenceClass: text("licence_class").notNull(),
+    licenceExpiresOn: date("licence_expires_on").notNull(),
+    status: driverStatus("status").notNull().default("active"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("drivers_user_id_key").on(table.userId),
+    uniqueIndex("drivers_licence_hash_key").on(table.licenceNumberHash),
+    index("drivers_vendor_idx").on(table.vendorId, table.status),
+  ],
+);
+
+export const deliveryEvents = pgTable(
+  "delivery_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "cascade" }),
+    kind: deliveryEventKind("kind").notNull(),
+    actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+    note: text("note"),
+    recipientName: text("recipient_name"),
+    photoStorageKey: text("photo_storage_key"),
+    photoContentType: text("photo_content_type"),
+    photoSizeBytes: integer("photo_size_bytes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("delivery_events_booking_idx").on(table.bookingId, table.createdAt)],
+);
+
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "restrict" }),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    rating: integer("rating").notNull(),
+    comment: text("comment"),
+    status: reviewStatus("status").notNull().default("published"),
+    moderationNote: text("moderation_note"),
+    moderatedBy: uuid("moderated_by").references(() => users.id, { onDelete: "set null" }),
+    moderatedAt: timestamp("moderated_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("reviews_booking_key").on(table.bookingId),
+    index("reviews_vendor_idx").on(table.vendorId, table.status),
+    check("reviews_rating_range", sql`${table.rating} between 1 and 5`),
+  ],
+);
+
+export const disputes = pgTable(
+  "disputes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "restrict" }),
+    openedBy: uuid("opened_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    openedByRole: userRole("opened_by_role").notNull(),
+    category: disputeCategory("category").notNull(),
+    description: text("description").notNull(),
+    status: disputeStatus("status").notNull().default("open"),
+    assignedTo: uuid("assigned_to").references(() => users.id, { onDelete: "set null" }),
+    resolution: text("resolution"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index("disputes_booking_idx").on(table.bookingId),
+    index("disputes_status_idx").on(table.status, table.createdAt),
+    uniqueIndex("disputes_one_active_per_booking_key")
+      .on(table.bookingId)
+      .where(sql`${table.status} not in ('resolved', 'closed')`),
+  ],
+);
+
+export const disputeMessages = pgTable(
+  "dispute_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    disputeId: uuid("dispute_id")
+      .notNull()
+      .references(() => disputes.id, { onDelete: "cascade" }),
+    authorId: uuid("author_id").references(() => users.id, { onDelete: "set null" }),
+    authorRole: userRole("author_role").notNull(),
+    body: text("body").notNull(),
+    attachmentStorageKey: text("attachment_storage_key"),
+    attachmentFileName: text("attachment_file_name"),
+    attachmentContentType: text("attachment_content_type"),
+    attachmentSizeBytes: integer("attachment_size_bytes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("dispute_messages_dispute_idx").on(table.disputeId, table.createdAt)],
+);
+
 export type User = typeof users.$inferSelect;
 export type UserRole = (typeof userRole.enumValues)[number];
 export type VendorProfile = typeof vendorProfiles.$inferSelect;
@@ -536,3 +689,10 @@ export type BookingEvent = typeof bookingEvents.$inferSelect;
 export type BookingStatus = (typeof bookingStatus.enumValues)[number];
 export type Payment = typeof payments.$inferSelect;
 export type Payout = typeof payouts.$inferSelect;
+export type Driver = typeof drivers.$inferSelect;
+export type DeliveryEvent = typeof deliveryEvents.$inferSelect;
+export type DeliveryEventKind = (typeof deliveryEventKind.enumValues)[number];
+export type Review = typeof reviews.$inferSelect;
+export type Dispute = typeof disputes.$inferSelect;
+export type DisputeStatus = (typeof disputeStatus.enumValues)[number];
+export type DisputeMessage = typeof disputeMessages.$inferSelect;
