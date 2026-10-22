@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { normalizeRegistration, truckDocumentSchema, truckSchema } from "@/lib/validation/truck";
 import { identitySchema, vendorProfileSchema } from "@/lib/validation/vendor";
 
+const TRUCK_POLICY = { cargoTypes: ["general_goods", "machinery"], truckCategories: ["heavy_duty", "flatbed"] };
+
 const validTruck = {
   registrationNumber: "kja-123ab",
   make: "MAN",
@@ -21,7 +23,7 @@ const validTruck = {
 
 describe("truck validation", () => {
   it("accepts a valid truck and normalizes values", () => {
-    const result = truckSchema.parse(validTruck);
+    const result = truckSchema(TRUCK_POLICY).parse(validTruck);
     expect(result.registrationNumber).toBe("KJA-123AB");
     expect(result.year).toBe(2019);
     expect(result.maxPayloadKg).toBe(20000);
@@ -43,7 +45,7 @@ describe("truck validation", () => {
     [{ baseState: "Atlantis" }, "baseState"],
     [{ bodyLengthM: "-1" }, "bodyLengthM"],
   ])("rejects %o", (override, field) => {
-    const result = truckSchema.safeParse({ ...validTruck, ...override });
+    const result = truckSchema(TRUCK_POLICY).safeParse({ ...validTruck, ...override });
     expect(result.success).toBe(false);
     expect(result.error?.issues.some((issue) => issue.path[0] === field)).toBe(true);
   });
@@ -93,5 +95,12 @@ describe("vendor validation", () => {
     expect(identitySchema.safeParse({ idDocumentType: "nin", idDocumentReference: "1234" }).success).toBe(false);
     expect(identitySchema.safeParse({ idDocumentType: "international_passport", idDocumentReference: "A12345678" }).success).toBe(true);
     expect(identitySchema.safeParse({ idDocumentType: "drivers_licence", idDocumentReference: "ABC 123!" }).success).toBe(false);
+  });
+});
+
+describe("configurable truck policy", () => {
+  it("rejects disabled truck categories and unknown cargo types", () => {
+    expect(truckSchema({ cargoTypes: ["general_goods"], truckCategories: ["flatbed"] }).safeParse(validTruck).success).toBe(false);
+    expect(truckSchema({ cargoTypes: ["machinery"], truckCategories: ["heavy_duty"] }).safeParse(validTruck).success).toBe(false);
   });
 });

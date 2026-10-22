@@ -3,6 +3,7 @@ import { addDays, isIsoDate, lagosToday } from "@/lib/dates";
 import { routeSchema, shipmentSchema } from "@/lib/validation/marketplace";
 
 const inAWeek = addDays(lagosToday(), 7);
+const POLICY = { minWeightKg: 50, cargoTypes: ["general_goods", "machinery"] };
 
 const route = {
   truckId: "8a5f0a5e-5c2b-4c4f-9f2a-0e6f7e1d2c3b",
@@ -51,7 +52,7 @@ describe("dates", () => {
 
 describe("route validation", () => {
   it("parses money into kobo and checkbox values", () => {
-    const parsed = routeSchema.parse(route);
+    const parsed = routeSchema(50).parse(route);
     expect(parsed.ratePerKgKobo).toBe(2_550);
     expect(parsed.minimumChargeKobo).toBe(500_000);
     expect(parsed.dedicatedPriceKobo).toBeNull();
@@ -60,7 +61,7 @@ describe("route validation", () => {
   });
 
   it("requires a whole-truck price when shared loads are not allowed", () => {
-    const result = routeSchema.safeParse({ ...route, allowsShared: undefined });
+    const result = routeSchema(50).safeParse({ ...route, allowsShared: undefined });
     expect(result.success).toBe(false);
     expect(result.error?.issues[0].path).toEqual(["dedicatedPriceKobo"]);
   });
@@ -73,7 +74,7 @@ describe("route validation", () => {
     [{ capacityKg: "20" }, "capacityKg"],
     [{ destinationState: "Lagos", destinationCity: "apapa" }, "destinationCity"],
   ])("rejects %o", (override, field) => {
-    const result = routeSchema.safeParse({ ...route, ...override });
+    const result = routeSchema(50).safeParse({ ...route, ...override });
     expect(result.success).toBe(false);
     expect(result.error?.issues.some((issue) => issue.path[0] === field)).toBe(true);
   });
@@ -81,19 +82,47 @@ describe("route validation", () => {
 
 describe("shipment validation", () => {
   it("accepts a valid shipment", () => {
-    const parsed = shipmentSchema.parse(shipment);
+    const parsed = shipmentSchema(POLICY).parse(shipment);
     expect(parsed.weightKg).toBe(800);
     expect(parsed.declaredValueKobo).toBeNull();
     expect(parsed.handlingNotes).toBeNull();
   });
 
   it("enforces the 50 kg minimum", () => {
-    const result = shipmentSchema.safeParse({ ...shipment, weightKg: "49" });
+    const result = shipmentSchema(POLICY).safeParse({ ...shipment, weightKg: "49" });
     expect(result.success).toBe(false);
     expect(result.error?.issues[0].message).toContain("at least 50");
   });
 
   it("rejects unknown cargo types", () => {
-    expect(shipmentSchema.safeParse({ ...shipment, cargoType: "explosives" }).success).toBe(false);
+    expect(shipmentSchema(POLICY).safeParse({ ...shipment, cargoType: "explosives" }).success).toBe(false);
+  });
+});
+
+describe("configurable shipment policy", () => {
+  it("applies the configured minimum weight and cargo categories", () => {
+    const shipment = {
+      originState: "Lagos",
+      originCity: "Ikeja",
+      originAddress: "12 Allen Avenue",
+      destinationState: "Kano",
+      destinationCity: "Kano",
+      destinationAddress: "3 Bompai Road",
+      cargoType: "furniture",
+      description: "Office chairs and desks",
+      weightKg: "30",
+      packageCount: "10",
+      declaredValueKobo: "",
+      pickupDate: addDays(lagosToday(), 3),
+      handlingNotes: "",
+      bookingType: "shared",
+    };
+    expect(shipmentSchema({ minWeightKg: 50, cargoTypes: ["furniture"] }).safeParse(shipment).success).toBe(false);
+    expect(shipmentSchema({ minWeightKg: 25, cargoTypes: ["furniture"] }).safeParse(shipment).success).toBe(true);
+    expect(shipmentSchema({ minWeightKg: 25, cargoTypes: ["general_goods"] }).safeParse(shipment).success).toBe(false);
+  });
+
+  it("uses the minimum weight as the smallest trip capacity", () => {
+    expect(routeSchema(200).safeParse({ ...route, capacityKg: "150" }).success).toBe(false);
   });
 });

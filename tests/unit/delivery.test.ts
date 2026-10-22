@@ -47,11 +47,12 @@ describe("licence coverage", () => {
 describe("dispute window", () => {
   const day = 24 * 60 * 60 * 1000;
   it("allows disputes on active bookings and recently closed ones", () => {
-    expect(withinDisputeWindow("in_transit", null)).toBe(true);
-    expect(withinDisputeWindow("completed", new Date(Date.now() - 3 * day))).toBe(true);
-    expect(withinDisputeWindow("completed", new Date(Date.now() - 15 * day))).toBe(false);
-    expect(withinDisputeWindow("cancelled", null)).toBe(false);
-    expect(withinDisputeWindow("pending_vendor_acceptance", null)).toBe(false);
+    expect(withinDisputeWindow("in_transit", null, 14)).toBe(true);
+    expect(withinDisputeWindow("completed", new Date(Date.now() - 3 * day), 14)).toBe(true);
+    expect(withinDisputeWindow("completed", new Date(Date.now() - 15 * day), 14)).toBe(false);
+    expect(withinDisputeWindow("completed", new Date(Date.now() - 15 * day), 30)).toBe(true);
+    expect(withinDisputeWindow("cancelled", null, 14)).toBe(false);
+    expect(withinDisputeWindow("pending_vendor_acceptance", null, 14)).toBe(false);
   });
 });
 

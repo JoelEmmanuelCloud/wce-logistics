@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatNaira, nairaToKobo, quoteFor } from "@/lib/pricing";
 
-const shared = { type: "shared" as const, ratePerKgKobo: nairaToKobo(20), minimumChargeKobo: 0, dedicatedPriceKobo: null };
+const shared = { type: "shared" as const, minWeightKg: 50, ratePerKgKobo: nairaToKobo(20), minimumChargeKobo: 0, dedicatedPriceKobo: null };
 
 describe("quoteFor", () => {
   it("prices shared loads by chargeable weight times rate", () => {

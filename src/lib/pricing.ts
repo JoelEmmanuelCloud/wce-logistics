@@ -1,4 +1,3 @@
-export const MIN_SHIPMENT_KG = 50;
 export const KOBO_PER_NAIRA = 100;
 
 export type LineItem = { label: string; amountKobo: number };
@@ -13,6 +12,7 @@ export type Quote = {
 export type QuoteInput = {
   type: "shared" | "dedicated";
   weightKg: number;
+  minWeightKg: number;
   ratePerKgKobo: number;
   minimumChargeKobo: number;
   dedicatedPriceKobo: number | null;
@@ -30,7 +30,7 @@ export function nairaToKobo(value: number): number {
 }
 
 export function quoteFor(input: QuoteInput): Quote | null {
-  if (!Number.isInteger(input.weightKg) || input.weightKg < MIN_SHIPMENT_KG) {
+  if (!Number.isInteger(input.weightKg) || input.weightKg < input.minWeightKg) {
     return null;
   }
 

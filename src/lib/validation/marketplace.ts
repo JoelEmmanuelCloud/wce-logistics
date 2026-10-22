@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { isNigerianState } from "@/data/nigeria-states";
 import { addDays, isIsoDate, lagosToday } from "@/lib/dates";
-import { CARGO_TYPES } from "@/lib/labels";
-import { MIN_SHIPMENT_KG, nairaToKobo } from "@/lib/pricing";
+import { nairaToKobo } from "@/lib/pricing";
 
 export const MAX_BOOKING_HORIZON_DAYS = 90;
 
@@ -57,59 +56,63 @@ const wholeNumber = (label: string, min: number, max: number) =>
     .min(min, `The ${label} must be at least ${min.toLocaleString("en-NG")}.`)
     .max(max, `The ${label} must be ${max.toLocaleString("en-NG")} or less.`);
 
-export const routeSchema = z
-  .object({
-    truckId: z.uuid({ message: "Choose a truck." }),
-    originState: state("Choose the origin state."),
-    originCity: place("Enter the town or city of departure."),
-    destinationState: state("Choose the destination state."),
-    destinationCity: place("Enter the destination town or city."),
-    departureDate: futureDate("departure date"),
-    transitHours: wholeNumber("estimated transit time in hours", 1, 240),
-    capacityKg: wholeNumber("capacity offered", MIN_SHIPMENT_KG, 100_000),
-    allowsShared: z.enum(["on"]).optional().transform((value) => value === "on"),
-    ratePerKgKobo: requiredMoney("rate per kilogram", 0.01),
-    minimumChargeKobo: optionalMoney("minimum charge"),
-    dedicatedPriceKobo: optionalMoney("price for the whole truck", 1),
-  })
-  .superRefine((value, context) => {
-    if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
-      context.addIssue({ code: "custom", path: ["destinationCity"], message: "The destination must be different from the origin." });
-    }
-    if (!value.allowsShared && !value.dedicatedPriceKobo) {
-      context.addIssue({ code: "custom", path: ["dedicatedPriceKobo"], message: "Set a whole-truck price, or allow shared loads." });
-    }
-  })
-  .transform((value) => ({ ...value, minimumChargeKobo: value.minimumChargeKobo ?? 0 }));
+export const routeSchema = (minWeightKg: number) =>
+    z
+    .object({
+      truckId: z.uuid({ message: "Choose a truck." }),
+      originState: state("Choose the origin state."),
+      originCity: place("Enter the town or city of departure."),
+      destinationState: state("Choose the destination state."),
+      destinationCity: place("Enter the destination town or city."),
+      departureDate: futureDate("departure date"),
+      transitHours: wholeNumber("estimated transit time in hours", 1, 240),
+      capacityKg: wholeNumber("capacity offered", minWeightKg, 100_000),
+      allowsShared: z.enum(["on"]).optional().transform((value) => value === "on"),
+      ratePerKgKobo: requiredMoney("rate per kilogram", 0.01),
+      minimumChargeKobo: optionalMoney("minimum charge"),
+      dedicatedPriceKobo: optionalMoney("price for the whole truck", 1),
+    })
+    .superRefine((value, context) => {
+      if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
+        context.addIssue({ code: "custom", path: ["destinationCity"], message: "The destination must be different from the origin." });
+      }
+      if (!value.allowsShared && !value.dedicatedPriceKobo) {
+        context.addIssue({ code: "custom", path: ["dedicatedPriceKobo"], message: "Set a whole-truck price, or allow shared loads." });
+      }
+    })
+    .transform((value) => ({ ...value, minimumChargeKobo: value.minimumChargeKobo ?? 0 }));
 
-export type RouteInput = z.infer<typeof routeSchema>;
+export type RouteInput = z.infer<ReturnType<typeof routeSchema>>;
 
-export const shipmentSchema = z
-  .object({
-    originState: state("Choose the pickup state."),
-    originCity: place("Enter the pickup town or city."),
-    originAddress: z.string().trim().min(5, "Enter the pickup address.").max(240),
-    destinationState: state("Choose the delivery state."),
-    destinationCity: place("Enter the delivery town or city."),
-    destinationAddress: z.string().trim().min(5, "Enter the delivery address.").max(240),
-    cargoType: z.enum(CARGO_TYPES.map((option) => option.value) as [string, ...string[]], { message: "Choose the type of cargo." }),
-    description: z.string().trim().min(5, "Describe the goods, for example 40 bags of cement.").max(500),
-    weightKg: wholeNumber("total weight in kg", MIN_SHIPMENT_KG, 100_000),
-    packageCount: wholeNumber("number of packages", 1, 100_000),
-    declaredValueKobo: optionalMoney("declared value"),
-    pickupDate: futureDate("pickup date"),
-    handlingNotes: z
-      .string()
-      .trim()
-      .max(500)
-      .optional()
-      .transform((value) => value || null),
-    bookingType: z.enum(["shared", "dedicated"], { message: "Choose shared or dedicated." }),
-  })
-  .superRefine((value, context) => {
-    if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
-      context.addIssue({ code: "custom", path: ["destinationCity"], message: "The delivery location must be different from the pickup location." });
-    }
-  });
+export type ShipmentPolicy = { minWeightKg: number; cargoTypes: readonly string[] };
 
-export type ShipmentInput = z.infer<typeof shipmentSchema>;
+  export const shipmentSchema = (policy: ShipmentPolicy) =>
+    z
+    .object({
+      originState: state("Choose the pickup state."),
+      originCity: place("Enter the pickup town or city."),
+      originAddress: z.string().trim().min(5, "Enter the pickup address.").max(240),
+      destinationState: state("Choose the delivery state."),
+      destinationCity: place("Enter the delivery town or city."),
+      destinationAddress: z.string().trim().min(5, "Enter the delivery address.").max(240),
+      cargoType: z.string().refine((value) => policy.cargoTypes.includes(value), "Choose the type of cargo."),
+      description: z.string().trim().min(5, "Describe the goods, for example 40 bags of cement.").max(500),
+      weightKg: wholeNumber("total weight in kg", policy.minWeightKg, 100_000),
+      packageCount: wholeNumber("number of packages", 1, 100_000),
+      declaredValueKobo: optionalMoney("declared value"),
+      pickupDate: futureDate("pickup date"),
+      handlingNotes: z
+        .string()
+        .trim()
+        .max(500)
+        .optional()
+        .transform((value) => value || null),
+      bookingType: z.enum(["shared", "dedicated"], { message: "Choose shared or dedicated." }),
+    })
+    .superRefine((value, context) => {
+      if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
+        context.addIssue({ code: "custom", path: ["destinationCity"], message: "The delivery location must be different from the pickup location." });
+      }
+    });
+
+export type ShipmentInput = z.infer<ReturnType<typeof shipmentSchema>>;

@@ -10,10 +10,6 @@ describe("splitCommission", () => {
     expect(splitCommission(500_000, 0)).toEqual({ platformFeeKobo: 0, vendorPayableKobo: 500_000 });
   });
 
-  it("uses the configured commission rate by default", () => {
-    expect(splitCommission(1_000_000)).toEqual({ platformFeeKobo: 100_000, vendorPayableKobo: 900_000 });
-  });
-
   it("never loses or invents a kobo", () => {
     for (const total of [1, 99, 12_345, 987_654_321]) {
       const split = splitCommission(total, 1250);
