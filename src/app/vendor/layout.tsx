@@ -18,6 +18,7 @@ const NAV = [
   { href: "/vendor/routes", label: "Trips" },
   { href: "/vendor/bookings", label: "Bookings" },
   { href: "/vendor/payouts", label: "Earnings" },
+  { href: "/vendor/reviews", label: "Reviews" },
 ] as const;
 
 export default async function VendorLayout({ children }: LayoutProps<"/vendor">) {
