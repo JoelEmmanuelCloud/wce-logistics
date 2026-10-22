@@ -148,3 +148,11 @@ export async function setDriverStatus(vendorId: string, actorId: string, driverI
     await recordAudit({ actorId, action: status === "active" ? "driver.reactivated" : "driver.deactivated", entityType: "driver", entityId: driver.id }, tx);
   });
 }
+
+export async function activeDriverFor(userId: string) {
+  const row = await findDriverForUser(userId);
+  if (!row || row.driver.status !== "active" || row.vendorStatus === "suspended") {
+    return null;
+  }
+  return row;
+}
