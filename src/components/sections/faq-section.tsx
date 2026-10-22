@@ -1,7 +1,6 @@
 import { PlusIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { FAQS } from "@/data/landing";
-import { stagger } from "@/lib/motion";
 
 export function FaqSection({ contactEmail }: { contactEmail: string }) {
   return (
@@ -22,8 +21,8 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
           </p>
         </div>
         <div className="border-t border-navy/15">
-          {FAQS.map((faq, index) => (
-            <details key={faq.question} style={stagger(index % 3)} className="reveal faq-item group border-b border-navy/15">
+          {FAQS.map((faq) => (
+            <details key={faq.question} className="faq-item group border-b border-navy/15">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-[clamp(18px,1.5vw,22px)] font-semibold [&::-webkit-details-marker]:hidden">
                 {faq.question}
                 <span className="grid size-10 shrink-0 place-items-center rounded-full border border-navy/20 transition-all duration-300 group-open:rotate-45 group-open:border-orange group-open:bg-orange">

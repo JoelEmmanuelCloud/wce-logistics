@@ -2,7 +2,6 @@ import Image from "next/image";
 import { LockIcon, ReceiptIcon, ScaleIcon } from "@/components/line-icons";
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
-import { stagger } from "@/lib/motion";
 
 const FORMULA = [
   { term: "Chargeable weight", note: "Your declared load in kg" },
@@ -35,7 +34,7 @@ const RULES = [
 export function PricingSection() {
   return (
     <Section id="pricing" tone="white" labelledBy="pricing-title">
-      <div className="reveal grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
           <Eyebrow className="text-orange-ink">Pricing</Eyebrow>
           <DisplayHeading id="pricing-title" className="mt-5">
@@ -50,7 +49,7 @@ export function PricingSection() {
       </div>
 
       <div
-        className="reveal mt-[clamp(40px,5vw,72px)] grid items-stretch gap-3 rounded-[28px] bg-sand p-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.15fr]"
+        className="mt-[clamp(40px,5vw,72px)] grid items-stretch gap-3 rounded-[28px] bg-sand p-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.15fr]"
         role="group"
         aria-label="Price calculation: chargeable weight times rate per kilogram, plus itemised charges, equals your total in naira"
       >
@@ -76,13 +75,13 @@ export function PricingSection() {
       </div>
 
       <div className="mt-4 grid gap-4 lg:mt-5 lg:grid-cols-[5fr_7fr] lg:gap-5">
-        <div className="reveal relative min-h-[260px] overflow-hidden rounded-[28px]">
+        <div className="relative min-h-[260px] overflow-hidden rounded-[28px]">
           <Image
             src={IMAGES.warehouse.src}
             alt={IMAGES.warehouse.alt}
             fill
             sizes="(min-width: 1024px) 40vw, 100vw"
-            className="reveal-zoom object-cover"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/10 to-transparent" aria-hidden="true" />
           <p className="absolute inset-x-6 bottom-6 font-display text-[clamp(26px,2.4vw,40px)] uppercase leading-[0.95] text-white">
@@ -90,8 +89,8 @@ export function PricingSection() {
           </p>
         </div>
         <ul className="grid gap-4 lg:gap-5">
-          {RULES.map(({ Icon, title, detail }, index) => (
-            <li key={title} style={stagger(index)} className="reveal flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
+          {RULES.map(({ Icon, title, detail }) => (
+            <li key={title} className="flex gap-5 rounded-[28px] border border-navy/10 p-[clamp(22px,2.2vw,32px)]">
               <span className="grid size-12 shrink-0 place-items-center rounded-full bg-orange/12 text-orange-ink">
                 <Icon className="size-6" />
               </span>

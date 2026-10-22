@@ -38,10 +38,10 @@ export function VendorSection() {
               alt={IMAGES.vendor.alt}
               fill
               sizes="(min-width: 1024px) 40vw, 100vw"
-              className="reveal-zoom object-cover object-[center_32%]"
+              className="object-cover object-[center_32%]"
             />
           </div>
-          <div className="reveal relative z-10 -mt-[clamp(48px,6vw,96px)] ml-[clamp(16px,3vw,48px)] rounded-[28px] bg-white p-[clamp(24px,2.6vw,40px)] shadow-[0_24px_60px_rgba(11,37,69,0.22)]">
+          <div className="relative z-10 -mt-[clamp(48px,6vw,96px)] ml-[clamp(16px,3vw,48px)] rounded-[28px] bg-white p-[clamp(24px,2.6vw,40px)] shadow-[0_24px_60px_rgba(11,37,69,0.22)]">
             <h3 className="font-display text-[clamp(26px,2.2vw,36px)] uppercase leading-none">What you will need</h3>
             <ul className="mt-6 grid gap-4">
               {VENDOR_DOCUMENTS.map((document) => (

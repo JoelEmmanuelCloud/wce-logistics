@@ -17,7 +17,7 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
     <footer className="bg-navy text-white">
       <div className="mx-auto w-full max-w-[1760px] px-[clamp(20px,3.2vw,56px)] pt-[clamp(72px,9vw,136px)]">
         <div className="grid gap-10 border-b border-white/12 pb-[clamp(48px,6vw,88px)] lg:grid-cols-[1.4fr_1fr] lg:items-end">
-          <p className="reveal font-display text-[clamp(60px,9vw,160px)] uppercase leading-[0.86]">
+          <p className="font-display text-[clamp(60px,9vw,160px)] uppercase leading-[0.86]">
             Move more.
             <span className="block pl-[0.5em] text-orange">Build more.</span>
           </p>

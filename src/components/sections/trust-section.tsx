@@ -3,7 +3,6 @@ import { DocumentIcon, GaugeIcon, PinCheckIcon, ShieldCheckIcon } from "@/compon
 import { DisplayHeading, Eyebrow, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { BOOKING_STATUSES } from "@/data/landing";
-import { stagger } from "@/lib/motion";
 
 const CHECKS = [
   {
@@ -49,7 +48,7 @@ export function TrustSection() {
               alt={IMAGES.inspection.alt}
               fill
               sizes="(min-width: 1024px) 45vw, 100vw"
-              className="reveal-zoom object-cover"
+              className="object-cover"
             />
             <span className="absolute left-4 top-4 rounded-full bg-orange px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-navy">
               Checked per truck
@@ -58,8 +57,8 @@ export function TrustSection() {
         </div>
 
         <ul className="grid gap-4 sm:grid-cols-2">
-          {CHECKS.map(({ Icon, title, detail }, index) => (
-            <li key={title} style={stagger(index % 2)} className="reveal rounded-[28px] border border-white/12 bg-white/[0.04] p-[clamp(24px,2.4vw,36px)]">
+          {CHECKS.map(({ Icon, title, detail }) => (
+            <li key={title} className="rounded-[28px] border border-white/12 bg-white/[0.04] p-[clamp(24px,2.4vw,36px)]">
               <span className="grid size-14 place-items-center rounded-full bg-orange text-navy">
                 <Icon className="size-7" />
               </span>
@@ -70,7 +69,7 @@ export function TrustSection() {
         </ul>
       </div>
 
-      <div className="reveal mt-[clamp(56px,7vw,104px)] rounded-[28px] bg-white p-[clamp(24px,3vw,48px)] text-navy">
+      <div className="mt-[clamp(56px,7vw,104px)] rounded-[28px] bg-white p-[clamp(24px,3vw,48px)] text-navy">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
           <h3 className="font-display text-[clamp(28px,2.6vw,44px)] uppercase leading-none">Every booking, every status</h3>
           <p className="text-[15px] text-navy/70">Email updates and a live booking page at each step</p>
@@ -78,7 +77,7 @@ export function TrustSection() {
         <ol className="status-track mt-10 grid gap-6 sm:grid-cols-5 sm:gap-0">
           {BOOKING_STATUSES.map((status, index) => (
             <li key={status} className="relative flex items-center gap-4 sm:flex-col sm:items-start sm:gap-5">
-              <span style={stagger(index)} className="track-step relative z-10 grid size-11 shrink-0 place-items-center rounded-full bg-orange font-display text-lg text-navy ring-4 ring-white sm:ring-8">
+              <span className="relative z-10 grid size-11 shrink-0 place-items-center rounded-full bg-orange font-display text-lg text-navy ring-4 ring-white sm:ring-8">
                 {index + 1}
               </span>
               {index < BOOKING_STATUSES.length - 1 && (
