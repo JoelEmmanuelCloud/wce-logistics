@@ -28,7 +28,7 @@ async function paymentRows(sql: postgres.Sql, bookingId: string) {
 test.describe("payments", () => {
   test.skip(({ isMobile }) => isMobile, "covered on desktop");
 
-  test("shipper pays online, the booking confirms once and the vendor share is paid out", async ({ browser, page, request, sql, signInAs, createUser }) => {
+  test("shipper pays online, the booking confirms once and the vendor share is held", async ({ browser, page, request, sql, signInAs, createUser }) => {
     test.slow();
     const shipper = await signInAs("customer", { fullName: "Amaka Paid" });
     const vendorUser = await createUser("vendor", "Paystack Vendor");
@@ -73,16 +73,9 @@ test.describe("payments", () => {
 
     await adminPage.goto("/admin/payouts");
     const payoutRow = adminPage.getByRole("row").filter({ hasText: reference });
-    await payoutRow.getByRole("button", { name: "Mark paid" }).click();
-    await payoutRow.getByLabel("Bank transfer reference").fill("ACCESS-TRF-55120");
-    await payoutRow.getByRole("button", { name: "Confirm payout" }).click();
-    await expect(payoutRow.getByText("Paid out")).toBeVisible();
-    await expect(payoutRow.getByText(/ref ACCESS-TRF-55120/)).toBeVisible();
+    await expect(payoutRow.getByText("On hold", { exact: true })).toBeVisible();
+    await expect(payoutRow.getByRole("button", { name: "Mark paid" })).toHaveCount(0);
     await adminContext.close();
-
-    await vendorPage.reload();
-    await expect(vendorPage.getByText("Paid out")).toBeVisible();
-    await expect(vendorPage.getByText(/reference ACCESS-TRF-55120/)).toBeVisible();
     await vendorContext.close();
   });
 

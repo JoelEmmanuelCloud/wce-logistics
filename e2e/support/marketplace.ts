@@ -65,3 +65,26 @@ export async function acceptedBooking(sql: postgres.Sql, vendorUser: TestUser, c
   await sql`update shipments set status = 'booked' where id = ${shipmentId}`;
   return { bookingId: booking.id, reference, totalKobo, vendorId };
 }
+
+export async function paidBooking(sql: postgres.Sql, vendorUser: TestUser, customer: TestUser, weightKg = 600, ratePerKgKobo = 2000) {
+  const booking = await acceptedBooking(sql, vendorUser, customer, weightKg, ratePerKgKobo);
+  const fee = Math.round(booking.totalKobo / 10);
+  const [payment] = await sql<{ id: string }[]>`
+    insert into payments (booking_id, provider, reference, provider_transaction_id, amount_kobo, status, channel, platform_fee_kobo, vendor_payable_kobo, paid_at)
+    values (${booking.bookingId}, 'offline', ${`${booking.reference}-OFFLINE-E2E`}, 'E2E', ${booking.totalKobo}, 'successful', 'bank_transfer', ${fee}, ${booking.totalKobo - fee}, now())
+    returning id`;
+  await sql`insert into payouts (booking_id, vendor_id, payment_id, amount_kobo) values (${booking.bookingId}, ${booking.vendorId}, ${payment.id}, ${booking.totalKobo - fee})`;
+  await sql`update bookings set status = 'confirmed' where id = ${booking.bookingId}`;
+  return { ...booking, vendorShareKobo: booking.totalKobo - fee };
+}
+
+export async function addDriver(sql: postgres.Sql, vendorId: string, user: TestUser, options: { licenceClass?: string; expiresInDays?: number } = {}) {
+  const expires = lagosDate(options.expiresInDays ?? 365);
+  const licence = `E2E${randomInt(10_000_000, 99_999_999)}`;
+  await sql`update users set role = 'driver' where id = ${user.id}`;
+  const [driver] = await sql<{ id: string }[]>`
+    insert into drivers (vendor_id, user_id, full_name, phone, licence_number_encrypted, licence_number_hash, licence_number_last4, licence_class, licence_expires_on)
+    values (${vendorId}, ${user.id}, ${user.fullName}, ${user.phone}, 'v1.e2e.e2e.e2e', ${`e2e-${licence}`}, ${licence.slice(-4)}, ${options.licenceClass ?? "E"}, ${expires})
+    returning id`;
+  return driver.id;
+}
