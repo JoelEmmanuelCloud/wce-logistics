@@ -7,7 +7,7 @@ import { BookingHeader, BookingSummary, BookingTimeline } from "@/components/mar
 import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
-import { formatPhone } from "@/lib/phone";
+import { EmailLink, PhoneLink } from "@/components/ui/contact-link";
 import { formatNaira } from "@/lib/pricing";
 import { requireRole } from "@/server/auth/dal";
 import { listDeliveryEvents } from "@/server/delivery";
@@ -40,7 +40,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
             <DescriptionList
               items={[
                 { label: "Shipper", value: detail.customerName },
-                { label: "Shipper phone", value: formatPhone(detail.customerPhone) },
+                { label: "Shipper phone", value: <PhoneLink phone={detail.customerPhone} /> },
                 {
                   label: "Vendor",
                   value: (
@@ -49,8 +49,8 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
                     </Link>
                   ),
                 },
-                { label: "Vendor email", value: detail.vendorEmail },
-                ...(detail.driverName ? [{ label: "Driver", value: `${detail.driverName}, ${formatPhone(detail.driverPhone)}` }] : []),
+                { label: "Vendor email", value: <EmailLink email={detail.vendorEmail} /> },
+                ...(detail.driverName ? [{ label: "Driver", value: <>{detail.driverName}, <PhoneLink phone={detail.driverPhone} /></> }] : []),
               ]}
             />
           </Card>

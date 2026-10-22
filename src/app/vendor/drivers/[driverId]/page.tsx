@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList, PageHeader } from "@/components/ui/card";
+import { EmailLink, PhoneLink } from "@/components/ui/contact-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { lagosToday } from "@/lib/dates";
 import { BOOKING_STATUS, DRIVER_STATUS, formatDate, labelFor, LICENCE_CLASSES } from "@/lib/labels";
@@ -49,8 +50,8 @@ export default async function VendorDriverPage({ params }: PageProps<"/vendor/dr
             <CardHeader title="Details" />
             <DescriptionList
               items={[
-                { label: "Sign-in email", value: email },
-                { label: "Mobile number", value: formatPhone(driver.phone) },
+                { label: "Sign-in email", value: <EmailLink email={email} /> },
+                { label: "Mobile number", value: <PhoneLink phone={driver.phone} /> },
                 { label: "Licence number", value: `Ending ${driver.licenceNumberLast4}` },
                 { label: "Licence class", value: labelFor(LICENCE_CLASSES, driver.licenceClass) },
                 { label: "Licence expiry", value: formatDate(driver.licenceExpiresOn) },

@@ -12,8 +12,8 @@ import { ActionButton } from "@/components/ui/action-button";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
+import { PhoneLink } from "@/components/ui/contact-link";
 import { formatDateTime } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { requireRole } from "@/server/auth/dal";
@@ -131,7 +131,7 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
               <DescriptionList
                 items={[
                   { label: "Name", value: detail.driverName },
-                  { label: "Phone", value: <a href={`tel:${detail.driverPhone ?? ""}`} className="underline decoration-orange decoration-2 underline-offset-4">{formatPhone(detail.driverPhone)}</a> },
+                  { label: "Phone", value: <PhoneLink phone={detail.driverPhone} /> },
                 ]}
               />
             </Card>

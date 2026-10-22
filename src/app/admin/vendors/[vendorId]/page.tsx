@@ -7,9 +7,9 @@ import { DecisionPanel } from "@/components/admin/decision-panel";
 import { DocumentReview } from "@/components/admin/document-review";
 import { RevealId } from "@/components/admin/reveal-id";
 import { Card, CardHeader, DescriptionList, PageHeader } from "@/components/ui/card";
+import { EmailLink, PhoneLink } from "@/components/ui/contact-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { DOCUMENT_STATUS, formatDate, formatDateTime, ID_DOCUMENT_TYPES, labelFor, TRUCK_STATUS, VENDOR_CATEGORIES, VERIFICATION_STATUS } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { getVendorForAdmin, listAuditLogs } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 import { DOCUMENT_TITLES, requiredVendorDocuments } from "@/server/vendors";
@@ -50,9 +50,9 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
               items={[
                 { label: "Legal name", value: vendor.legalName },
                 { label: "Business name", value: vendor.businessName },
-                { label: "Sign-in email", value: user.email },
-                { label: "Account phone", value: formatPhone(user.phone) },
-                { label: "Business email", value: vendor.email },
+                { label: "Sign-in email", value: <EmailLink email={user.email} /> },
+                { label: "Account phone", value: <PhoneLink phone={user.phone} /> },
+                { label: "Business email", value: <EmailLink email={vendor.email} /> },
                 { label: "Address", value: `${vendor.addressLine}, ${vendor.city}, ${vendor.state}` },
                 { label: "CAC number", value: vendor.cacNumber },
                 { label: "Operating states", value: vendor.operatingStates.join(", ") },

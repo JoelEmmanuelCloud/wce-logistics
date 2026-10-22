@@ -6,10 +6,10 @@ import { DeliveryTimeline } from "@/components/delivery/delivery-timeline";
 import { DeliveryUpdateForm } from "@/components/delivery/delivery-update-form";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
+import { PhoneLink } from "@/components/ui/contact-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { availableUpdates } from "@/lib/delivery";
 import { BOOKING_STATUS, DELIVERY_ACTIONS, formatDate, formatKg, formatTransit, labelFor } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
 import { listDeliveryEvents } from "@/server/delivery";
 import { activeDriverFor } from "@/server/drivers";
@@ -57,7 +57,7 @@ export default async function DriverDeliveryPage({ params }: PageProps<"/driver/
                 { label: "Address", value: `${shipment.originAddress}, ${shipment.originCity}, ${shipment.originState}` },
                 { label: "Requested date", value: formatDate(shipment.pickupDate) },
                 { label: "Shipper", value: detail.customerName },
-                { label: "Shipper's phone", value: <a href={`tel:${detail.customerPhone ?? ""}`} className="underline decoration-orange decoration-2 underline-offset-4">{formatPhone(detail.customerPhone)}</a> },
+                { label: "Shipper's phone", value: <PhoneLink phone={detail.customerPhone} /> },
               ]}
             />
           </Card>

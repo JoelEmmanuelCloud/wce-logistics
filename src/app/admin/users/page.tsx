@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { setUserStatusAction } from "@/app/admin/actions";
 import { DataTable, FilterTabs, Pagination, SearchForm } from "@/components/admin/list-controls";
 import { PageHeader } from "@/components/ui/card";
+import { EmailLink, PhoneLink } from "@/components/ui/contact-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatDate, formatDateTime } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { listUsersForAdmin, parsePage, parseQuery } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 
@@ -51,9 +51,9 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
             <tr key={user.id} className="hover:bg-navy/[0.02]">
               <td className="px-4 py-3">
                 <span className="font-semibold text-navy">{user.fullName ?? "Not set"}</span>
-                {user.email && <span className="block text-[13px] text-navy/70">{user.email}</span>}
+                {user.email && <span className="block text-[13px] text-navy/70"><EmailLink email={user.email} /></span>}
               </td>
-              <td className="px-4 py-3 whitespace-nowrap text-navy/80">{formatPhone(user.phone)}</td>
+              <td className="px-4 py-3 text-navy/80"><PhoneLink phone={user.phone} /></td>
               <td className="px-4 py-3 text-navy/80">{user.role ? ROLE_LABELS[user.role] : "Onboarding"}</td>
               <td className="px-4 py-3 whitespace-nowrap text-navy/80">{formatDate(user.createdAt)}</td>
               <td className="px-4 py-3 whitespace-nowrap text-navy/80">{user.lastSignInAt ? formatDateTime(user.lastSignInAt) : "Never"}</td>

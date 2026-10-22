@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DataTable, FilterTabs, Pagination, SearchForm } from "@/components/admin/list-controls";
 import { PageHeader } from "@/components/ui/card";
+import { PhoneLink } from "@/components/ui/contact-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatDate, labelFor, VENDOR_CATEGORIES, VERIFICATION_STATUS } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { listVendorsForAdmin, parsePage, parseQuery, VENDOR_FILTERS, type VendorFilter } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 
@@ -42,7 +42,7 @@ export default async function AdminVendorsPage({ searchParams }: PageProps<"/adm
                 {vendor.businessName && <span className="block text-[13px] text-navy/70">{vendor.legalName}</span>}
               </td>
               <td className="px-4 py-3 text-navy/80">{labelFor(VENDOR_CATEGORIES, vendor.category)}</td>
-              <td className="px-4 py-3 whitespace-nowrap text-navy/80">{formatPhone(phone)}</td>
+              <td className="px-4 py-3 text-navy/80"><PhoneLink phone={phone} /></td>
               <td className="px-4 py-3 text-navy/80">{vendor.operatingStates.length}</td>
               <td className="px-4 py-3 whitespace-nowrap text-navy/80">{vendor.submittedAt ? formatDate(vendor.submittedAt) : "Not submitted"}</td>
               <td className="px-4 py-3">

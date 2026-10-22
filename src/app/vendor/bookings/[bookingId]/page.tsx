@@ -10,9 +10,9 @@ import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
+import { PhoneLink } from "@/components/ui/contact-link";
 import { ASSIGNABLE_STATUSES, availableUpdates } from "@/lib/delivery";
 import { DELIVERY_ACTIONS, formatDateTime } from "@/lib/labels";
-import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
 import { driverOptions, listDeliveryEvents } from "@/server/delivery";
 import { ACTIVE_DISPUTE_STATUSES, canOpenDispute, latestDisputeForBooking } from "@/server/disputes";
@@ -92,7 +92,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
                 title={booking.driverId ? "Driver" : "Assign a driver"}
                 description={
                   booking.driverId
-                    ? `${detail.driverName}, ${formatPhone(detail.driverPhone)}. You can change the driver until the goods are collected.`
+                    ? <>{detail.driverName}, <PhoneLink phone={detail.driverPhone} />. You can change the driver until the goods are collected.</>
                     : "The shipper sees the driver's name and phone number once you assign one."
                 }
               />
@@ -111,7 +111,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
               <DescriptionList
                 items={[
                   { label: "Name", value: detail.driverName },
-                  { label: "Phone", value: formatPhone(detail.driverPhone) },
+                  { label: "Phone", value: <PhoneLink phone={detail.driverPhone} /> },
                 ]}
               />
             </Card>
@@ -136,7 +136,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
               <DescriptionList
                 items={[
                   { label: "Name", value: detail.customerName },
-                  { label: "Phone", value: formatPhone(detail.customerPhone) },
+                  { label: "Phone", value: <PhoneLink phone={detail.customerPhone} /> },
                 ]}
               />
             </Card>
