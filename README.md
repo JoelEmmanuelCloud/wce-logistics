@@ -105,12 +105,25 @@ npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 | `npm run jobs:expire-bookings` | Expire booking requests the vendor did not answer within 24 hours and release their capacity |
 | `npm run jobs:complete-deliveries` | Complete bookings delivered more than 72 hours ago without an open dispute, and make their payouts payable |
 
+## Deployment
+
+The test environment runs at https://wcelogistics.com:
+
+| Piece | Where |
+|---|---|
+| App | Vercel project `wce-logistics`, London region (`lhr1`), deployed on every push to `master` |
+| Database | Supabase project `wce-logistics-test` (London). The Supabase Vercel integration injects `POSTGRES_URL` (pooled, used by the app) and `POSTGRES_URL_NON_POOLING` (used for migrations) |
+| Documents | Private S3 bucket `wcelogistics-test-documents` in `eu-west-2`, accessed by an IAM user limited by `infra/aws/s3-documents-policy.json` |
+| Email | Resend, sending from `noreply@wcelogistics.com` |
+| DNS | Porkbun: `A wcelogistics.com 76.76.21.21` and `CNAME www cname.vercel-dns.com` |
+| Scheduled jobs | `.github/workflows/scheduled-jobs.yml` calls `/api/cron/<job>` with the `CRON_SECRET` repository secret |
+
+Production builds run `scripts/deploy-migrate.ts` first, which applies migrations only when `VERCEL_ENV` is `production`. Secrets are added with `npx vercel env add NAME production --sensitive` and never committed.
+
 ## Production operations
 
-- Run `npm run db:migrate` before each deployment that includes new migrations.
-- Schedule `npm run jobs:expire-documents` to run daily, for example at 00:30 Africa/Lagos.
-- Schedule `npm run jobs:expire-bookings` to run every 15 minutes.
-- Schedule `npm run jobs:complete-deliveries` to run every hour.
+- Migrations run automatically on production deployments. Run `npm run db:migrate` by hand only for other environments.
+- Scheduled jobs run from GitHub Actions: `expire-bookings` every 15 minutes, `complete-deliveries` hourly and `expire-documents` daily. Each can also be started by hand from the Actions tab, or locally with `npm run jobs:<name>`.
 - Keep the documents bucket private. Files are only ever served through short-lived signed links after an authorization check.
 - Serve the app behind HTTPS. Session cookies use the `__Host-` prefix and the `Secure` flag in production.
 - In the Paystack dashboard, set the webhook URL to `https://<your domain>/api/webhooks/paystack`. The callback URL is sent with each transaction, so it needs no dashboard setting.
