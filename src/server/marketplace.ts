@@ -21,8 +21,8 @@ export const OPEN_BOOKING_STATUSES: BookingStatus[] = [
   "delivery_attempted",
 ];
 
-const CUSTOMER_CANCELLABLE: BookingStatus[] = ["pending_vendor_acceptance", "awaiting_payment", "confirmed"];
-const VENDOR_CANCELLABLE: BookingStatus[] = ["awaiting_payment", "confirmed"];
+export const CUSTOMER_CANCELLABLE: BookingStatus[] = ["pending_vendor_acceptance", "awaiting_payment", "confirmed", "pickup_scheduled"];
+export const VENDOR_CANCELLABLE: BookingStatus[] = ["awaiting_payment", "confirmed", "pickup_scheduled"];
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 

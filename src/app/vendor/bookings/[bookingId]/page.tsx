@@ -9,7 +9,7 @@ import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
-import { getBookingDetail } from "@/server/marketplace";
+import { getBookingDetail, VENDOR_CANCELLABLE } from "@/server/marketplace";
 import { findVendorProfileByUser } from "@/server/vendors";
 import { AcceptButton } from "../accept-button";
 
@@ -30,7 +30,7 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
   }
   const { booking } = detail;
   const pending = booking.status === "pending_vendor_acceptance";
-  const cancellable = booking.status === "awaiting_payment" || booking.status === "confirmed";
+  const cancellable = VENDOR_CANCELLABLE.includes(booking.status);
 
   return (
     <>

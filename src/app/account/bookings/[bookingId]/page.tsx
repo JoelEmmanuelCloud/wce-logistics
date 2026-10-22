@@ -10,13 +10,11 @@ import { formatDateTime } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { requireRole } from "@/server/auth/dal";
-import { getBookingDetail } from "@/server/marketplace";
+import { CUSTOMER_CANCELLABLE, getBookingDetail } from "@/server/marketplace";
 import { paystackConfigured } from "@/server/paystack";
 import { PayButton } from "./pay-button";
 
 export const metadata: Metadata = { title: "Booking" };
-
-const CANCELLABLE = ["pending_vendor_acceptance", "awaiting_payment", "confirmed"];
 
 export default async function CustomerBookingPage({ params, searchParams }: PageProps<"/account/bookings/[bookingId]">) {
   const { bookingId } = await params;
@@ -90,7 +88,7 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
               </Link>
             </Alert>
           )}
-          {CANCELLABLE.includes(booking.status) && (
+          {CUSTOMER_CANCELLABLE.includes(booking.status) && (
             <Card tone="danger">
               <CardHeader title="Cancel booking" description="Cancelling releases the space on the truck." />
               <ReasonActionForm
