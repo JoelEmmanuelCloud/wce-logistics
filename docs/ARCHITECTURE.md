@@ -122,6 +122,9 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 - Webhooks are rejected with 401 unless the `x-paystack-signature` HMAC-SHA512 matches the secret key, compared in constant time.
 - On success the commission (`PLATFORM_COMMISSION_BPS`) and vendor share are stored on the payment, and a payout row holds the vendor share (`on_hold`). It becomes `eligible` when the booking completes, and an administrator can only mark an eligible payout as paid, never while a dispute is open.
 - Refunds are issued from the admin Payments page through the Paystack refund API, and the related payout is cancelled.
+- Vendors add a payout bank account from the Earnings page. The bank comes from Paystack's bank list, the account name is resolved through Paystack, and a transfer recipient is created. The account number is encrypted and only the last four digits are shown. The vendor is emailed whenever the account changes.
+- An eligible payout can be paid by Paystack transfer. The payout moves to `processing` with a unique `wce-po-...` reference before the transfer is requested. `transfer.success`, `transfer.failed` and `transfer.reversed` webhooks are verified against Paystack's transfer verify endpoint before the payout changes: success marks it `paid` and emails the vendor once, failure returns it to `eligible` with the reason so it can be retried. If the transfer request itself errors, the app checks whether Paystack created the transfer before treating it as failed, so a retry can never pay twice.
+- Manual payouts remain available: an administrator records the bank transfer reference.
 
 ## Delivery operations
 
@@ -137,10 +140,14 @@ Resend delivers sign-in codes and notifications. Every email has a plain text an
 - A shipper or vendor can open one active dispute per paid booking, while it is in progress or up to 14 days after it is completed or cancelled. Opening a dispute puts the payout back on hold.
 - Disputes move through `open`, `under_review`, `awaiting_information`, `resolved` and `closed`. A party replying to `awaiting_information` moves it back to `under_review`. Closing requires an outcome, which is emailed to both parties and releases the payout if the booking is completed. Refunds stay a separate, explicit action on the Payments page.
 
+## Scheduled jobs
+
+The jobs in `scripts/` run with `node --conditions=react-server --import tsx`, which lets them use the same services as the app instead of their own SQL. They therefore follow the same rules, write the same audit entries and send the same emails. System actions are audited without an IP address because there is no request.
+
 ## Testing
 
 - Unit tests (`npm test`) cover email and phone normalization, encryption, validation, pricing, commission splits, webhook signatures, truck document rules, delivery steps, licence coverage and dispute windows.
-- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server, so the real email and payment code paths run. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds, drivers and licence checks, delivery updates with photos, receipt confirmation, reviews, disputes and payouts, on desktop and mobile Chrome.
+- End-to-end tests (`npm run test:e2e`) build the app and run it with a separate `wce_logistics_test` database, a separate bucket, a local Resend-compatible email server and a local Paystack-compatible server (checkout, verification, refunds, banks, account resolution, recipients and transfers), so the real email and payment code paths run. The scheduled jobs are run as real processes against the test database after the other suites finish. They cover the landing page, metadata, sign-in and lockout, access control, the full vendor and truck review lifecycle, document access control, duplicate registration numbers, the booking marketplace, Paystack checkout, webhook replay and forged signatures, refunds, drivers and licence checks, delivery updates with photos, receipt confirmation, reviews, disputes, payout bank accounts, Paystack transfers including failures and duplicate webhooks, and the scheduled jobs and their emails, on desktop and mobile Chrome.
 
 ## Decisions
 

@@ -2,7 +2,7 @@
 
 This document tracks the WCE Logistics build against the product requirements in [PRD.md](PRD.md). Technical design is described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Last updated: 22 October 2026 (Phase 4 complete)
+Last updated: 22 October 2026 (Phase 4 complete, payout accounts and job emails added)
 
 ## Project scope
 
@@ -102,6 +102,8 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Admin Payouts page with mark-as-paid and transfer reference
 - [x] Vendor Earnings page
 - [x] Offline bank transfer recording kept as a fallback
+- [x] Vendor payout bank accounts verified through Paystack (bank list, account name resolution, transfer recipient), encrypted account numbers, change alerts by email
+- [x] Admin pays eligible payouts by Paystack transfer with confirmation, verified transfer webhooks, safe retry after failures, and a payout email to the vendor
 
 ### Phase 4: Delivery operations
 
@@ -123,6 +125,8 @@ The minimum shipment is 50 kg. Money is held in kobo and displayed in NGN. The f
 - [x] Dispute messages with attachments between shipper, vendor and the WCE team
 - [x] Admin dispute queue: assign, under review, awaiting information, resolve or close with an outcome
 - [x] Emails for driver assignment, goods collected, departure, failed attempts, delivery, incidents, completion, reviews and every dispute change
+- [x] Administrators emailed when a dispute is opened
+- [x] Scheduled jobs send emails: expired requests (shipper and vendor), automatic completion (shipper and vendor), trucks taken off the market for expired documents (vendor)
 
 ## What has been tested
 
@@ -141,7 +145,7 @@ All suites passed on the latest run. Two landing and sign-in tests can time out 
 - [x] Licence class coverage per truck type and the dispute window
 - [x] Driver, delivery update, review and dispute validation
 
-### End-to-end tests (40 scenarios, Playwright, desktop and mobile Chrome)
+### End-to-end tests (46 scenarios, Playwright, desktop and mobile Chrome)
 
 These run against a production build with a separate test database, a separate storage bucket, and local Resend and Paystack test servers, so the real email and payment code paths are exercised.
 
@@ -164,6 +168,11 @@ These run against a production build with a separate test database, a separate s
 - [x] Vendor adds a driver, duplicate email rejected, driver signs in and records every delivery step with a photo
 - [x] Shipper sees the driver and delivery progress, photo access limited to booking parties, receipt confirmed, review submitted and shown to the vendor, admin pays the vendor
 - [x] Dispute with evidence holds the payout through completion, vendor and shipper reply, admin asks for information and resolves, payout released and both parties emailed
+- [x] Vendor adds a Paystack-verified bank account, invalid accounts rejected, account number stored encrypted, change email sent
+- [x] Admin pays by Paystack transfer, webhook marks it paid, duplicate webhook sends no second email
+- [x] Failed transfer returns the payout to the queue with the reason and can be retried with a new reference
+- [x] Vendors without a bank account can only be paid manually
+- [x] Scheduled jobs expire requests, complete deliveries and flag expired trucks, with the right emails
 - [x] Drivers cannot see other drivers' deliveries; licences that do not cover the truck or expire before departure cannot be assigned; busy drivers cannot be deactivated; deactivated drivers lose access; cancellation blocked after collection
 
 ### Manual checks
@@ -189,7 +198,6 @@ These run against a production build with a separate test database, a separate s
 
 ### Phase 3 remaining
 
-- [ ] Vendor payout bank account details, with optional Paystack transfer recipients for automatic payouts
 - [ ] Partial refunds
 - [ ] Reconciliation report against Paystack settlements
 - [ ] In-app notification centre
@@ -198,8 +206,6 @@ These run against a production build with a separate test database, a separate s
 
 - [ ] Admin verification of driver licences (upload of the licence photo and an admin review queue)
 - [ ] Admin driver list for oversight across vendors
-- [ ] Emails when bookings expire or complete automatically (the scheduled jobs update records but do not send email yet)
-- [ ] Email administrators when a new dispute is opened
 - [ ] Vendor replies to reviews
 
 ### Admin configuration and reporting

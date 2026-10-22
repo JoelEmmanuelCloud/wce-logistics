@@ -17,10 +17,10 @@ Interstate logistics and truck booking platform for Nigeria. Move more. Build mo
 | Trucks | Registration, document uploads with expiry dates, photos, submission for review, availability, archiving |
 | Administration | Review queues, vendor and truck decisions, document review, user suspension, booking oversight, offline payment recording, audit log |
 | Marketplace | Vendors publish trips with capacity and per-kilogram pricing. Shippers describe a load, compare verified trucks with itemised prices, and request a booking. Vendors accept or decline. Capacity is reserved safely under concurrent requests |
-| Payments | Paystack checkout for accepted bookings, verified server side through the callback and a signed webhook. A platform commission is split from each payment, vendor payouts are tracked until paid, and refunds go back through Paystack. Bank transfers can still be recorded by administrators |
+| Payments | Paystack checkout for accepted bookings, verified server side through the callback and a signed webhook. A platform commission is split from each payment. Vendors register a payout bank account that Paystack verifies, and admins pay completed bookings by Paystack transfer or record a manual transfer. Refunds go back through Paystack. Bank transfers can still be recorded by administrators |
 | Delivery | Vendors add drivers with licence details and assign them to confirmed bookings. Drivers sign in to their own area, record pickup, departure, delivery attempts, delivery and incidents with photo evidence. Shippers follow progress and confirm receipt, which releases the vendor payout |
 | Reviews and disputes | Shippers rate completed bookings, and ratings appear on truck offers. Shippers and vendors can open a dispute with evidence. Administrators work the dispute queue, and payouts stay on hold until a dispute is closed |
-| Operations | Jobs that flag trucks with expired documents, expire unanswered booking requests and complete deliveries after 72 hours, command to create administrators |
+| Operations | Jobs that flag trucks with expired documents, expire unanswered booking requests and complete deliveries after 72 hours, each emailing the people affected. Command to create administrators |
 
 Live GPS tracking, route optimisation and automated load matching are later phases in the PRD. Without a Paystack key, online checkout is hidden and administrators confirm bookings by recording bank transfer references.
 
