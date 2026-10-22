@@ -1,11 +1,21 @@
 import "server-only";
 import { and, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
-import { randomInt } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
-import type { Booking, Payment } from "@/server/db/schema";
+import type { Booking, Payment, Payout } from "@/server/db/schema";
 import { serverEnv } from "@/server/env";
-import { initializeTransaction, PaystackError, paystackConfigured, refundTransaction, verifyTransaction } from "@/server/paystack";
+import {
+  initializeTransaction,
+  initiateTransfer,
+  PaystackError,
+  paystackConfigured,
+  refundTransaction,
+  verifyTransaction,
+  verifyTransfer,
+  type PaystackTransfer,
+} from "@/server/paystack";
+import { describeAccount } from "@/server/payout-accounts";
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
@@ -226,27 +236,142 @@ export async function refundPayment(adminId: string, paymentId: string, reason: 
   });
 }
 
-export async function markPayoutPaid(adminId: string, payoutId: string, transferReference: string): Promise<void> {
-  await db().transaction(async (tx) => {
-    const [current] = await tx.select().from(schema.payouts).where(eq(schema.payouts.id, payoutId)).limit(1).for("update");
-    if (!current || current.status !== "eligible") {
-      throw new PaymentError("Only payouts for completed bookings without an open dispute can be paid.");
-    }
-    const [dispute] = await tx
-      .select({ id: schema.disputes.id })
-      .from(schema.disputes)
-      .where(and(eq(schema.disputes.bookingId, current.bookingId), notInArray(schema.disputes.status, ["resolved", "closed"])))
-      .limit(1);
-    if (dispute) {
-      throw new PaymentError("This booking has an open dispute. Resolve it before paying the vendor.");
-    }
+async function lockPayableLocked(tx: Transaction, payoutId: string): Promise<Payout> {
+  const [current] = await tx.select().from(schema.payouts).where(eq(schema.payouts.id, payoutId)).limit(1).for("update");
+  if (!current || current.status !== "eligible") {
+    throw new PaymentError("Only payouts for completed bookings without an open dispute can be paid.");
+  }
+  const [dispute] = await tx
+    .select({ id: schema.disputes.id })
+    .from(schema.disputes)
+    .where(and(eq(schema.disputes.bookingId, current.bookingId), notInArray(schema.disputes.status, ["resolved", "closed"])))
+    .limit(1);
+  if (dispute) {
+    throw new PaymentError("This booking has an open dispute. Resolve it before paying the vendor.");
+  }
+  return current;
+}
+
+export async function markPayoutPaid(adminId: string, payoutId: string, transferReference: string): Promise<Payout> {
+  return db().transaction(async (tx) => {
+    const current = await lockPayableLocked(tx, payoutId);
+    const [account] = await tx.select().from(schema.payoutAccounts).where(eq(schema.payoutAccounts.vendorId, current.vendorId)).limit(1);
     const [payout] = await tx
       .update(schema.payouts)
-      .set({ status: "paid", transferReference, paidAt: sql`now()`, paidBy: adminId })
+      .set({
+        status: "paid",
+        transferReference,
+        destination: account ? describeAccount(account) : null,
+        failureReason: null,
+        paidAt: sql`now()`,
+        paidBy: adminId,
+      })
       .where(eq(schema.payouts.id, current.id))
       .returning();
-    await recordAudit({ actorId: adminId, action: "payout.paid", entityType: "payout", entityId: payout.id, metadata: { transferReference, amountKobo: payout.amountKobo } }, tx);
+    await recordAudit(
+      { actorId: adminId, action: "payout.paid", entityType: "payout", entityId: payout.id, metadata: { transferReference, amountKobo: payout.amountKobo, method: "manual" } },
+      tx,
+    );
+    return payout;
   });
+}
+
+const TRANSFER_DONE = new Set(["success"]);
+const TRANSFER_FAILED = new Set(["failed", "reversed", "abandoned", "rejected", "blocked"]);
+
+export type TransferOutcome = { payout: Payout; outcome: "paid" | "failed" | "processing"; changed: boolean };
+
+async function applyTransferResult(payoutId: string, transfer: PaystackTransfer, actorId: string | null): Promise<TransferOutcome> {
+  return db().transaction(async (tx) => {
+    const [current] = await tx.select().from(schema.payouts).where(eq(schema.payouts.id, payoutId)).limit(1).for("update");
+    if (TRANSFER_DONE.has(transfer.status)) {
+      if (current.status === "paid") {
+        return { payout: current, outcome: "paid" as const, changed: false };
+      }
+      const [payout] = await tx
+        .update(schema.payouts)
+        .set({ status: "paid", transferReference: transfer.transfer_code, failureReason: null, paidAt: sql`now()` })
+        .where(eq(schema.payouts.id, payoutId))
+        .returning();
+      await recordAudit({ actorId, action: "payout.paid", entityType: "payout", entityId: payoutId, metadata: { method: "paystack", transferCode: transfer.transfer_code } }, tx);
+      return { payout, outcome: "paid" as const, changed: true };
+    }
+    if (TRANSFER_FAILED.has(transfer.status)) {
+      const reason = `Paystack transfer ${transfer.status}${transfer.reason ? `: ${transfer.reason}` : ""}`.slice(0, 500);
+      const [payout] = await tx
+        .update(schema.payouts)
+        .set({ status: "eligible", failureReason: reason, paidAt: null, transferReference: null })
+        .where(eq(schema.payouts.id, payoutId))
+        .returning();
+      await recordAudit(
+        { actorId, action: "payout.transfer_failed", entityType: "payout", entityId: payoutId, metadata: { status: transfer.status, reason: transfer.reason ?? null } },
+        tx,
+      );
+      return { payout, outcome: "failed" as const, changed: current.status !== "eligible" };
+    }
+    const [payout] = await tx.update(schema.payouts).set({ transferReference: transfer.transfer_code || null }).where(eq(schema.payouts.id, payoutId)).returning();
+    return { payout, outcome: "processing" as const, changed: false };
+  });
+}
+
+export async function payWithPaystack(adminId: string, payoutId: string): Promise<TransferOutcome> {
+  if (!paystackConfigured()) {
+    throw new PaymentError("Paystack is not configured. Pay the vendor manually and record the reference.");
+  }
+  const prepared = await db().transaction(async (tx) => {
+    const current = await lockPayableLocked(tx, payoutId);
+    const [account] = await tx.select().from(schema.payoutAccounts).where(eq(schema.payoutAccounts.vendorId, current.vendorId)).limit(1);
+    if (!account) {
+      throw new PaymentError("This vendor has not added a payout bank account yet.");
+    }
+    const providerReference = `wce-po-${randomBytes(12).toString("hex")}`;
+    const [payout] = await tx
+      .update(schema.payouts)
+      .set({ status: "processing", providerReference, destination: describeAccount(account), failureReason: null, paidBy: adminId })
+      .where(eq(schema.payouts.id, current.id))
+      .returning();
+    const [booking] = await tx.select({ reference: schema.bookings.reference }).from(schema.bookings).where(eq(schema.bookings.id, current.bookingId)).limit(1);
+    await recordAudit({ actorId: adminId, action: "payout.transfer_started", entityType: "payout", entityId: payout.id, metadata: { providerReference, amountKobo: payout.amountKobo } }, tx);
+    return { reference: providerReference, amountKobo: payout.amountKobo, recipientCode: account.recipientCode, reason: `WCE Logistics payout for ${booking.reference}` };
+  });
+
+  let transfer: PaystackTransfer;
+  try {
+    transfer = await initiateTransfer(prepared);
+  } catch (error) {
+    if (!(error instanceof PaystackError)) {
+      throw error;
+    }
+    console.error(error);
+    const existing = await verifyTransfer(prepared.reference).catch((verifyError: unknown) => {
+      if (verifyError instanceof PaystackError) {
+        return null;
+      }
+      throw verifyError;
+    });
+    if (existing) {
+      return applyTransferResult(payoutId, existing, adminId);
+    }
+    await applyTransferResult(payoutId, { reference: prepared.reference, transfer_code: "", status: "failed", amount: prepared.amountKobo, reason: "the transfer could not be started" }, adminId);
+    throw new PaymentError("Paystack could not start the transfer. Check the Paystack balance and try again, or pay manually.");
+  }
+  return applyTransferResult(payoutId, transfer, adminId);
+}
+
+export async function settleTransferReference(reference: string): Promise<TransferOutcome | null> {
+  const [payout] = await db().select().from(schema.payouts).where(eq(schema.payouts.providerReference, reference)).limit(1);
+  if (!payout || (payout.status !== "processing" && payout.status !== "paid")) {
+    return null;
+  }
+  const transfer = await verifyTransfer(reference);
+  if (transfer.reference !== reference || transfer.amount !== payout.amountKobo) {
+    console.error(`Paystack transfer ${reference} does not match payout ${payout.id}`);
+    return null;
+  }
+  if (payout.status === "paid" && !TRANSFER_FAILED.has(transfer.status)) {
+    return { payout, outcome: "paid", changed: false };
+  }
+  return applyTransferResult(payout.id, transfer, null);
 }
 
 const bookingRef = schema.bookings.reference;
@@ -270,10 +395,16 @@ export async function listPayouts(filter: { vendorId?: string; bookingId?: strin
       bookingReference: bookingRef,
       bookingStatus: schema.bookings.status,
       vendorName: sql<string>`coalesce(${schema.vendorProfiles.businessName}, ${schema.vendorProfiles.legalName})`,
+      account: {
+        bankName: schema.payoutAccounts.bankName,
+        accountNumberLast4: schema.payoutAccounts.accountNumberLast4,
+        accountName: schema.payoutAccounts.accountName,
+      },
     })
     .from(schema.payouts)
     .innerJoin(schema.bookings, eq(schema.bookings.id, schema.payouts.bookingId))
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.payouts.vendorId))
+    .leftJoin(schema.payoutAccounts, eq(schema.payoutAccounts.vendorId, schema.payouts.vendorId))
     .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(desc(schema.payouts.createdAt))
     .limit(200);

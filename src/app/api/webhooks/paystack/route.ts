@@ -1,9 +1,12 @@
 import { after, NextResponse } from "next/server";
-import { notifyBooking } from "@/server/notifications";
+import { findBooking } from "@/server/marketplace";
+import { notifyBooking, notifyPayoutSent } from "@/server/notifications";
 import { validWebhookSignature } from "@/server/paystack";
-import { settlePaystackReference } from "@/server/payments";
+import { settlePaystackReference, settleTransferReference } from "@/server/payments";
 
 type PaystackEvent = { event?: string; data?: { reference?: string } };
+
+const TRANSFER_EVENTS = new Set(["transfer.success", "transfer.failed", "transfer.reversed"]);
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -18,11 +21,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid body" }, { status: 400 });
   }
 
-  if (payload.event === "charge.success" && typeof payload.data?.reference === "string") {
-    const result = await settlePaystackReference(payload.data.reference, "webhook");
+  const reference = typeof payload.data?.reference === "string" ? payload.data.reference : null;
+  if (payload.event === "charge.success" && reference) {
+    const result = await settlePaystackReference(reference, "webhook");
     if (result?.outcome === "paid") {
       const booking = result.booking;
       after(() => notifyBooking("booking.confirmed", booking));
+    }
+  }
+
+  if (payload.event && TRANSFER_EVENTS.has(payload.event) && reference) {
+    const result = await settleTransferReference(reference);
+    if (result?.outcome === "paid" && result.changed) {
+      const payout = result.payout;
+      after(async () => {
+        const booking = await findBooking(payout.bookingId);
+        if (booking) {
+          await notifyPayoutSent(payout, booking.reference);
+        }
+      });
     }
   }
 
