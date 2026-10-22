@@ -6,7 +6,7 @@ import { archiveTruckAction, deleteTruckPhotoAction, setTruckAvailabilityAction,
 import { TruckForm } from "@/app/vendor/trucks/truck-form";
 import { Checklist } from "@/components/app/checklist";
 import { Alert } from "@/components/ui/alert";
-import { buttonClasses } from "@/components/ui/button-classes";
+import { SubmitButton } from "@/components/ui/button";
 import { Card, CardHeader, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { DOCUMENT_STATUS, formatDate, TRUCK_DOCUMENT_TYPES, TRUCK_STATUS } from "@/lib/labels";
@@ -98,9 +98,9 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
               <form action={setTruckAvailabilityAction}>
                 <input type="hidden" name="truckId" value={truck.id} />
                 <input type="hidden" name="available" value={truck.listingStatus === "unavailable" ? "true" : "false"} />
-                <button type="submit" className={buttonClasses("outline", "sm")}>
+                <SubmitButton variant="outline" size="sm" pendingLabel="Saving">
                   {truck.listingStatus === "active" ? "Mark unavailable" : "Mark available"}
-                </button>
+                </SubmitButton>
               </form>
             )}
           </div>
@@ -243,9 +243,9 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
             <CardHeader title="Archive truck" description="Archived trucks are removed from your fleet and can no longer be booked. This keeps their history for our records." />
             <form action={archiveTruckAction}>
               <input type="hidden" name="truckId" value={truck.id} />
-              <button type="submit" className={buttonClasses("danger", "sm")}>
+              <SubmitButton variant="danger" size="sm" pendingLabel="Archiving">
                 Archive this truck
-              </button>
+              </SubmitButton>
             </form>
           </Card>
         )}
