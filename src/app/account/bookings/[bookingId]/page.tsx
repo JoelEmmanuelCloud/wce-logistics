@@ -1,17 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { confirmReceiptAction, submitReviewAction } from "@/app/account/bookings/actions";
 import { customerCancelBookingAction } from "@/app/account/shipments/actions";
+import { DeliveryTimeline } from "@/components/delivery/delivery-timeline";
 import { BookingHeader, BookingSummary, BookingTimeline } from "@/components/marketplace/booking-detail";
 import { ReasonActionForm } from "@/components/marketplace/reason-action-form";
+import { ReviewForm } from "@/components/reviews/review-form";
+import { Stars } from "@/components/reviews/star-rating";
+import { ActionButton } from "@/components/ui/action-button";
 import { Alert } from "@/components/ui/alert";
-import { Card, CardHeader } from "@/components/ui/card";
+import { buttonClasses } from "@/components/ui/button-classes";
+import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
+import { AUTO_COMPLETE_HOURS } from "@/lib/delivery";
 import { formatDateTime } from "@/lib/labels";
+import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { requireRole } from "@/server/auth/dal";
+import { listDeliveryEvents } from "@/server/delivery";
+import { ACTIVE_DISPUTE_STATUSES, canOpenDispute, latestDisputeForBooking } from "@/server/disputes";
 import { CUSTOMER_CANCELLABLE, getBookingDetail } from "@/server/marketplace";
 import { paystackConfigured } from "@/server/paystack";
+import { reviewForBooking } from "@/server/reviews";
 import { PayButton } from "./pay-button";
 
 export const metadata: Metadata = { title: "Booking" };
@@ -25,6 +36,15 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
     notFound();
   }
   const { booking } = detail;
+  const [deliveryRows, review, dispute, disputable] = await Promise.all([
+    listDeliveryEvents(booking.id),
+    reviewForBooking(booking.id),
+    latestDisputeForBooking(booking.id),
+    canOpenDispute(booking),
+  ]);
+  const activeDispute = dispute && ACTIVE_DISPUTE_STATUSES.includes(dispute.status) ? dispute : null;
+  const canDispute = !activeDispute && disputable;
+  const driverVisible = Boolean(detail.driverName) && ["pickup_scheduled", "goods_collected", "in_transit", "delivery_attempted", "delivered"].includes(booking.status);
   const contactEmail = site.contactEmail;
   const onlinePayments = paystackConfigured();
   const paymentNotice = {
@@ -77,9 +97,61 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
             ))}
           {booking.status === "confirmed" && (
             <Alert tone="success" title="Booking confirmed">
-              Payment received. The vendor will contact you to arrange pickup. A confirmation has been emailed to you.
+              Payment received. The vendor will assign a driver and contact you to arrange pickup. A confirmation has been emailed to you.
             </Alert>
           )}
+          {activeDispute && (
+            <Alert tone="warning" title="Dispute open">
+              Our team is reviewing the problem you reported.{" "}
+              <Link href={`/account/bookings/${booking.id}/dispute`} className="font-semibold underline decoration-orange decoration-2 underline-offset-4">
+                View dispute
+              </Link>
+            </Alert>
+          )}
+          {booking.status === "delivered" && (
+            <Card tone="attention">
+              <CardHeader
+                title="Did everything arrive safely?"
+                description={`Confirm receipt to complete the booking. If you do nothing, it completes automatically ${AUTO_COMPLETE_HOURS} hours after delivery.`}
+              />
+              <div className="grid gap-3">
+                <ActionButton action={confirmReceiptAction.bind(null, booking.id)} label="Confirm receipt" pendingLabel="Confirming" />
+                {canDispute && (
+                  <Link href={`/account/bookings/${booking.id}/dispute`} className={buttonClasses("outline")}>
+                    Report a problem
+                  </Link>
+                )}
+              </div>
+            </Card>
+          )}
+          {driverVisible && (
+            <Card>
+              <CardHeader title="Your driver" />
+              <DescriptionList
+                items={[
+                  { label: "Name", value: detail.driverName },
+                  { label: "Phone", value: <a href={`tel:${detail.driverPhone ?? ""}`} className="underline decoration-orange decoration-2 underline-offset-4">{formatPhone(detail.driverPhone)}</a> },
+                ]}
+              />
+            </Card>
+          )}
+          {booking.status === "completed" &&
+            (review ? (
+              <Card>
+                <CardHeader title="Your review" />
+                <div className="grid gap-2">
+                  <span className="inline-flex items-center gap-2 text-[14px] text-navy">
+                    <Stars value={review.rating} /> {review.rating} out of 5
+                  </span>
+                  {review.comment && <p className="text-[15px] text-navy/80">{review.comment}</p>}
+                </div>
+              </Card>
+            ) : (
+              <Card tone="attention">
+                <CardHeader title="Rate this delivery" description="Your review helps other shippers choose reliable vendors." />
+                <ReviewForm action={submitReviewAction.bind(null, booking.id)} />
+              </Card>
+            ))}
           {(booking.status === "rejected" || booking.status === "expired" || booking.status === "cancelled") && (
             <Alert tone="info" title="This booking is closed">
               {booking.statusNote ?? "This booking is no longer active."}{" "}
@@ -98,6 +170,20 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
                 reasonLabel="Why are you cancelling?"
               />
             </Card>
+          )}
+          {(booking.driverId || deliveryRows.length > 0) && <DeliveryTimeline rows={deliveryRows} />}
+          {canDispute && booking.status !== "delivered" && (
+            <Card>
+              <CardHeader title="Something wrong?" description="Report a problem with this booking. Our team reviews every dispute." />
+              <Link href={`/account/bookings/${booking.id}/dispute`} className={buttonClasses("outline")}>
+                Report a problem
+              </Link>
+            </Card>
+          )}
+          {dispute && !activeDispute && (
+            <Link href={`/account/bookings/${booking.id}/dispute`} className="text-[14px] font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
+              View the closed dispute
+            </Link>
           )}
           <BookingTimeline detail={detail} />
         </div>

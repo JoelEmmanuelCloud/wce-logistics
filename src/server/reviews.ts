@@ -6,7 +6,7 @@ import type { Review } from "@/server/db/schema";
 
 export class ReviewError extends Error {}
 
-export async function submitReview(customerId: string, bookingId: string, input: { rating: number; comment: string | null }): Promise<Review> {
+export async function submitReview(customerId: string, bookingId: string, input: { rating: number; comment: string | null }): Promise<{ review: Review; bookingReference: string }> {
   return db().transaction(async (tx) => {
     const [booking] = await tx.select().from(schema.bookings).where(eq(schema.bookings.id, bookingId)).limit(1).for("update");
     if (!booking || booking.customerId !== customerId) {
@@ -24,7 +24,7 @@ export async function submitReview(customerId: string, bookingId: string, input:
       throw new ReviewError("You have already reviewed this booking.");
     }
     await recordAudit({ actorId: customerId, action: "review.submitted", entityType: "review", entityId: review.id, metadata: { bookingId: booking.id, rating: input.rating } }, tx);
-    return review;
+    return { review, bookingReference: booking.reference };
   });
 }
 

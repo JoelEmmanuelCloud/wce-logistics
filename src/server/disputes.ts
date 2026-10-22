@@ -201,3 +201,16 @@ export async function listDisputes(scope: "active" | "closed") {
 export function disputeRole(role: UserRole | null): string {
   return role === "customer" ? "Shipper" : role === "vendor" ? "Vendor" : role === "admin" ? "WCE Logistics" : "User";
 }
+
+export async function canOpenDispute(booking: Booking): Promise<boolean> {
+  const closedAt = booking.status === "completed" ? booking.completedAt : booking.status === "cancelled" ? booking.updatedAt : null;
+  if (!withinDisputeWindow(booking.status, closedAt)) {
+    return false;
+  }
+  const [paid] = await db()
+    .select({ id: schema.payments.id })
+    .from(schema.payments)
+    .where(and(eq(schema.payments.bookingId, booking.id), inArray(schema.payments.status, ["successful", "partially_refunded", "refunded"])))
+    .limit(1);
+  return Boolean(paid);
+}

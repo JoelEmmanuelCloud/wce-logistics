@@ -447,3 +447,8 @@ export async function activeBookingForShipment(shipmentId: string): Promise<Book
 }
 
 export type Offer = Awaited<ReturnType<typeof searchOffers>>[number];
+
+export async function findBooking(bookingId: string): Promise<Booking | null> {
+  const [booking] = await db().select().from(schema.bookings).where(eq(schema.bookings.id, bookingId)).limit(1);
+  return booking ?? null;
+}
