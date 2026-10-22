@@ -16,7 +16,7 @@ export function DeliveryTimeline({ rows, title = "Delivery progress" }: { rows: 
       ) : (
         <ol className="grid gap-4">
           {rows.map(({ event, actorName, actorRole }) => (
-            <li key={event.id} className="relative border-l-2 border-orange/40 pl-4">
+            <li key={event.id} className="relative border-l-2 border-navy/10 pl-4">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={event.kind} map={DELIVERY_EVENT} />
                 <span className="text-[13px] text-navy/70">{formatDateTime(event.createdAt)}</span>

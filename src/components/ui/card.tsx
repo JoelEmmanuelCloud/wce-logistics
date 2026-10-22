@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 const CARD_TONES = {
   light: "border-navy/10 bg-white text-navy",
   dark: "border-navy bg-navy text-white",
-  attention: "border-orange-ink/40 bg-white text-navy",
-  danger: "border-[#B42318]/30 bg-white text-navy",
+  attention: "border-navy/40 bg-white text-navy",
+  danger: "border-navy/10 bg-white text-navy",
 } as const;
 
 export function Card({ children, className, tone = "light" }: { children: ReactNode; className?: string; tone?: keyof typeof CARD_TONES }) {

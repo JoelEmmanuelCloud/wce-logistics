@@ -31,7 +31,7 @@ export default async function AdminPaymentsPage() {
             Refunds due ({needsRefund.length})
           </h2>
           {needsRefund.map(({ payment, bookingReference, bookingStatus }) => (
-            <div key={payment.id} className="grid gap-4 rounded-lg border border-orange-ink/40 bg-white p-5 md:grid-cols-[1fr_auto] md:items-start">
+            <div key={payment.id} className="grid gap-4 rounded-lg border border-navy/10 bg-white p-5 md:grid-cols-[1fr_auto] md:items-start">
               <div>
                 <p className="font-semibold text-navy">
                   {formatNaira(payment.amountKobo)} for <Link href={`/admin/bookings/${payment.bookingId}`} className="underline decoration-orange decoration-2 underline-offset-4">{bookingReference}</Link>

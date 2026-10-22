@@ -13,7 +13,7 @@ function Stat({ label, value, href, tone = "default" }: { label: string; value: 
     <Link
       href={href}
       className={`rounded-lg border p-5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange ${
-        tone === "attention" && value > 0 ? "border-orange-ink/40 bg-orange/[0.07] hover:border-orange-ink" : "border-navy/10 bg-white hover:border-navy/30"
+        tone === "attention" && value > 0 ? "border-navy/40 bg-white hover:border-navy" : "border-navy/10 bg-white hover:border-navy/30"
       }`}
     >
       <p className="text-[13px] font-semibold text-navy/70">{label}</p>
