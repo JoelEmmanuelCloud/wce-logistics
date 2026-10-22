@@ -452,3 +452,28 @@ export async function findBooking(bookingId: string): Promise<Booking | null> {
   const [booking] = await db().select().from(schema.bookings).where(eq(schema.bookings.id, bookingId)).limit(1);
   return booking ?? null;
 }
+
+export async function expireOverdueRequests(): Promise<Booking[]> {
+  return db().transaction(async (tx) => {
+    const due = await tx
+      .select()
+      .from(schema.bookings)
+      .where(and(eq(schema.bookings.status, "pending_vendor_acceptance"), lte(schema.bookings.responseDueAt, sql`now()`)))
+      .limit(500)
+      .for("update", { skipLocked: true });
+    const expired: Booking[] = [];
+    for (const booking of due) {
+      const note = "The vendor did not respond in time.";
+      const [updated] = await tx.update(schema.bookings).set({ status: "expired", statusNote: note }).where(eq(schema.bookings.id, booking.id)).returning();
+      await releaseCapacity(tx, booking);
+      await tx
+        .update(schema.shipments)
+        .set({ status: "open" })
+        .where(and(eq(schema.shipments.id, booking.shipmentId), eq(schema.shipments.status, "booked")));
+      await addEvent(tx, booking.id, "expired", null, note);
+      await recordAudit({ actorId: null, action: "booking.expired", entityType: "booking", entityId: booking.id, metadata: { reservedKg: booking.reservedKg } }, tx);
+      expired.push(updated);
+    }
+    return expired;
+  });
+}

@@ -1,6 +1,7 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { lagosToday } from "@/lib/dates";
+import { recordAudit } from "@/server/audit";
 import { db, schema } from "@/server/db";
 import type { Truck, TruckDocument, TruckPhoto } from "@/server/db/schema";
 
@@ -100,4 +101,37 @@ export async function photoCounts(truckIds: string[]): Promise<Map<string, numbe
     counts.set(row.truckId, (counts.get(row.truckId) ?? 0) + 1);
   }
   return counts;
+}
+
+export async function flagTrucksWithExpiredDocuments(): Promise<Array<{ id: string; vendorId: string; registrationNumber: string }>> {
+  const required = sql.join(
+    REQUIRED_TRUCK_DOCUMENTS.map((type) => sql`${type}`),
+    sql`, `,
+  );
+  return db().transaction(async (tx) => {
+    const rows = await tx.execute<{ id: string; vendor_id: string; registration_number: string; previous: string }>(sql`
+      update trucks t
+      set listing_status = 'expired_documentation', updated_at = now()
+      from (select id, listing_status from trucks where listing_status in ('active', 'unavailable') and archived_at is null for update) previous
+      where t.id = previous.id
+        and exists (
+          select 1
+          from unnest(array[${required}]::truck_document_type[]) as required(type)
+          left join lateral (
+            select d.status, d.expiry_date
+            from truck_documents d
+            where d.truck_id = t.id and d.type = required.type
+            order by d.uploaded_at desc
+            limit 1
+          ) latest on true
+          where latest.status is null
+             or latest.status = 'rejected'
+             or (latest.expiry_date is not null and latest.expiry_date <= (now() at time zone 'Africa/Lagos')::date)
+        )
+      returning t.id, t.vendor_id, t.registration_number, previous.listing_status as previous`);
+    for (const row of rows) {
+      await recordAudit({ actorId: null, action: "truck.documents_expired", entityType: "truck", entityId: row.id, metadata: { previousStatus: row.previous } }, tx);
+    }
+    return rows.map((row) => ({ id: row.id, vendorId: row.vendor_id, registrationNumber: row.registration_number }));
+  });
 }
