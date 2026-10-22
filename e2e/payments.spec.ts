@@ -60,7 +60,7 @@ test.describe("payments", () => {
     await vendorPage.goto("/vendor/payouts");
     await expect(vendorPage.getByRole("link", { name: reference })).toBeVisible();
     await expect(vendorPage.getByText("₦10,800").first()).toBeVisible();
-    await expect(vendorPage.getByText("Held until delivery")).toBeVisible();
+    await expect(vendorPage.getByText("On hold", { exact: true })).toBeVisible();
 
     const admin = await createUser("admin", "Payout Admin");
     const adminContext = await browser.newContext();

@@ -160,8 +160,56 @@ export const PAYMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
 };
 
 export const PAYOUT_STATUS: Record<string, { label: string; tone: Tone }> = {
-  on_hold: { label: "Held until delivery", tone: "info" },
+  on_hold: { label: "On hold", tone: "info" },
   eligible: { label: "Ready to pay", tone: "warning" },
   paid: { label: "Paid out", tone: "success" },
   cancelled: { label: "Cancelled", tone: "neutral" },
+};
+
+export const LICENCE_CLASSES = [
+  { value: "C", label: "Class C: goods vehicles under 3 tonnes" },
+  { value: "E", label: "Class E: heavy goods vehicles" },
+  { value: "G", label: "Class G: articulated vehicles" },
+] as const;
+
+export const DRIVER_STATUS: Record<string, { label: string; tone: Tone }> = {
+  active: { label: "Active", tone: "success" },
+  inactive: { label: "Inactive", tone: "neutral" },
+};
+
+export const DELIVERY_EVENT: Record<string, { label: string; tone: Tone }> = {
+  driver_assigned: { label: "Driver assigned", tone: "info" },
+  arrived_at_pickup: { label: "Arrived at pickup", tone: "info" },
+  goods_collected: { label: "Goods collected", tone: "success" },
+  departed: { label: "On the road", tone: "info" },
+  arrived_at_destination: { label: "Arrived at destination", tone: "info" },
+  delivery_attempted: { label: "Delivery attempted", tone: "warning" },
+  delivered: { label: "Delivered", tone: "success" },
+  incident_reported: { label: "Incident reported", tone: "danger" },
+  receipt_confirmed: { label: "Receipt confirmed", tone: "success" },
+};
+
+export const DISPUTE_CATEGORIES = [
+  { value: "non_delivery", label: "Goods not delivered" },
+  { value: "late_delivery", label: "Late delivery" },
+  { value: "damaged_goods", label: "Damaged goods" },
+  { value: "missing_goods", label: "Missing goods" },
+  { value: "unexpected_charges", label: "Unexpected charges" },
+  { value: "incorrect_details", label: "Incorrect booking details" },
+  { value: "cancellation", label: "Cancellation" },
+  { value: "payment_or_refund", label: "Payment or refund" },
+  { value: "other", label: "Something else" },
+] as const;
+
+export const DISPUTE_STATUS: Record<string, { label: string; tone: Tone }> = {
+  open: { label: "Open", tone: "warning" },
+  under_review: { label: "Under review", tone: "info" },
+  awaiting_information: { label: "Awaiting information", tone: "warning" },
+  resolved: { label: "Resolved", tone: "success" },
+  closed: { label: "Closed", tone: "neutral" },
+};
+
+export const REVIEW_STATUS: Record<string, { label: string; tone: Tone }> = {
+  published: { label: "Published", tone: "success" },
+  hidden: { label: "Hidden", tone: "neutral" },
 };
