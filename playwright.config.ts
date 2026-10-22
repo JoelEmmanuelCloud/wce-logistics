@@ -18,9 +18,9 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "desktop", testIgnore: "**/jobs.spec.ts", use: { ...devices["Desktop Chrome"], channel: "chrome", viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", testIgnore: "**/jobs.spec.ts", use: { ...devices["Pixel 7"], channel: "chrome" } },
-    { name: "jobs", testMatch: "**/jobs.spec.ts", dependencies: ["desktop", "mobile"], use: { ...devices["Desktop Chrome"], channel: "chrome" } },
+    { name: "desktop", testIgnore: ["**/jobs.spec.ts", "**/settings.spec.ts"], use: { ...devices["Desktop Chrome"], channel: "chrome", viewport: { width: 1440, height: 900 } } },
+    { name: "mobile", testIgnore: ["**/jobs.spec.ts", "**/settings.spec.ts"], use: { ...devices["Pixel 7"], channel: "chrome" } },
+    { name: "global", testMatch: ["**/jobs.spec.ts", "**/settings.spec.ts"], dependencies: ["desktop", "mobile"], use: { ...devices["Desktop Chrome"], channel: "chrome" } },
   ],
   webServer: [
     {
