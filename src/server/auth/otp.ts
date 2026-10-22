@@ -73,8 +73,10 @@ export async function requestOtp(email: string, ipAddress: string | null): Promi
       to: email,
       subject: `${code} is your WCE Logistics sign-in code`,
       heading: "Your sign-in code",
-      paragraphs: [`Enter this code to sign in to WCE Logistics: ${code}`, `It expires in ${OTP_TTL_MINUTES} minutes. Never share it with anyone, including our staff.`],
-      footnote: "If you did not try to sign in, you can ignore this email. Your account stays secure.",
+      preview: `Use ${code} to sign in. It expires in ${OTP_TTL_MINUTES} minutes.`,
+      paragraphs: ["Enter this code on the sign-in page to continue to WCE Logistics."],
+      code,
+      footnote: `The code expires in ${OTP_TTL_MINUTES} minutes and can be used once. WCE Logistics will never ask you for it. If you did not try to sign in, you can ignore this email.`,
     });
   } catch (error) {
     await database.delete(schema.otpChallenges).where(eq(schema.otpChallenges.id, challenge.id));
