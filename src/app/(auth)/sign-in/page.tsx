@@ -17,8 +17,7 @@ export default async function SignInPage() {
 
   return (
     <>
-      <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Sign in or create an account</p>
-      <h1 className="mt-3 font-display text-[clamp(40px,5vw,60px)] uppercase leading-[0.92] text-navy">Welcome to WCE Logistics</h1>
+      <h1 className="font-display text-[clamp(40px,5vw,60px)] uppercase leading-[0.92] text-navy">Welcome to WCE Logistics</h1>
       <p className="mt-4 text-[16px] leading-relaxed text-navy/70">
         Use your email address. New here? We will set up your account after you verify it.
       </p>

@@ -18,7 +18,6 @@ export default async function AccountPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Shipper account"
         title={firstName ? `Welcome, ${firstName}` : "Welcome"}
         description="Book space on verified trucks between Nigerian states, and follow every booking from request to delivery."
         action={

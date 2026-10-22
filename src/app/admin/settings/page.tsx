@@ -52,7 +52,6 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Configuration"
         title="Settings"
         description="Marketplace rules and categories. Every change is recorded with who made it, and applies to new bookings and payments only."
       />

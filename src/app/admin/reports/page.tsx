@@ -47,7 +47,6 @@ export default async function AdminReportsPage({ searchParams }: PageProps<"/adm
   return (
     <>
       <PageHeader
-        eyebrow="Finance"
         title="Reports"
         description="How the marketplace is performing. Money is counted when payments are confirmed; Lagos time."
         action={

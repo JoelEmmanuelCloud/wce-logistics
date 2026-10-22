@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { INDUSTRIES } from "@/data/landing";
 
@@ -8,8 +8,7 @@ export function IndustriesSection() {
     <Section id="industries" tone="sand" labelledBy="industries-title">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
         <div>
-          <Eyebrow className="text-orange-ink">Industries</Eyebrow>
-          <DisplayHeading id="industries-title" className="mt-5">
+          <DisplayHeading id="industries-title">
             Who we
             <span className="block text-orange-deep">move for</span>
           </DisplayHeading>

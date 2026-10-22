@@ -23,12 +23,11 @@ export function CardHeader({ title, description, action }: { title: string; desc
   );
 }
 
-export function PageHeader({ eyebrow, title, description, action }: { eyebrow?: string; title: string; description?: ReactNode; action?: ReactNode }) {
+export function PageHeader({ title, description, action }: { title: string; description?: ReactNode; action?: ReactNode }) {
   return (
     <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        {eyebrow && <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">{eyebrow}</p>}
-        <h1 className="mt-2 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{title}</h1>
+        <h1 className="font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{title}</h1>
         {description && <p className="mt-3 max-w-[44em] text-[16px] leading-relaxed text-navy/70">{description}</p>}
       </div>
       {action}

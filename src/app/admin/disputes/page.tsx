@@ -20,7 +20,6 @@ export default async function AdminDisputesPage({ searchParams }: PageProps<"/ad
   return (
     <>
       <PageHeader
-        eyebrow="Support"
         title="Disputes"
         description="Problems reported by shippers and vendors. Vendor payouts for a booking stay on hold while its dispute is open."
       />

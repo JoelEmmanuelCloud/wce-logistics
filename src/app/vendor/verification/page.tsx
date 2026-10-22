@@ -50,9 +50,8 @@ export default async function VendorVerificationPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Step 2 of 3"
         title="Verification"
-        description="We confirm the identity of every vendor before their trucks can take bookings. Your details are encrypted and only visible to our verification team."
+        description="Step 2 of 3. We confirm the identity of every vendor before their trucks can take bookings. Your details are encrypted and only visible to our verification team."
       />
       <div className="mb-6">
         <VendorStatusBanner profile={profile} />

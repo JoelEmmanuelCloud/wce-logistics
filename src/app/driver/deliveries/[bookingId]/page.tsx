@@ -39,8 +39,8 @@ export default async function DriverDeliveryPage({ params }: PageProps<"/driver/
         Back to deliveries
       </Link>
       <header className="mb-8 mt-4">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Delivery</p>
-        <h1 className="mt-2 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
+        <p className="text-[14px] font-medium text-navy/70">Delivery</p>
+        <h1 className="mt-1 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-[14px] text-navy/70">
           <StatusBadge status={booking.status} map={BOOKING_STATUS} />
           <span>

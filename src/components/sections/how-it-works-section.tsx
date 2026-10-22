@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, type KeyboardEvent } from "react";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { SHIPPER_STEPS, VENDOR_STEPS, type Step } from "@/data/landing";
 
@@ -41,8 +41,7 @@ export function HowItWorksSection() {
     <Section id="how-it-works" tone="sand" labelledBy="how-title" watermark="left">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange-ink">How it works</Eyebrow>
-          <DisplayHeading id="how-title" className="mt-5">
+          <DisplayHeading id="how-title">
             Four steps,
             <span className="block pl-[0.6em] text-orange-deep">one record</span>
           </DisplayHeading>

@@ -20,7 +20,7 @@ export default async function ShipmentsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Shipping" title="Shipments" description="Every load you have asked us to move, and the trucks matched to it." action={shipments.length > 0 ? start : undefined} />
+      <PageHeader title="Shipments" description="Every load you have asked us to move, and the trucks matched to it." action={shipments.length > 0 ? start : undefined} />
       {shipments.length === 0 ? (
         <EmptyState title="No shipments yet" description="Describe your load and we will show verified trucks making that trip, with the full price before you commit." action={start} />
       ) : (

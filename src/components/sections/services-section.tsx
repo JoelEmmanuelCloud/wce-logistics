@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { ComponentType } from "react";
 import { BusIcon, ExcavatorIcon, TruckIcon } from "@/components/fleet-icons";
 import { ClockIcon } from "@/components/line-icons";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { SERVICES, type ServiceKey } from "@/data/landing";
 
@@ -45,8 +45,7 @@ export function ServicesSection() {
     <Section id="services" tone="white" labelledBy="services-title" watermark="right">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange-ink">Services</Eyebrow>
-          <DisplayHeading id="services-title" className="mt-5">
+          <DisplayHeading id="services-title">
             What we <span className="text-orange-deep">move</span>
           </DisplayHeading>
         </div>

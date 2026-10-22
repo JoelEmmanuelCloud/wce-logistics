@@ -15,9 +15,8 @@ export default async function VendorProfilePage() {
   return (
     <>
       <PageHeader
-        eyebrow={profile ? "Step 1 of 3" : "Step 1 of 3: get started"}
         title="Business profile"
-        description="Tell us who you are and where you operate. This is what shippers and our verification team will see."
+        description="Step 1 of 3. Tell us who you are and where you operate. This is what shippers and our verification team will see."
       />
       {!editable && (
         <div className="mb-6">

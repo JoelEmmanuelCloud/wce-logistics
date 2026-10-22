@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { DocumentIcon, GaugeIcon, PinCheckIcon, ShieldCheckIcon } from "@/components/line-icons";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { BOOKING_STATUSES } from "@/data/landing";
 
@@ -32,8 +32,7 @@ export function TrustSection() {
     <Section id="trust" tone="navy" labelledBy="trust-title" watermark="right">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div className="lg:sticky lg:top-12 lg:self-start">
-          <Eyebrow className="text-orange">Accountability</Eyebrow>
-          <DisplayHeading id="trust-title" className="mt-5">
+          <DisplayHeading id="trust-title">
             Verified
             <span className="block text-orange">before</span>
             they move

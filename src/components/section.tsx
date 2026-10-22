@@ -51,15 +51,6 @@ export function Section({
   );
 }
 
-export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <p className={`flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.18em] ${className ?? ""}`}>
-      <span className="size-2 rounded-full bg-current" aria-hidden="true" />
-      {children}
-    </p>
-  );
-}
-
 export function DisplayHeading({ id, children, className }: { id: string; children: ReactNode; className?: string }) {
   return (
     <h2 id={id} className={`font-display uppercase leading-[0.9] text-[clamp(48px,6.6vw,112px)] ${className ?? ""}`}>

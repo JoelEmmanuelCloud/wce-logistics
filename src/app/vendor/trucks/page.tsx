@@ -24,7 +24,6 @@ export default async function VendorTrucksPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Fleet"
         title="Trucks"
         description="Each truck is reviewed on its own. Only active trucks from verified vendors can take bookings."
         action={trucks.length > 0 ? addTruck : undefined}

@@ -19,7 +19,6 @@ export default async function NewShipmentPage() {
         Back to shipments
       </Link>
       <PageHeader
-        eyebrow="Book a truck"
         title="Send a shipment"
         description="Tell us what you are moving and where. We will show verified trucks making that trip, with the full price."
       />

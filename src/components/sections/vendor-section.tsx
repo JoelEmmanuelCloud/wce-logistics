@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { TruckIcon } from "@/components/fleet-icons";
 import { ArrowUpRightIcon, CheckIcon } from "@/components/line-icons";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { VENDOR_DOCUMENTS } from "@/data/landing";
 
@@ -12,8 +12,7 @@ export function VendorSection() {
       <TruckIcon className="pointer-events-none absolute -right-[6%] -bottom-[18%] w-[min(560px,60vw)] opacity-[0.13] mix-blend-multiply" />
       <div className="relative grid gap-12 lg:grid-cols-[1.3fr_1fr] lg:items-end lg:gap-20">
         <div>
-          <Eyebrow>For truck owners and fleets</Eyebrow>
-          <DisplayHeading id="vendors-title" className="mt-5 text-[clamp(52px,7.4vw,128px)]">
+          <DisplayHeading id="vendors-title" className="text-[clamp(52px,7.4vw,128px)]">
             Own a truck?
             <span className="mt-[0.08em] inline-block bg-navy px-[0.14em] pb-[0.02em] text-white">Put it to work.</span>
           </DisplayHeading>

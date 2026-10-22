@@ -24,9 +24,8 @@ export default async function NewTruckPage() {
         Back to trucks
       </Link>
       <PageHeader
-        eyebrow="Step 3 of 3"
         title="Add a truck"
-        description="Enter the details exactly as they appear on the vehicle documents. Next you will upload documents and photos."
+        description="Step 3 of 3. Enter the details exactly as they appear on the vehicle documents. Next you will upload documents and photos."
       />
       <Card>
         <TruckForm

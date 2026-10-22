@@ -32,7 +32,7 @@ export default async function AdminOverviewPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Operations" title="Overview" description="Review queues and the health of the vendor network." />
+      <PageHeader title="Overview" description="Review queues and the health of the vendor network." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="Bookings awaiting payment" value={stats.bookingsAwaitingPayment} href="/admin/bookings?status=payment" tone="attention" />
         <Stat label="Bookings awaiting vendor" value={stats.bookingsAwaitingVendor} href="/admin/bookings?status=pending" />

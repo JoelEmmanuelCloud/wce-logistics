@@ -34,7 +34,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps<"/admin
 
   return (
     <>
-      <PageHeader eyebrow="Accounts" title="Users" description="Suspending a user signs them out everywhere and blocks future sign-ins." />
+      <PageHeader title="Users" description="Suspending a user signs them out everywhere and blocks future sign-ins." />
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <FilterTabs base="/admin/users" filters={ROLE_FILTERS} active={role} query={query} />
         <SearchForm base="/admin/users" status={role} query={query} placeholder="Name, email or phone" />

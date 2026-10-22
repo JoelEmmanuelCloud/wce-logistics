@@ -27,7 +27,6 @@ export default async function NewRoutePage() {
         Back to trips
       </Link>
       <PageHeader
-        eyebrow="Trips"
         title="Schedule a trip"
         description="Publish a trip your truck is already making. Shippers going the same way can book the space you offer."
       />

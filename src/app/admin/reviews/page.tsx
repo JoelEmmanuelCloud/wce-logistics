@@ -18,7 +18,6 @@ export default async function AdminReviewsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Marketplace"
         title="Reviews"
         description="Hide reviews that are abusive, contain personal information or are not about the delivery. Hidden reviews no longer count towards a vendor's rating."
       />

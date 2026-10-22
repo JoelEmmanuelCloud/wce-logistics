@@ -96,8 +96,8 @@ export function BookingHeader({ detail, action }: { detail: Detail; action?: Rea
   return (
     <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Booking</p>
-        <h1 className="mt-2 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{detail.booking.reference}</h1>
+        <p className="text-[14px] font-medium text-navy/70">Booking</p>
+        <h1 className="mt-1 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{detail.booking.reference}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-[14px] text-navy/70">
           <StatusBadge status={detail.booking.status} map={BOOKING_STATUS} />
           <span>Requested {formatDateTime(detail.booking.createdAt)}</span>

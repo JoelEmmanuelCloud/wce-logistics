@@ -25,7 +25,7 @@ export default async function VendorPayoutsPage({ searchParams }: PageProps<"/ve
 
   return (
     <>
-      <PageHeader eyebrow="Finance" title="Earnings" description="Your share of each paid booking, after the platform commission. We pay out once delivery is confirmed." />
+      <PageHeader title="Earnings" description="Your share of each paid booking, after the platform commission. We pay out once delivery is confirmed." />
       {accountNotice === "saved" && account && (
         <div className="mb-6">
           <Alert tone="success" title="Bank account saved">

@@ -27,7 +27,6 @@ export default async function VendorBookingsPage({ searchParams }: PageProps<"/v
   return (
     <>
       <PageHeader
-        eyebrow="Marketplace"
         title="Bookings"
         description={`Answer new requests within ${responseWindowHours} hours. Requests you do not answer expire and the space is released.`}
       />

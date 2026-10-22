@@ -23,7 +23,7 @@ export default async function AdminAuditPage({ searchParams }: PageProps<"/admin
 
   return (
     <>
-      <PageHeader eyebrow="Accountability" title="Audit log" description="Every sign-in, submission and administrative decision, newest first." />
+      <PageHeader title="Audit log" description="Every sign-in, submission and administrative decision, newest first." />
       <DataTable caption="Audit log" headers={["When", "Actor", "Action", "Entity", "Details"]}>
         {result.rows.map((entry) => (
           <tr key={entry.log.id} className="align-top hover:bg-navy/[0.02]">

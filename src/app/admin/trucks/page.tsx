@@ -19,7 +19,7 @@ export default async function AdminTrucksPage({ searchParams }: PageProps<"/admi
 
   return (
     <>
-      <PageHeader eyebrow="Compliance" title="Trucks" description="Check each truck's documents and photos before it can take bookings." />
+      <PageHeader title="Trucks" description="Check each truck's documents and photos before it can take bookings." />
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <FilterTabs base="/admin/trucks" filters={TRUCK_FILTERS} active={status} query={query} />
         <SearchForm base="/admin/trucks" status={status} query={query} placeholder="Registration or vendor" />

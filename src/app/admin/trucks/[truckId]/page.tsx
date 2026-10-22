@@ -59,7 +59,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
         Back to trucks
       </Link>
       <PageHeader
-        eyebrow={`${truck.make} ${truck.model}${truck.year ? `, ${truck.year}` : ""}`}
+        description={`${truck.make} ${truck.model}${truck.year ? `, ${truck.year}` : ""}`}
         title={truck.registrationNumber}
         action={<StatusBadge status={truck.listingStatus} map={TRUCK_STATUS} />}
       />

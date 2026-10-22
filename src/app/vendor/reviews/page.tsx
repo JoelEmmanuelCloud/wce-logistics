@@ -17,7 +17,7 @@ export default async function VendorReviewsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Reputation" title="Reviews" description="Shippers rate each completed booking. Your rating is shown next to every trip you offer." />
+      <PageHeader title="Reviews" description="Shippers rate each completed booking. Your rating is shown next to every trip you offer." />
       <Card className="mb-6">
         <RatingSummary average={rating?.average ?? 0} count={rating?.count ?? 0} />
       </Card>

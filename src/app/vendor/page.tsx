@@ -55,7 +55,6 @@ export default async function VendorOverviewPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Vendor dashboard"
         title={firstName ? `Welcome, ${firstName}` : "Welcome"}
         description="Get verified, add your trucks, and you are ready to receive bookings on the routes you run."
       />

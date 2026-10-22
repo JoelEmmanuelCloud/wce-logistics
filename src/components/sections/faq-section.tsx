@@ -1,5 +1,5 @@
 import { PlusIcon } from "@/components/line-icons";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { FAQS } from "@/data/landing";
 
 export function FaqSection({ contactEmail }: { contactEmail: string }) {
@@ -7,8 +7,7 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
     <Section id="faq" tone="white" labelledBy="faq-title" watermark="left">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
         <div>
-          <Eyebrow className="text-orange-ink">FAQ</Eyebrow>
-          <DisplayHeading id="faq-title" className="mt-5">
+          <DisplayHeading id="faq-title">
             Good to
             <span className="block text-orange-deep">know</span>
           </DisplayHeading>

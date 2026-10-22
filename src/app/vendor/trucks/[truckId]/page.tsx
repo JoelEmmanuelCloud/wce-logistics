@@ -89,7 +89,7 @@ export default async function TruckDetailPage({ params }: PageProps<"/vendor/tru
         Back to trucks
       </Link>
       <PageHeader
-        eyebrow={`${truck.make} ${truck.model}`}
+        description={`${truck.make} ${truck.model}`}
         title={truck.registrationNumber}
         action={
           <div className="flex flex-wrap items-center gap-3">

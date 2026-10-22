@@ -25,7 +25,6 @@ export default async function VendorRoutesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Capacity"
         title="Trips"
         description="Each trip is a truck making a journey on a date. Shippers book the space you offer, and bookings reserve capacity automatically."
         action={routes.length > 0 ? schedule : undefined}

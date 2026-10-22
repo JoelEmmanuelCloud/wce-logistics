@@ -22,7 +22,6 @@ export default async function AdminPaymentsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Finance"
         title="Payments"
         description="Every payment attempt with its commission split. Payments on cancelled bookings must be refunded."
       />

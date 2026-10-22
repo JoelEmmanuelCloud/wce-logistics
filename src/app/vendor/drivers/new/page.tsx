@@ -23,7 +23,6 @@ export default async function NewDriverPage() {
         Back to drivers
       </Link>
       <PageHeader
-        eyebrow="Drivers"
         title="Add a driver"
         description="Drivers get their own sign-in and see only the deliveries you assign to them. They never see prices or your earnings."
       />

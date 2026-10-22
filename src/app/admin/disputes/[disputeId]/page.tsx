@@ -40,8 +40,8 @@ export default async function AdminDisputePage({ params }: PageProps<"/admin/dis
         Back to disputes
       </Link>
       <header className="mb-8 mt-4">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Dispute</p>
-        <h1 className="mt-2 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
+        <p className="text-[14px] font-medium text-navy/70">Dispute</p>
+        <h1 className="mt-1 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
         <p className="mt-2 text-[15px] text-navy/70">
           {row.vendorName}.{" "}
           <Link href={`/admin/bookings/${booking.id}`} className="font-semibold underline decoration-orange decoration-2 underline-offset-4">

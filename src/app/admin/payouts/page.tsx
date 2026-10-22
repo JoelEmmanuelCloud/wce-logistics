@@ -25,7 +25,6 @@ export default async function AdminPayoutsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Finance"
         title="Vendor payouts"
         description="Each paid booking creates a payout of the vendor's share. It becomes ready to pay when the booking is completed and no dispute is open."
         action={

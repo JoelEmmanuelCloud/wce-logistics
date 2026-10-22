@@ -24,7 +24,7 @@ export default async function AdminBookingsPage({ searchParams }: PageProps<"/ad
 
   return (
     <>
-      <PageHeader eyebrow="Marketplace" title="Bookings" description="Record payments, follow trips and step in when a booking needs help." />
+      <PageHeader title="Bookings" description="Record payments, follow trips and step in when a booking needs help." />
       <div className="mb-5">
         <FilterTabs base="/admin/bookings" filters={FILTERS} active={filter} query="" />
       </div>

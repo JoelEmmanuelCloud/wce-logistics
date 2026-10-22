@@ -26,7 +26,6 @@ export default async function VendorDriversPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Fleet"
         title="Drivers"
         description="Assign a driver to every confirmed booking. Their licence must be valid and cover the truck they drive."
         action={rows.length > 0 ? addDriver : undefined}

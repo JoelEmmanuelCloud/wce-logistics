@@ -32,8 +32,8 @@ export function BookingDispute({
         Back to booking {booking.reference}
       </Link>
       <header className="mb-8 mt-4">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-orange-ink">Dispute</p>
-        <h1 className="mt-2 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
+        <p className="text-[14px] font-medium text-navy/70">Dispute</p>
+        <h1 className="mt-1 font-display text-[clamp(34px,4vw,56px)] uppercase leading-[0.95] text-navy">{booking.reference}</h1>
       </header>
       <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
         <div className="grid content-start gap-6">

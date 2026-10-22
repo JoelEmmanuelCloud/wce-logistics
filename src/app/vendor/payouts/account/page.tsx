@@ -39,7 +39,6 @@ export default async function PayoutAccountPage() {
         Back to earnings
       </Link>
       <PageHeader
-        eyebrow="Finance"
         title="Payout bank account"
         description="Your share of each completed booking is sent to this account. The account name must match your business or your own name."
       />

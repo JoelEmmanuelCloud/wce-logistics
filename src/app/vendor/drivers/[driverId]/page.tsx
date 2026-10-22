@@ -37,7 +37,7 @@ export default async function VendorDriverPage({ params }: PageProps<"/vendor/dr
       <Link href="/vendor/drivers" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
         Back to drivers
       </Link>
-      <PageHeader eyebrow="Driver" title={driver.fullName} action={<StatusBadge status={driver.status} map={DRIVER_STATUS} />} />
+      <PageHeader title={driver.fullName} action={<StatusBadge status={driver.status} map={DRIVER_STATUS} />} />
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <div className="grid content-start gap-6">
           {expired && (

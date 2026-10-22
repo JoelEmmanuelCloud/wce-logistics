@@ -33,7 +33,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
         Back to shipments
       </Link>
       <PageHeader
-        eyebrow={`${formatKg(shipment.weightKg)}, ${shipment.bookingType === "dedicated" ? "dedicated truck" : "shared load"}`}
+        description={`${formatKg(shipment.weightKg)}, ${shipment.bookingType === "dedicated" ? "dedicated truck" : "shared load"}`}
         title={`${shipment.originCity} to ${shipment.destinationCity}`}
         action={<StatusBadge status={shipment.status} map={SHIPMENT_STATUS} />}
       />

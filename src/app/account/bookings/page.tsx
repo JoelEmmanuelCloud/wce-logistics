@@ -14,7 +14,7 @@ export default async function CustomerBookingsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Shipping" title="Bookings" description="Every truck you have requested, newest first." />
+      <PageHeader title="Bookings" description="Every truck you have requested, newest first." />
       {rows.length === 0 ? (
         <EmptyState
           title="No bookings yet"

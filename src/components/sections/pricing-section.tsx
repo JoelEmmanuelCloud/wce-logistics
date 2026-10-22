@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { LockIcon, ReceiptIcon, ScaleIcon } from "@/components/line-icons";
-import { DisplayHeading, Eyebrow, Section } from "@/components/section";
+import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 
 const FORMULA = [
@@ -36,8 +36,7 @@ export function PricingSection() {
     <Section id="pricing" tone="white" labelledBy="pricing-title">
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <Eyebrow className="text-orange-ink">Pricing</Eyebrow>
-          <DisplayHeading id="pricing-title" className="mt-5">
+          <DisplayHeading id="pricing-title">
             Priced by
             <span className="block pl-[0.6em] text-orange-deep">the kilo</span>
           </DisplayHeading>

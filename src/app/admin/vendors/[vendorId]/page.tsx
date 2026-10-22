@@ -37,7 +37,7 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
         Back to vendors
       </Link>
       <PageHeader
-        eyebrow={labelFor(VENDOR_CATEGORIES, vendor.category)}
+        description={labelFor(VENDOR_CATEGORIES, vendor.category)}
         title={vendor.businessName ?? vendor.legalName}
         action={<StatusBadge status={vendor.verificationStatus} map={VERIFICATION_STATUS} />}
       />

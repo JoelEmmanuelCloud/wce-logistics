@@ -56,7 +56,7 @@ export default async function DriverHomePage() {
 
   return (
     <>
-      <PageHeader eyebrow={`Driving for ${session.vendorName}`} title={`Hello, ${firstName}`} description="Your assigned deliveries. Record each step so the shipper can follow the shipment." />
+      <PageHeader title={`Hello, ${firstName}`} description={`Driving for ${session.vendorName}. Your assigned deliveries. Record each step so the shipper can follow the shipment.`} />
       <section aria-labelledby="active-title" className="grid gap-4">
         <h2 id="active-title" className="text-[19px] font-semibold text-navy">
           Current deliveries
