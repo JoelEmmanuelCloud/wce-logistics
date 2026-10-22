@@ -7,7 +7,7 @@ import { acceptedBooking, addDriver, paidBooking, verifiedVendorWithTruck } from
 const run = promisify(execFile);
 
 async function job(name: string): Promise<string> {
-  const { stdout } = await run(process.execPath, ["--conditions=react-server", "--import", "tsx", `scripts/${name}.ts`], {
+  const { stdout } = await run(process.execPath, ["--conditions=react-server", "--import", "tsx", "scripts/run-job.ts", name], {
     env: { ...process.env, ...testEnv, NODE_ENV: "production" },
     timeout: 60_000,
   });
