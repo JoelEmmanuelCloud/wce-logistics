@@ -60,7 +60,7 @@ export default async function AdminPayoutsPage() {
                 {payout.note && <span className="mt-1 block max-w-[240px] text-[12px] text-navy/70">{payout.note}</span>}
               </td>
               <td className="px-4 py-3">
-                {(payout.status === "on_hold" || payout.status === "eligible") && (
+                {payout.status === "eligible" && (
                   <ReasonActionForm
                     action={markPayoutPaidAction.bind(null, payout.id)}
                     trigger="Mark paid"

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, notInArray, sql } from "drizzle-orm";
 import { randomInt } from "node:crypto";
 import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
@@ -228,14 +228,23 @@ export async function refundPayment(adminId: string, paymentId: string, reason: 
 
 export async function markPayoutPaid(adminId: string, payoutId: string, transferReference: string): Promise<void> {
   await db().transaction(async (tx) => {
+    const [current] = await tx.select().from(schema.payouts).where(eq(schema.payouts.id, payoutId)).limit(1).for("update");
+    if (!current || current.status !== "eligible") {
+      throw new PaymentError("Only payouts for completed bookings without an open dispute can be paid.");
+    }
+    const [dispute] = await tx
+      .select({ id: schema.disputes.id })
+      .from(schema.disputes)
+      .where(and(eq(schema.disputes.bookingId, current.bookingId), notInArray(schema.disputes.status, ["resolved", "closed"])))
+      .limit(1);
+    if (dispute) {
+      throw new PaymentError("This booking has an open dispute. Resolve it before paying the vendor.");
+    }
     const [payout] = await tx
       .update(schema.payouts)
       .set({ status: "paid", transferReference, paidAt: sql`now()`, paidBy: adminId })
-      .where(and(eq(schema.payouts.id, payoutId), inArray(schema.payouts.status, ["on_hold", "eligible"])))
+      .where(eq(schema.payouts.id, current.id))
       .returning();
-    if (!payout) {
-      throw new PaymentError("This payout cannot be marked as paid.");
-    }
     await recordAudit({ actorId: adminId, action: "payout.paid", entityType: "payout", entityId: payout.id, metadata: { transferReference, amountKobo: payout.amountKobo } }, tx);
   });
 }
