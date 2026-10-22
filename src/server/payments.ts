@@ -260,7 +260,10 @@ export async function listPayments() {
     .limit(200);
 }
 
-export async function listPayouts(filter: { vendorId?: string } = {}) {
+export async function listPayouts(filter: { vendorId?: string; bookingId?: string } = {}) {
+  const conditions = [];
+  if (filter.vendorId) conditions.push(eq(schema.payouts.vendorId, filter.vendorId));
+  if (filter.bookingId) conditions.push(eq(schema.payouts.bookingId, filter.bookingId));
   return db()
     .select({
       payout: schema.payouts,
@@ -271,7 +274,7 @@ export async function listPayouts(filter: { vendorId?: string } = {}) {
     .from(schema.payouts)
     .innerJoin(schema.bookings, eq(schema.bookings.id, schema.payouts.bookingId))
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.payouts.vendorId))
-    .where(filter.vendorId ? eq(schema.payouts.vendorId, filter.vendorId) : undefined)
+    .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(desc(schema.payouts.createdAt))
     .limit(200);
 }
