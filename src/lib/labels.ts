@@ -70,17 +70,6 @@ export const BODY_TYPES = [
   { value: "low_bed", label: "Low bed" },
 ] as const;
 
-export const CARGO_TYPES = [
-  { value: "general_goods", label: "General goods" },
-  { value: "construction_materials", label: "Construction materials" },
-  { value: "agricultural_produce", label: "Agricultural produce" },
-  { value: "packaged_food", label: "Packaged food and drinks" },
-  { value: "machinery", label: "Machinery and equipment" },
-  { value: "electronics", label: "Electronics" },
-  { value: "furniture", label: "Furniture" },
-  { value: "chilled_goods", label: "Chilled or frozen goods" },
-] as const;
-
 export const TRUCK_DOCUMENT_TYPES = [
   { value: "vehicle_registration", label: "Vehicle registration", required: true, expires: false },
   { value: "proof_of_ownership", label: "Proof of ownership or lease", required: true, expires: false },

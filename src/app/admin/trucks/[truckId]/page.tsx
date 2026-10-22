@@ -10,9 +10,10 @@ import { Checklist } from "@/components/app/checklist";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { BODY_TYPES, CARGO_TYPES, DOCUMENT_STATUS, formatDate, formatDateTime, formatKg, labelFor, TRUCK_CATEGORIES, TRUCK_STATUS, VERIFICATION_STATUS } from "@/lib/labels";
+import { BODY_TYPES, DOCUMENT_STATUS, formatDate, formatDateTime, formatKg, labelFor, TRUCK_CATEGORIES, TRUCK_STATUS, VERIFICATION_STATUS } from "@/lib/labels";
 import { getTruckForAdmin, listAuditLogs } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
+import { cargoLabels } from "@/server/settings";
 import { REQUIRED_TRUCK_DOCUMENTS, todayIso, TRUCK_DOCUMENT_TITLES, truckSubmissionChecks } from "@/server/trucks";
 
 export const metadata: Metadata = { title: "Truck review" };
@@ -35,7 +36,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
     notFound();
   }
   const { truck, vendor, documents, photos } = data;
-  const history = await listAuditLogs({ page: 1, entityId: truck.id });
+  const [history, cargo] = await Promise.all([listAuditLogs({ page: 1, entityId: truck.id }), cargoLabels()]);
   const checks = truckSubmissionChecks(documents, photos);
   const today = todayIso();
 
@@ -75,7 +76,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
                 { label: "Tyres", value: truck.tyreCount },
                 { label: "Body dimensions", value: dimensions(truck.bodyLengthM, truck.bodyWidthM, truck.bodyHeightM) },
                 { label: "Base", value: `${truck.baseCity}, ${truck.baseState}` },
-                { label: "Cargo types", value: truck.cargoTypes.map((type) => labelFor(CARGO_TYPES, type)).join(", ") },
+                { label: "Cargo types", value: truck.cargoTypes.map((type) => cargo.get(type) ?? labelFor([], type)).join(", ") },
                 { label: "Registered", value: formatDate(truck.createdAt) },
               ]}
             />

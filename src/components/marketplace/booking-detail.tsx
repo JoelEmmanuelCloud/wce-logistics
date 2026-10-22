@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { BOOKING_STATUS, CARGO_TYPES, formatDate, formatDateTime, formatKg, formatTransit, labelFor, TRUCK_CATEGORIES } from "@/lib/labels";
+import { BOOKING_STATUS, formatDate, formatDateTime, formatKg, formatTransit, labelFor, TRUCK_CATEGORIES } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
 import type { getBookingDetail } from "@/server/marketplace";
 
@@ -33,7 +33,7 @@ export function BookingSummary({ detail }: { detail: Detail }) {
           <CardHeader title="Shipment" />
           <DescriptionList
             items={[
-              { label: "Cargo", value: labelFor(CARGO_TYPES, shipment.cargoType) },
+              { label: "Cargo", value: detail.cargoLabel ?? labelFor([], shipment.cargoType) },
               { label: "Description", value: shipment.description },
               { label: "Weight", value: formatKg(shipment.weightKg) },
               { label: "Packages", value: shipment.packageCount },

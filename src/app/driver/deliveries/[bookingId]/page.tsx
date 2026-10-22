@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { availableUpdates } from "@/lib/delivery";
-import { BOOKING_STATUS, CARGO_TYPES, DELIVERY_ACTIONS, formatDate, formatKg, formatTransit, labelFor } from "@/lib/labels";
+import { BOOKING_STATUS, DELIVERY_ACTIONS, formatDate, formatKg, formatTransit, labelFor } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import { requireRole } from "@/server/auth/dal";
 import { listDeliveryEvents } from "@/server/delivery";
@@ -74,7 +74,7 @@ export default async function DriverDeliveryPage({ params }: PageProps<"/driver/
             <CardHeader title="Cargo" />
             <DescriptionList
               items={[
-                { label: "Type", value: labelFor(CARGO_TYPES, shipment.cargoType) },
+                { label: "Type", value: detail.cargoLabel ?? labelFor([], shipment.cargoType) },
                 { label: "Description", value: shipment.description },
                 { label: "Weight", value: formatKg(shipment.weightKg) },
                 { label: "Packages", value: shipment.packageCount },
