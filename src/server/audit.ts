@@ -14,7 +14,7 @@ type AuditEntry = {
 type Executor = Pick<Database, "insert">;
 
 export async function recordAudit(entry: AuditEntry, executor: Executor = db()): Promise<void> {
-  const { ipAddress } = await requestMeta();
+  const ipAddress = entry.actorId === null ? null : (await requestMeta()).ipAddress;
   await executor.insert(schema.auditLogs).values({
     actorId: entry.actorId,
     action: entry.action,
