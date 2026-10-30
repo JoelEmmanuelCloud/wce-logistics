@@ -25,8 +25,8 @@ function buildMenus(contactEmail: string): Menu[] {
       })),
       linksTitle: "Plan a shipment",
       links: [
+        { title: "Check a price", href: "#estimate" },
         { title: "How booking works", href: "#how-it-works" },
-        { title: "Per-kilogram pricing", href: "#pricing" },
         { title: "Common questions", href: "#faq" },
         { title: "Sign in to book", href: "/sign-in" },
       ],
