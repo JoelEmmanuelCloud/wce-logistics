@@ -96,7 +96,6 @@ body {
 
 .hero-mask {
   display: block;
-  overflow: hidden;
   padding: 0.12em 0.12em 0.04em calc(0.12em + var(--indent, 0em));
   margin: -0.12em -0.12em -0.04em;
 }
@@ -126,13 +125,18 @@ body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .hero-mask {
+    animation: hero-mask-clip 1.3s linear both;
+  }
+
   .hero-line {
-    animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(100ms + var(--i, 0) * 120ms);
+    animation:
+      hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(100ms + var(--i, 0) * 120ms) both,
+      hero-glow 0.9s ease-in-out calc(1.3s + var(--i, 0) * 450ms) both;
   }
 
   .hero-underline {
-    animation: hero-underline 0.7s cubic-bezier(0.65, 0, 0.35, 1) 1.15s both;
+    animation: hero-underline 0.7s cubic-bezier(0.65, 0, 0.35, 1) 2.4s both;
   }
 
   .hero-fade {
@@ -163,6 +167,30 @@ body {
 @keyframes hero-rise {
   from {
     transform: translateY(105%);
+  }
+}
+
+@keyframes hero-mask-clip {
+  from,
+  99% {
+    clip-path: inset(0);
+  }
+  to {
+    clip-path: none;
+  }
+}
+
+@keyframes hero-glow {
+  from,
+  to {
+    text-shadow:
+      0 0 0 transparent,
+      0 0 0 transparent;
+  }
+  45% {
+    text-shadow:
+      0 0 0.08em currentColor,
+      0 0 0.4em color-mix(in srgb, currentColor 55%, transparent);
   }
 }
 
