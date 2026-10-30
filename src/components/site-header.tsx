@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRightIcon } from "@/components/line-icons";
+import { ArrowUpRightIcon, CloseIcon, MailIcon, MenuIcon, WhatsAppIcon } from "@/components/line-icons";
 import { WceLogo } from "@/components/wce-logo";
 import { IMAGES, type SiteImage } from "@/data/images";
 import { INDUSTRIES, SERVICES } from "@/data/landing";
@@ -183,6 +183,7 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
   const [menuIndex, setMenuIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<number | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const baseId = useId();
   const panelId = `${baseId}-panel`;
@@ -200,6 +201,18 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
     setMenuIndex(index);
     setMenuOpen(true);
   }
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      return;
+    }
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = previous;
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     function onPointerDown(event: PointerEvent) {
@@ -222,6 +235,7 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-[clamp(10px,1.6vh,16px)] z-50 px-[clamp(12px,calc(3.2vw-8px),48px)]">
+      {mobileOpen && <div aria-hidden="true" className="pointer-events-auto fixed inset-0 -z-10 bg-navy/45 backdrop-blur-[2px] md:hidden" />}
       <div ref={navRef} className="pointer-events-auto relative mx-auto max-w-[1744px]">
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-navy/70 p-2 shadow-[0_12px_40px_rgba(5,14,28,0.28)] backdrop-blur-[10px] backdrop-saturate-150 md:gap-6">
           <Link href="/" aria-label="WCE Logistics home" className="shrink-0 pl-2 text-[clamp(13px,1.1vw,17px)]">
@@ -263,17 +277,18 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Link href="/sign-in?as=customer" className="flex h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-sm font-semibold text-navy">
+            <Link href="/sign-in?as=customer" className="flex h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-[14px] font-semibold text-navy">
               Book a truck
             </Link>
             <button
               type="button"
               aria-expanded={mobileOpen}
               aria-controls={`${baseId}-mobile`}
+              aria-label={mobileOpen ? "Close" : "Menu"}
               onClick={() => setMobileOpen((value) => !value)}
-              className="flex h-10 items-center gap-2 whitespace-nowrap rounded-xl border border-white/30 px-3.5 text-sm font-medium text-white"
+              className="grid size-10 place-items-center rounded-xl border border-white/30 text-white transition-colors hover:bg-white/10"
             >
-              {mobileOpen ? "Close" : "Menu"}
+              {mobileOpen ? <CloseIcon className="size-5" /> : <MenuIcon className="size-5" />}
             </button>
           </div>
         </div>
@@ -289,47 +304,107 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
         <div
           id={`${baseId}-mobile`}
           hidden={!mobileOpen}
-          className="absolute inset-x-0 top-full mt-2 max-h-[calc(100svh-96px)] overflow-y-auto rounded-2xl border border-white/40 bg-white/95 p-3 text-navy shadow-[0_24px_60px_rgba(11,37,69,0.35)] backdrop-blur-xl md:hidden"
+          className="absolute inset-x-0 top-full mt-2 flex max-h-[calc(100svh-88px)] flex-col overflow-hidden rounded-2xl border border-white/40 bg-white text-navy shadow-[0_24px_60px_rgba(11,37,69,0.35)] md:hidden"
         >
-          <Link
-            href="/sign-in"
-            onClick={closeMenus}
-            className="flex h-11 items-center justify-center rounded-xl border border-navy/15 text-[15px] font-semibold text-navy transition-colors hover:bg-navy/5"
-          >
-            Sign in
-          </Link>
-          {menus.map((menu) => (
-            <section key={menu.label} className="border-b border-navy/10 py-2 last:border-b-0">
-              <h2 className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">{menu.label}</h2>
-              <ul className="grid gap-1">
-                {menu.features.map((item) => (
-                  <li key={item.title}>
-                    <MenuLink
-                      href={item.href}
-                      onClick={closeMenus}
-                      className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none"
+          <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-1">
+            {menus.map((menu, index) => {
+              const open = mobileSection === index;
+              const sectionId = `${baseId}-mobile-${index}`;
+              return (
+                <section key={menu.label} className="border-b border-navy/10 last:border-b-0">
+                  <h2>
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={sectionId}
+                      onClick={() => setMobileSection(open ? null : index)}
+                      className="flex w-full items-center justify-between gap-3 px-3 py-4 text-left text-[17px] font-semibold text-navy"
                     >
-                      <span className="block text-[15px] font-semibold text-navy">{item.title}</span>
-                      <span className="block text-[13px] leading-snug text-navy/65">{item.detail}</span>
-                    </MenuLink>
-                  </li>
-                ))}
-              </ul>
-              <ul className="flex flex-wrap gap-2 px-3 pb-2 pt-2">
-                {menu.links.map((link) => (
-                  <li key={link.title}>
-                    <MenuLink
-                      href={link.href}
-                      onClick={closeMenus}
-                      className="inline-flex rounded-full bg-sand px-3 py-1.5 text-[13px] font-medium text-navy transition-colors hover:bg-navy/10"
-                    >
-                      {link.title}
-                    </MenuLink>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+                      {menu.label}
+                      <span className={`grid size-8 place-items-center rounded-full transition-colors ${open ? "bg-orange text-navy" : "bg-sand text-navy"}`}>
+                        <Chevron open={open} />
+                      </span>
+                    </button>
+                  </h2>
+                  <div id={sectionId} hidden={!open} className="pb-3">
+                    <ul className="grid gap-1">
+                      {menu.features.map((item) => (
+                        <li key={item.title}>
+                          <MenuLink
+                            href={item.href}
+                            onClick={closeMenus}
+                            className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-navy/5 focus-visible:bg-navy/5 focus-visible:outline-none"
+                          >
+                            <span className="relative size-12 shrink-0 overflow-hidden rounded-xl bg-navy/10">
+                              <Image src={item.image.src} alt="" fill sizes="48px" className="object-cover" />
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block text-[15px] font-semibold text-navy">{item.title}</span>
+                              <span className="block text-[13px] leading-snug text-navy/65">{item.detail}</span>
+                            </span>
+                          </MenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                    <ul className="mt-2 flex flex-wrap gap-2 px-2">
+                      {menu.links.filter((link) => !link.href.startsWith("/sign-in")).map((link) => (
+                        <li key={link.title}>
+                          <MenuLink
+                            href={link.href}
+                            onClick={closeMenus}
+                            className="inline-flex h-9 items-center rounded-full bg-sand px-3.5 text-[13px] font-semibold text-navy transition-colors hover:bg-navy/10"
+                          >
+                            {link.title}
+                          </MenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+          <div className="grid gap-3 border-t border-navy/10 bg-sand/60 p-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/sign-in?as=customer"
+                onClick={closeMenus}
+                className="flex h-12 items-center justify-center rounded-xl bg-orange text-[15px] font-semibold text-navy"
+              >
+                Book a truck
+              </Link>
+              <Link
+                href="/sign-in?as=vendor"
+                onClick={closeMenus}
+                className="flex h-12 items-center justify-center rounded-xl bg-navy text-[15px] font-semibold text-white"
+              >
+                List your truck
+              </Link>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <Link href="/sign-in" onClick={closeMenus} className="flex h-11 items-center px-2 text-[15px] font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
+                Sign in
+              </Link>
+              <div className="flex gap-2">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat on WhatsApp"
+                  className="grid size-11 place-items-center rounded-full bg-white text-[#25D366] shadow-[0_2px_8px_rgba(11,37,69,0.08)]"
+                >
+                  <WhatsAppIcon className="size-5" />
+                </a>
+                <a
+                  href={`mailto:${contactEmail}`}
+                  aria-label={`Email ${contactEmail}`}
+                  className="grid size-11 place-items-center rounded-full bg-white text-orange-ink shadow-[0_2px_8px_rgba(11,37,69,0.08)]"
+                >
+                  <MailIcon className="size-5" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>

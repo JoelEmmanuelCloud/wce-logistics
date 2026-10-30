@@ -132,6 +132,7 @@ test.describe("mobile navigation", () => {
     const menu = page.getByRole("button", { name: "Menu" });
     await menu.click();
     await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
+    await page.locator("header").getByRole("button", { name: "Company" }).click();
     await page.locator("header").getByRole("link", { name: /Become a vendor/ }).click();
     await expect(page).toHaveURL(/#vendors$/);
     await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
