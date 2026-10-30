@@ -28,7 +28,7 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
                   <PlusIcon className="size-5" />
                 </span>
               </summary>
-              <p className="max-w-[44em] pb-7 pr-16 text-[16px] leading-relaxed text-navy/75">{faq.answer}</p>
+              <p className="max-w-[44em] pb-7 sm:pr-16 text-[16px] leading-relaxed text-navy/75">{faq.answer}</p>
             </details>
           ))}
         </div>
