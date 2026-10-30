@@ -28,7 +28,7 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
         { title: "Check a price", href: "#estimate" },
         { title: "How booking works", href: "#how-it-works" },
         { title: "Common questions", href: "#faq" },
-        { title: "Sign in to book", href: "/sign-in" },
+        { title: "Book a truck", href: "/sign-in?as=customer" },
       ],
     },
     {
@@ -251,16 +251,21 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
             </ul>
           </nav>
 
-          <Link
-            href="/sign-in"
-            className="hidden h-10 shrink-0 items-center rounded-xl bg-white px-5 text-[15px] font-semibold text-navy transition-colors hover:bg-orange md:inline-flex"
-          >
-            Sign in
-          </Link>
+          <div className="hidden shrink-0 items-center gap-1 md:flex">
+            <Link href="/sign-in" className="flex h-10 items-center rounded-xl px-4 text-[15px] font-medium text-white transition-colors hover:bg-white/10">
+              Sign in
+            </Link>
+            <Link
+              href="/sign-in?as=customer"
+              className="flex h-10 items-center rounded-xl bg-orange px-5 text-[15px] font-semibold text-navy transition-colors hover:bg-white"
+            >
+              Book a truck
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Link href="/sign-in" className="flex h-10 items-center whitespace-nowrap rounded-xl bg-white px-3.5 text-sm font-semibold text-navy">
-              Sign in
+            <Link href="/sign-in?as=customer" className="flex h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-sm font-semibold text-navy">
+              Book a truck
             </Link>
             <button
               type="button"
@@ -287,6 +292,13 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
           hidden={!mobileOpen}
           className="absolute inset-x-0 top-full mt-2 max-h-[calc(100svh-96px)] overflow-y-auto rounded-2xl border border-white/40 bg-white/95 p-3 text-navy shadow-[0_24px_60px_rgba(11,37,69,0.35)] backdrop-blur-xl md:hidden"
         >
+          <Link
+            href="/sign-in"
+            onClick={closeMenus}
+            className="flex h-11 items-center justify-center rounded-xl border border-navy/15 text-[15px] font-semibold text-navy transition-colors hover:bg-navy/5"
+          >
+            Sign in
+          </Link>
           {menus.map((menu) => (
             <section key={menu.label} className="border-b border-navy/10 py-2 last:border-b-0">
               <h2 className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-[0.14em] text-orange-ink">{menu.label}</h2>
