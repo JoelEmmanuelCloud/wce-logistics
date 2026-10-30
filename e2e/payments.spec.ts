@@ -32,7 +32,7 @@ test.describe("payments", () => {
     test.slow();
     const shipper = await signInAs("customer", { fullName: "Amaka Paid" });
     const vendorUser = await createUser("vendor", "Paystack Vendor");
-    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 600, 2000);
+    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 600, 2_000_000);
 
     const paymentReference = await openCheckout(page, bookingId);
     expect(paymentReference).toMatch(new RegExp(`^${reference}-[A-Z2-9]{6}$`));
@@ -82,7 +82,7 @@ test.describe("payments", () => {
   test("the callback settles the payment when the webhook never arrives", async ({ page, sql, signInAs, createUser }) => {
     const shipper = await signInAs("customer", { fullName: "Callback Shipper" });
     const vendorUser = await createUser("vendor", "Callback Vendor");
-    const { bookingId } = await acceptedBooking(sql, vendorUser, shipper, 600, 2000);
+    const { bookingId } = await acceptedBooking(sql, vendorUser, shipper, 600, 2_000_000);
 
     const paymentReference = await openCheckout(page, bookingId);
     const response = await fetch(`http://127.0.0.1:${fakePaystackPort}/checkout/${encodeURIComponent(paymentReference)}/pay?webhook=skip`, { method: "POST", redirect: "manual" });
@@ -95,7 +95,7 @@ test.describe("payments", () => {
   test("an abandoned checkout leaves the booking payable", async ({ page, sql, signInAs, createUser }) => {
     const shipper = await signInAs("customer", { fullName: "Abandoned Shipper" });
     const vendorUser = await createUser("vendor", "Abandon Vendor");
-    const { bookingId } = await acceptedBooking(sql, vendorUser, shipper, 600, 2000);
+    const { bookingId } = await acceptedBooking(sql, vendorUser, shipper, 600, 2_000_000);
 
     await openCheckout(page, bookingId);
     await page.getByRole("button", { name: "Cancel payment" }).click();
@@ -121,7 +121,7 @@ test.describe("payments", () => {
     test.slow();
     const shipper = await signInAs("customer", { fullName: "Refund Shipper" });
     const vendorUser = await createUser("vendor", "Refund Vendor");
-    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 600, 2000);
+    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 600, 2_000_000);
 
     const paymentReference = await openCheckout(page, bookingId);
     await page.getByRole("button", { name: "Pay now" }).click();

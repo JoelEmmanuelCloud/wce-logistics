@@ -19,8 +19,11 @@ export async function openLaneRates(today: string): Promise<LaneRates> {
     .select({
       origin: schema.routes.originState,
       destination: schema.routes.destinationState,
-      ratePerKgKobo: schema.routes.ratePerKgKobo,
+      ratePerTonneKobo: schema.routes.ratePerTonneKobo,
       minimumChargeKobo: schema.routes.minimumChargeKobo,
+      loadingChargeKobo: schema.routes.loadingChargeKobo,
+      offloadingChargeKobo: schema.routes.offloadingChargeKobo,
+      tollChargeKobo: schema.routes.tollChargeKobo,
       remainingKg,
     })
     .from(schema.routes)
@@ -37,14 +40,21 @@ export async function openLaneRates(today: string): Promise<LaneRates> {
         eq(schema.vendorProfiles.verificationStatus, "verified"),
       ),
     )
-    .orderBy(asc(schema.routes.originState), asc(schema.routes.destinationState), asc(schema.routes.ratePerKgKobo))
+    .orderBy(asc(schema.routes.originState), asc(schema.routes.destinationState), asc(schema.routes.ratePerTonneKobo))
     .limit(MAX_OFFERS);
 
   const lanes = new Map<string, RouteLane>();
   for (const row of rows) {
     const key = `${row.origin}|${row.destination}`;
     const lane = lanes.get(key) ?? { origin: row.origin, destination: row.destination, offers: [] };
-    lane.offers.push({ ratePerKgKobo: row.ratePerKgKobo, minimumChargeKobo: row.minimumChargeKobo, remainingKg: Number(row.remainingKg) });
+    lane.offers.push({
+      ratePerTonneKobo: row.ratePerTonneKobo,
+      minimumChargeKobo: row.minimumChargeKobo,
+      loadingChargeKobo: row.loadingChargeKobo,
+      offloadingChargeKobo: row.offloadingChargeKobo,
+      tollChargeKobo: row.tollChargeKobo,
+      remainingKg: Number(row.remainingKg),
+    });
     lanes.set(key, lane);
   }
   return { minShipmentKg, lanes: [...lanes.values()] };

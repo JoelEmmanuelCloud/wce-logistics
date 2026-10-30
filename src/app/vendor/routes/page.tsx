@@ -49,10 +49,13 @@ export default async function VendorRoutesPage() {
                     {route.originState} to {route.destinationState}. Departs {formatDate(route.departureDate)}, about {formatTransit(route.transitHours)}. Truck {registrationNumber}.
                   </p>
                   <p className="mt-1 text-[14px] text-navy/70">
-                    {formatNaira(route.ratePerKgKobo)}/kg
+                    {formatNaira(route.ratePerTonneKobo)} per tonne
                     {route.minimumChargeKobo > 0 && `, minimum ${formatNaira(route.minimumChargeKobo)}`}
                     {route.dedicatedPriceKobo && `, whole truck ${formatNaira(route.dedicatedPriceKobo)}`}
                     {!route.allowsShared && ", whole truck only"}
+                    {route.loadingChargeKobo > 0 && `, loading ${formatNaira(route.loadingChargeKobo)}`}
+                    {route.offloadingChargeKobo > 0 && `, offloading ${formatNaira(route.offloadingChargeKobo)}`}
+                    {route.tollChargeKobo > 0 && `, tolls ${formatNaira(route.tollChargeKobo)}`}
                   </p>
                 </div>
                 <div>

@@ -4,7 +4,7 @@ export type LineItem = { label: string; amountKobo: number };
 
 export type Quote = {
   chargeableWeightKg: number;
-  ratePerKgKobo: number;
+  ratePerTonneKobo: number;
   lineItems: LineItem[];
   totalKobo: number;
 };
@@ -13,10 +13,31 @@ export type QuoteInput = {
   type: "shared" | "dedicated";
   weightKg: number;
   minWeightKg: number;
-  ratePerKgKobo: number;
+  ratePerTonneKobo: number;
   minimumChargeKobo: number;
   dedicatedPriceKobo: number | null;
+  loadingChargeKobo: number;
+  offloadingChargeKobo: number;
+  tollChargeKobo: number;
 };
+
+export const KG_PER_TONNE = 1000;
+
+export function transportKobo(weightKg: number, ratePerTonneKobo: number): number {
+  return Math.round((weightKg * ratePerTonneKobo) / KG_PER_TONNE);
+}
+
+function extraCharges(input: QuoteInput): LineItem[] {
+  return [
+    { label: "Loading", amountKobo: input.loadingChargeKobo },
+    { label: "Offloading", amountKobo: input.offloadingChargeKobo },
+    { label: "Tolls", amountKobo: input.tollChargeKobo },
+  ].filter((item) => item.amountKobo > 0);
+}
+
+function total(lineItems: LineItem[]): number {
+  return lineItems.reduce((sum, item) => sum + item.amountKobo, 0);
+}
 
 const naira = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const grouped = new Intl.NumberFormat("en-NG");
@@ -38,30 +59,39 @@ export function quoteFor(input: QuoteInput): Quote | null {
     if (!input.dedicatedPriceKobo || input.dedicatedPriceKobo <= 0) {
       return null;
     }
+    const lineItems = [{ label: "Dedicated truck for this trip", amountKobo: input.dedicatedPriceKobo }, ...extraCharges(input)];
     return {
       chargeableWeightKg: input.weightKg,
-      ratePerKgKobo: input.ratePerKgKobo,
-      lineItems: [{ label: "Dedicated truck for this trip", amountKobo: input.dedicatedPriceKobo }],
-      totalKobo: input.dedicatedPriceKobo,
+      ratePerTonneKobo: input.ratePerTonneKobo,
+      lineItems,
+      totalKobo: total(lineItems),
     };
   }
 
-  const baseKobo = input.weightKg * input.ratePerKgKobo;
+  const baseKobo = transportKobo(input.weightKg, input.ratePerTonneKobo);
   const lineItems: LineItem[] = [
-    { label: `Transport: ${grouped.format(input.weightKg)} kg at ${formatNaira(input.ratePerKgKobo)}/kg`, amountKobo: baseKobo },
+    { label: `Transport: ${grouped.format(input.weightKg)} kg at ${formatNaira(input.ratePerTonneKobo)} per tonne`, amountKobo: baseKobo },
   ];
   if (input.minimumChargeKobo > baseKobo) {
     lineItems.push({ label: "Minimum charge top-up", amountKobo: input.minimumChargeKobo - baseKobo });
   }
+  lineItems.push(...extraCharges(input));
   return {
     chargeableWeightKg: input.weightKg,
-    ratePerKgKobo: input.ratePerKgKobo,
+    ratePerTonneKobo: input.ratePerTonneKobo,
     lineItems,
-    totalKobo: lineItems.reduce((sum, item) => sum + item.amountKobo, 0),
+    totalKobo: total(lineItems),
   };
 }
 
-export type OpenOffer = { ratePerKgKobo: number; minimumChargeKobo: number; remainingKg: number };
+export type OpenOffer = {
+  ratePerTonneKobo: number;
+  minimumChargeKobo: number;
+  loadingChargeKobo: number;
+  offloadingChargeKobo: number;
+  tollChargeKobo: number;
+  remainingKg: number;
+};
 
 export type RouteLane = { origin: string; destination: string; offers: OpenOffer[] };
 
@@ -76,9 +106,12 @@ export function estimateRange(offers: OpenOffer[], weightKg: number, minWeightKg
       type: "shared",
       weightKg,
       minWeightKg,
-      ratePerKgKobo: offer.ratePerKgKobo,
+      ratePerTonneKobo: offer.ratePerTonneKobo,
       minimumChargeKobo: offer.minimumChargeKobo,
       dedicatedPriceKobo: null,
+      loadingChargeKobo: offer.loadingChargeKobo,
+      offloadingChargeKobo: offer.offloadingChargeKobo,
+      tollChargeKobo: offer.tollChargeKobo,
     });
     return quote ? [quote.totalKobo] : [];
   });

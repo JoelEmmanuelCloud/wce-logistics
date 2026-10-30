@@ -68,9 +68,12 @@ export const routeSchema = (minWeightKg: number) =>
       transitHours: wholeNumber("estimated transit time in hours", 1, 240),
       capacityKg: wholeNumber("capacity offered", minWeightKg, 100_000),
       allowsShared: z.enum(["on"]).optional().transform((value) => value === "on"),
-      ratePerKgKobo: requiredMoney("rate per kilogram", 0.01),
+      ratePerTonneKobo: requiredMoney("rate per tonne", 1),
       minimumChargeKobo: optionalMoney("minimum charge"),
       dedicatedPriceKobo: optionalMoney("price for the whole truck", 1),
+      loadingChargeKobo: optionalMoney("loading charge"),
+      offloadingChargeKobo: optionalMoney("offloading charge"),
+      tollChargeKobo: optionalMoney("toll charge"),
     })
     .superRefine((value, context) => {
       if (value.originState === value.destinationState && value.originCity.toLowerCase() === value.destinationCity.toLowerCase()) {
@@ -80,7 +83,13 @@ export const routeSchema = (minWeightKg: number) =>
         context.addIssue({ code: "custom", path: ["dedicatedPriceKobo"], message: "Set a whole-truck price, or allow shared loads." });
       }
     })
-    .transform((value) => ({ ...value, minimumChargeKobo: value.minimumChargeKobo ?? 0 }));
+    .transform((value) => ({
+      ...value,
+      minimumChargeKobo: value.minimumChargeKobo ?? 0,
+      loadingChargeKobo: value.loadingChargeKobo ?? 0,
+      offloadingChargeKobo: value.offloadingChargeKobo ?? 0,
+      tollChargeKobo: value.tollChargeKobo ?? 0,
+    }));
 
 export type RouteInput = z.infer<ReturnType<typeof routeSchema>>;
 

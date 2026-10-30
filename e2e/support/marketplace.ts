@@ -48,26 +48,26 @@ export async function createShipment(sql: postgres.Sql, customerId: string, weig
   return shipment.id;
 }
 
-export async function acceptedBooking(sql: postgres.Sql, vendorUser: TestUser, customer: TestUser, weightKg: number, ratePerKgKobo: number) {
+export async function acceptedBooking(sql: postgres.Sql, vendorUser: TestUser, customer: TestUser, weightKg: number, ratePerTonneKobo: number) {
   const [from, to] = corridor();
   const { vendorId, truckId } = await verifiedVendorWithTruck(sql, vendorUser);
   const [route] = await sql<{ id: string }[]>`
-    insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, reserved_kg, rate_per_kg_kobo, minimum_charge_kobo)
-    values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(6)}, 30, 5000, ${weightKg}, ${ratePerKgKobo}, 0)
+    insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, reserved_kg, rate_per_tonne_kobo, minimum_charge_kobo)
+    values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(6)}, 30, 5000, ${weightKg}, ${ratePerTonneKobo}, 0)
     returning id`;
   const shipmentId = await createShipment(sql, customer.id, weightKg, lagosDate(5), from, to);
-  const totalKobo = weightKg * ratePerKgKobo;
+  const totalKobo = Math.round((weightKg * ratePerTonneKobo) / 1000);
   const reference = bookingReference();
   const [booking] = await sql<{ id: string }[]>`
-    insert into bookings (reference, shipment_id, route_id, truck_id, vendor_id, customer_id, type, status, reserved_kg, chargeable_weight_kg, rate_per_kg_kobo, line_items, total_kobo, response_due_at, responded_at)
-    values (${reference}, ${shipmentId}, ${route.id}, ${truckId}, ${vendorId}, ${customer.id}, 'shared', 'awaiting_payment', ${weightKg}, ${weightKg}, ${ratePerKgKobo}, ${sql.json([{ label: `Transport: ${weightKg} kg`, amountKobo: totalKobo }])}, ${totalKobo}, now() + interval '1 day', now())
+    insert into bookings (reference, shipment_id, route_id, truck_id, vendor_id, customer_id, type, status, reserved_kg, chargeable_weight_kg, rate_per_tonne_kobo, line_items, total_kobo, response_due_at, responded_at)
+    values (${reference}, ${shipmentId}, ${route.id}, ${truckId}, ${vendorId}, ${customer.id}, 'shared', 'awaiting_payment', ${weightKg}, ${weightKg}, ${ratePerTonneKobo}, ${sql.json([{ label: `Transport: ${weightKg} kg`, amountKobo: totalKobo }])}, ${totalKobo}, now() + interval '1 day', now())
     returning id`;
   await sql`update shipments set status = 'booked' where id = ${shipmentId}`;
   return { bookingId: booking.id, reference, totalKobo, vendorId };
 }
 
-export async function paidBooking(sql: postgres.Sql, vendorUser: TestUser, customer: TestUser, weightKg = 600, ratePerKgKobo = 2000) {
-  const booking = await acceptedBooking(sql, vendorUser, customer, weightKg, ratePerKgKobo);
+export async function paidBooking(sql: postgres.Sql, vendorUser: TestUser, customer: TestUser, weightKg = 600, ratePerTonneKobo = 2_000_000) {
+  const booking = await acceptedBooking(sql, vendorUser, customer, weightKg, ratePerTonneKobo);
   const fee = Math.round(booking.totalKobo / 10);
   const [payment] = await sql<{ id: string }[]>`
     insert into payments (booking_id, provider, reference, provider_transaction_id, amount_kobo, status, channel, platform_fee_kobo, vendor_payable_kobo, paid_at)
