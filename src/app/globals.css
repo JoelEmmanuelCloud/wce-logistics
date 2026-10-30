@@ -94,6 +94,21 @@ body {
   animation: rise-in 0.35s ease-out both;
 }
 
+.hero-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.12em 0.12em 0.04em calc(0.12em + var(--indent, 0em));
+  margin: -0.12em -0.12em -0.04em;
+}
+
+.hero-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 2px;
+  padding-bottom: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -112,8 +127,12 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .hero-line {
-    animation: hero-settle 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--i, 0) * 90ms);
+    animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(100ms + var(--i, 0) * 120ms);
+  }
+
+  .hero-underline {
+    animation: hero-underline 0.7s cubic-bezier(0.65, 0, 0.35, 1) 1.15s both;
   }
 
   .hero-fade {
@@ -141,9 +160,15 @@ body {
   }
 }
 
-@keyframes hero-settle {
+@keyframes hero-rise {
   from {
-    transform: translateY(0.3em);
+    transform: translateY(105%);
+  }
+}
+
+@keyframes hero-underline {
+  from {
+    background-size: 0% 2px;
   }
 }
 

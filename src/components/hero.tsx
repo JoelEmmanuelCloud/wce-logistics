@@ -25,14 +25,20 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
 
       <div className="mt-[clamp(32px,7vh,88px)] grid flex-1 content-start gap-10 lg:min-h-0 lg:content-stretch lg:grid-cols-[1fr_minmax(340px,31%)] lg:gap-6">
         <h1 className="font-display whitespace-nowrap uppercase leading-[0.86] text-white text-[clamp(60px,min(17.5vh,10.8vw),220px)]">
-          <span className="hero-line block [--i:0]">Across</span>
-          <span className="hero-line block pl-[0.62em] text-orange [--i:1]">Every State</span>
-          <span className="hero-line block [--i:2]">On Demand</span>
+          <span className="hero-mask">
+            <span className="hero-line block [--i:0]">Across</span>
+          </span>
+          <span className="hero-mask [--indent:0.62em]">
+            <span className="hero-line block text-orange [--i:1]">Every State</span>
+          </span>
+          <span className="hero-mask">
+            <span className="hero-line block [--i:2]">On Demand</span>
+          </span>
         </h1>
 
         <div className="flex flex-col lg:min-h-0 lg:pt-1">
           <p className="hero-fade max-w-[22em] rounded-2xl border border-white/15 bg-navy/45 px-5 py-4 text-[clamp(18px,min(2.8vh,1.6vw),26px)] leading-[1.3] text-white backdrop-blur-md [--d:200ms]">
-            Built for Nigeria. Every vendor and truck <span className="text-orange">checked before it moves.</span>
+            Built for Nigeria. Every vendor and truck <span className="hero-underline text-orange">checked before it moves.</span>
           </p>
           <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-520px)*1.25))] lg:max-w-none" />
         </div>
