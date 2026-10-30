@@ -1,6 +1,7 @@
 import { cacheLife } from "next/cache";
 import Link from "next/link";
-import { ContactButton, WhatsAppButton } from "@/components/contact-button";
+import { ArrowButton, GlassButton } from "@/components/action-buttons";
+import { ChatIcon } from "@/components/line-icons";
 import { formatPhone } from "@/lib/phone";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
@@ -35,8 +36,11 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
               Tell us what you need to move and where. We will connect you with a verified truck.
             </p>
             <div className="flex flex-wrap items-center gap-3 lg:justify-end">
-              <WhatsAppButton href={whatsappUrl} />
-              <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+              <GlassButton href={whatsappUrl}>
+                <ChatIcon className="size-6" />
+                Chat on WhatsApp
+              </GlassButton>
+              <ArrowButton href={`mailto:${contactEmail}`} label="Get in touch" />
             </div>
           </div>
         </div>
