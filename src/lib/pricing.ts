@@ -61,7 +61,34 @@ export function quoteFor(input: QuoteInput): Quote | null {
   };
 }
 
-const compactNaira = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", notation: "compact", maximumFractionDigits: 1 });
+export type OpenOffer = { ratePerKgKobo: number; minimumChargeKobo: number; remainingKg: number };
+
+export type RouteLane = { origin: string; destination: string; offers: OpenOffer[] };
+
+export type Estimate = { lowestKobo: number; highestKobo: number; trips: number };
+
+export function estimateRange(offers: OpenOffer[], weightKg: number, minWeightKg: number): Estimate | null {
+  const totals = offers.flatMap((offer) => {
+    if (offer.remainingKg < weightKg) {
+      return [];
+    }
+    const quote = quoteFor({
+      type: "shared",
+      weightKg,
+      minWeightKg,
+      ratePerKgKobo: offer.ratePerKgKobo,
+      minimumChargeKobo: offer.minimumChargeKobo,
+      dedicatedPriceKobo: null,
+    });
+    return quote ? [quote.totalKobo] : [];
+  });
+  if (totals.length === 0) {
+    return null;
+  }
+  return { lowestKobo: Math.min(...totals), highestKobo: Math.max(...totals), trips: totals.length };
+}
+
+const compactNaira =new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", notation: "compact", maximumFractionDigits: 1 });
 
 export function formatCompactNaira(kobo: number): string {
   return compactNaira.format(kobo / KOBO_PER_NAIRA);

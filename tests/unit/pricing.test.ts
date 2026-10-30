@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatNaira, nairaToKobo, quoteFor } from "@/lib/pricing";
+import { estimateRange, formatNaira, nairaToKobo, quoteFor } from "@/lib/pricing";
 
 const shared = { type: "shared" as const, minWeightKg: 50, ratePerKgKobo: nairaToKobo(20), minimumChargeKobo: 0, dedicatedPriceKobo: null };
 
@@ -39,5 +39,39 @@ describe("formatNaira", () => {
   it("formats whole and fractional amounts", () => {
     expect(formatNaira(1_200_000)).toBe("₦12,000");
     expect(formatNaira(665_667)).toBe("₦6,656.67");
+  });
+});
+
+describe("estimateRange", () => {
+  const offer = (rateNaira: number, remainingKg: number, minimumNaira = 0) => ({
+    ratePerKgKobo: nairaToKobo(rateNaira),
+    minimumChargeKobo: nairaToKobo(minimumNaira),
+    remainingKg,
+  });
+
+  it("returns the lowest and highest totals across open trips", () => {
+    expect(estimateRange([offer(20, 5_000), offer(35, 5_000), offer(25, 5_000)], 500, 50)).toEqual({
+      lowestKobo: nairaToKobo(10_000),
+      highestKobo: nairaToKobo(17_500),
+      trips: 3,
+    });
+  });
+
+  it("skips trips without room for the load", () => {
+    expect(estimateRange([offer(20, 400), offer(30, 2_000)], 500, 50)).toEqual({
+      lowestKobo: nairaToKobo(15_000),
+      highestKobo: nairaToKobo(15_000),
+      trips: 1,
+    });
+  });
+
+  it("applies each trip's minimum charge", () => {
+    expect(estimateRange([offer(20, 5_000, 4_000)], 100, 50)?.lowestKobo).toBe(nairaToKobo(4_000));
+  });
+
+  it("returns null when no trip can take the load or the weight is below the minimum", () => {
+    expect(estimateRange([offer(20, 100)], 500, 50)).toBeNull();
+    expect(estimateRange([offer(20, 5_000)], 40, 50)).toBeNull();
+    expect(estimateRange([], 500, 50)).toBeNull();
   });
 });
