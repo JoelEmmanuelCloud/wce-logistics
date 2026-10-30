@@ -12,6 +12,7 @@ export function StructuredData() {
     slogan: site.tagline,
     description: site.description,
     email: site.contactEmail,
+    telephone: site.contactWhatsApp,
     areaServed: { "@type": "Country", name: "Nigeria" },
     makesOffer: SERVICES.map((service) => ({
       "@type": "Offer",
