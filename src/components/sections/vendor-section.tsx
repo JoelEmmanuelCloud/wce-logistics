@@ -21,7 +21,7 @@ export function VendorSection() {
             confirmed, paid bookings.
           </p>
           <Link
-            href="/sign-in"
+            href="/sign-in?as=vendor"
             className="group mt-10 inline-flex items-center gap-4 rounded-full bg-navy py-2 pl-7 pr-2 text-[17px] font-medium text-white transition-colors hover:bg-[#13335c]"
           >
             Register as a vendor

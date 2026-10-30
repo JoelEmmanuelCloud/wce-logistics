@@ -130,7 +130,7 @@ function EstimateFrame({ children }: { children: ReactNode }) {
 function BookLink() {
   return (
     <Link
-      href="/sign-in"
+      href="/sign-in?as=customer"
       className="group inline-flex h-12 w-fit items-center gap-3 rounded-full bg-orange pl-6 pr-1.5 text-[16px] font-semibold text-navy transition-colors hover:bg-white"
     >
       Sign in to book
