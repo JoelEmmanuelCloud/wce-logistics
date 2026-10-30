@@ -1,5 +1,6 @@
 import { cacheLife } from "next/cache";
-import { ContactButton } from "@/components/contact-button";
+import { ContactButton, WhatsAppButton } from "@/components/contact-button";
+import { formatPhone } from "@/lib/phone";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
 
@@ -19,7 +20,7 @@ async function Copyright() {
   return <p>&copy; {new Date().getFullYear()} WCE Logistics. All rights reserved.</p>;
 }
 
-export function SiteFooter({ contactEmail }: { contactEmail: string }) {
+export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { contactEmail: string; contactWhatsApp: string; whatsappUrl: string }) {
   return (
     <footer className="bg-navy text-white">
       <div className="mx-auto w-full max-w-[1760px] px-[clamp(20px,3.2vw,56px)] pt-[clamp(72px,9vw,136px)]">
@@ -32,7 +33,10 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
             <p className="max-w-[24em] text-[clamp(17px,1.35vw,21px)] leading-relaxed text-white/75 lg:text-right">
               Tell us what you need to move and where. We will connect you with a verified truck.
             </p>
-            <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+            <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+              <WhatsAppButton href={whatsappUrl} />
+              <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+            </div>
           </div>
         </div>
 
@@ -74,6 +78,14 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
               className="mt-5 inline-block break-all text-[15px] text-white/80 transition-colors hover:text-white"
             >
               {contactEmail}
+            </a>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 block text-[15px] text-white/80 transition-colors hover:text-white"
+            >
+              WhatsApp {formatPhone(contactWhatsApp)}
             </a>
           </div>
         </div>

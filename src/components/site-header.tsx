@@ -12,7 +12,7 @@ type Feature = { title: string; detail: string; href: string; image: SiteImage }
 type QuickLink = { title: string; href: string };
 type Menu = { label: string; intro: string; features: Feature[]; linksTitle: string; links: QuickLink[] };
 
-function buildMenus(contactEmail: string): Menu[] {
+function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
   return [
     {
       label: "Services",
@@ -59,6 +59,7 @@ function buildMenus(contactEmail: string): Menu[] {
       ],
       linksTitle: "Get in touch",
       links: [
+        { title: "Chat on WhatsApp", href: whatsappUrl },
         { title: contactEmail, href: `mailto:${contactEmail}` },
         { title: "Questions and answers", href: "#faq" },
         { title: "Sign in", href: "/sign-in" },
@@ -82,8 +83,16 @@ function MenuLink({ href, onClick, className, children, ...events }: {
       </Link>
     );
   }
+  const external = href.startsWith("https://");
   return (
-    <a href={href} onClick={onClick} className={className} {...events}>
+    <a
+      href={href}
+      onClick={onClick}
+      className={className}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      {...events}
+    >
       {children}
     </a>
   );
@@ -170,8 +179,8 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export function SiteHeader({ contactEmail }: { contactEmail: string }) {
-  const menus = buildMenus(contactEmail);
+export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string; whatsappUrl: string }) {
+  const menus = buildMenus(contactEmail, whatsappUrl);
   const [menuIndex, setMenuIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

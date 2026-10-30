@@ -1,12 +1,12 @@
 import Image from "next/image";
-import { ContactButton } from "@/components/contact-button";
+import { ContactButton, WhatsAppButton } from "@/components/contact-button";
 import { CargoIcon } from "@/components/fleet-icons";
 import { NigeriaRouteMap } from "@/components/nigeria-route-map";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/reserve/9JMZhTL8T7ulzIoD2E78_2010_02280041.JPG";
 
-export function Hero({ contactEmail }: { contactEmail: string }) {
+export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; whatsappUrl: string }) {
   return (
     <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-navy px-[clamp(20px,3.2vw,56px)] pb-[clamp(20px,3.4vh,44px)] pt-[calc(clamp(10px,1.6vh,16px)+58px)] lg:h-svh lg:min-h-[680px]">
       <Image
@@ -52,7 +52,10 @@ export function Hero({ contactEmail }: { contactEmail: string }) {
             <CargoIcon className="w-[72%]" />
           </span>
         </div>
-        <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+        <div className="flex flex-wrap items-center gap-3">
+          <WhatsAppButton href={whatsappUrl} />
+          <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+        </div>
       </div>
     </section>
   );
