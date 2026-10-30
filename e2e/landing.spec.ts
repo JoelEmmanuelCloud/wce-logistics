@@ -15,10 +15,22 @@ test.describe("landing page", () => {
     expect(errors).toEqual([]);
   });
 
-  test("header sign-in link opens the sign-in page", async ({ page }) => {
+  test("header sign-in link opens the sign-in page", async ({ page, isMobile }) => {
     await page.goto("/");
+    if (isMobile) {
+      await page.getByRole("button", { name: "Menu" }).click();
+    }
     await page.locator("header").getByRole("link", { name: "Sign in" }).filter({ visible: true }).click();
     await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome to WCE Logistics");
+  });
+
+  test("hero buttons start sign-up as a shipper or a vendor", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator("main > section").first();
+    await expect(hero.getByRole("link", { name: "Book a truck" })).toHaveAttribute("href", "/sign-in?as=customer");
+    await hero.getByRole("link", { name: "List your truck" }).click();
+    await expect(page).toHaveURL(/\/sign-in\?as=vendor$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome to WCE Logistics");
   });
 
@@ -120,6 +132,7 @@ test.describe("mobile navigation", () => {
     const menu = page.getByRole("button", { name: "Menu" });
     await menu.click();
     await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
+    await page.locator("header").getByRole("button", { name: "Company" }).click();
     await page.locator("header").getByRole("link", { name: /Become a vendor/ }).click();
     await expect(page).toHaveURL(/#vendors$/);
     await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");

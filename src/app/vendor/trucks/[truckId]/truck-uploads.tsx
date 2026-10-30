@@ -8,7 +8,7 @@ import { Field, TextInput } from "@/components/ui/field";
 import { initialFormState } from "@/lib/form-state";
 
 const FILE_INPUT =
-  "block w-full text-[14px] text-navy file:mr-4 file:rounded-md file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]";
+  "block w-full text-[14px] text-navy file:mr-4 file:rounded-xl file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]";
 
 export function TruckDocumentUpload({ truckId, type, label, expires }: { truckId: string; type: string; label: string; expires: boolean }) {
   const [state, action] = useActionState(uploadTruckDocumentAction, initialFormState);

@@ -40,7 +40,7 @@ export default async function VendorDriversPage() {
               <li key={driver.id}>
                 <Link
                   href={`/vendor/drivers/${driver.id}`}
-                  className="flex h-full flex-col gap-4 rounded-lg border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+                  className="flex h-full flex-col gap-4 rounded-2xl border border-navy/10 bg-white p-6 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-[19px] font-semibold text-navy">{driver.fullName}</p>

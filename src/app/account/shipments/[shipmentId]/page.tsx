@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { RatingSummary } from "@/components/reviews/star-rating";
 import { Alert } from "@/components/ui/alert";
@@ -29,7 +30,8 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
 
   return (
     <>
-      <Link href="/account/shipments" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/account/shipments" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to shipments
       </Link>
       <PageHeader
@@ -60,7 +62,7 @@ export default async function ShipmentPage({ params }: PageProps<"/account/shipm
               ) : (
                 <ul className="grid gap-4">
                   {offers.map((offer) => (
-                    <li key={offer.route.id} className="grid gap-5 rounded-lg border border-navy/10 bg-white p-6 lg:grid-cols-[1.5fr_1fr] lg:items-center">
+                    <li key={offer.route.id} className="grid gap-5 rounded-2xl border border-navy/10 bg-white p-6 lg:grid-cols-[1.5fr_1fr] lg:items-center">
                       <div>
                         <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-navy/70">Departs {formatDate(offer.route.departureDate)}</p>
                         <p className="mt-1 text-[18px] font-semibold text-navy">

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { ComponentType } from "react";
 import { BusIcon, ExcavatorIcon, TruckIcon } from "@/components/fleet-icons";
-import { ClockIcon } from "@/components/line-icons";
+import { ArrowUpRightIcon, ClockIcon } from "@/components/line-icons";
 import { DisplayHeading, Section } from "@/components/section";
 import { IMAGES } from "@/data/images";
 import { SERVICES, type ServiceKey } from "@/data/landing";
@@ -94,6 +94,13 @@ export function ServicesSection() {
                     </li>
                   ))}
                 </ul>
+                <a
+                  href="#estimate"
+                  className="mt-7 inline-flex items-center gap-2 text-[15px] font-semibold underline decoration-current/30 decoration-2 underline-offset-[6px] transition-[text-decoration-color] hover:decoration-current"
+                >
+                  Check a price
+                  <ArrowUpRightIcon className="size-4" />
+                </a>
               </div>
             </li>
           );

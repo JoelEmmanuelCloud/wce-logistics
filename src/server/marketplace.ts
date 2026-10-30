@@ -92,9 +92,12 @@ export async function createRoute(vendorId: string, actorId: string, input: Rout
         transitHours: input.transitHours,
         capacityKg: input.capacityKg,
         allowsShared: input.allowsShared,
-        ratePerKgKobo: input.ratePerKgKobo,
+        ratePerTonneKobo: input.ratePerTonneKobo,
         minimumChargeKobo: input.minimumChargeKobo,
         dedicatedPriceKobo: input.dedicatedPriceKobo,
+        loadingChargeKobo: input.loadingChargeKobo,
+        offloadingChargeKobo: input.offloadingChargeKobo,
+        tollChargeKobo: input.tollChargeKobo,
       })
       .returning();
     await recordAudit(
@@ -193,9 +196,12 @@ export async function searchOffers(shipment: Shipment) {
         type: shipment.bookingType,
         weightKg: shipment.weightKg,
         minWeightKg: Math.min(minShipmentKg, shipment.weightKg),
-        ratePerKgKobo: row.route.ratePerKgKobo,
+        ratePerTonneKobo: row.route.ratePerTonneKobo,
         minimumChargeKobo: row.route.minimumChargeKobo,
         dedicatedPriceKobo: row.route.dedicatedPriceKobo,
+        loadingChargeKobo: row.route.loadingChargeKobo,
+        offloadingChargeKobo: row.route.offloadingChargeKobo,
+        tollChargeKobo: row.route.tollChargeKobo,
       });
       return quote ? [{ ...row, remainingKg: row.route.capacityKg - row.route.reservedKg, quote }] : [];
     })
@@ -246,9 +252,12 @@ export async function requestBooking(customerId: string, shipmentId: string, rou
       type: shipment.bookingType,
       weightKg: shipment.weightKg,
       minWeightKg: Math.min(settings.minShipmentKg, shipment.weightKg),
-      ratePerKgKobo: route.ratePerKgKobo,
+      ratePerTonneKobo: route.ratePerTonneKobo,
       minimumChargeKobo: route.minimumChargeKobo,
       dedicatedPriceKobo: route.dedicatedPriceKobo,
+      loadingChargeKobo: route.loadingChargeKobo,
+      offloadingChargeKobo: route.offloadingChargeKobo,
+      tollChargeKobo: route.tollChargeKobo,
     });
     if (!quote) {
       throw new MarketplaceError("We could not price this trip. Choose another offer.");
@@ -272,7 +281,7 @@ export async function requestBooking(customerId: string, shipmentId: string, rou
         type: shipment.bookingType,
         reservedKg,
         chargeableWeightKg: quote.chargeableWeightKg,
-        ratePerKgKobo: quote.ratePerKgKobo,
+        ratePerTonneKobo: quote.ratePerTonneKobo,
         lineItems: quote.lineItems,
         totalKobo: quote.totalKobo,
         responseDueAt: sql`now() + make_interval(hours => ${settings.responseWindowHours})`,

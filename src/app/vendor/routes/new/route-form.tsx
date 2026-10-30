@@ -102,14 +102,32 @@ export function RouteForm({ trucks, minDate, maxDate }: { trucks: RouteTruckOpti
             Accept shared loads from several shippers
           </label>
           <div className="grid gap-6 md:grid-cols-3">
-            <Field id="ratePerKgKobo" label="Rate per kg" required hint="Charged on the shipment weight." errors={errors.ratePerKgKobo}>
-              <TextInput id="ratePerKgKobo" inputMode="decimal" placeholder="25" defaultValue={value("ratePerKgKobo")} hasHint errors={errors.ratePerKgKobo} />
+            <Field id="ratePerTonneKobo" label="Rate per tonne" required hint="Charged on the shipment weight. ₦80,000 per tonne is ₦80 per kg." errors={errors.ratePerTonneKobo}>
+              <TextInput id="ratePerTonneKobo" inputMode="decimal" placeholder="80000" defaultValue={value("ratePerTonneKobo")} hasHint errors={errors.ratePerTonneKobo} />
             </Field>
             <Field id="minimumChargeKobo" label="Minimum charge" hint="Smallest amount for any shared load." errors={errors.minimumChargeKobo}>
               <TextInput id="minimumChargeKobo" inputMode="decimal" placeholder="5000" defaultValue={value("minimumChargeKobo")} hasHint errors={errors.minimumChargeKobo} />
             </Field>
             <Field id="dedicatedPriceKobo" label="Whole-truck price" hint="Leave empty to offer shared loads only." errors={errors.dedicatedPriceKobo}>
               <TextInput id="dedicatedPriceKobo" inputMode="decimal" placeholder="450000" defaultValue={value("dedicatedPriceKobo")} hasHint errors={errors.dedicatedPriceKobo} />
+            </Field>
+          </div>
+        </fieldset>
+
+        <fieldset className="grid gap-4">
+          <legend className="text-[14px] font-semibold text-navy">Extra charges per booking</legend>
+          <p className="-mt-2 text-[13px] leading-snug text-navy/70">
+            Added to every booking on this trip and shown to the shipper as separate lines. Leave them empty if they are already in your rate.
+          </p>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Field id="loadingChargeKobo" label="Loading" errors={errors.loadingChargeKobo}>
+              <TextInput id="loadingChargeKobo" inputMode="decimal" placeholder="3000" defaultValue={value("loadingChargeKobo")} errors={errors.loadingChargeKobo} />
+            </Field>
+            <Field id="offloadingChargeKobo" label="Offloading" errors={errors.offloadingChargeKobo}>
+              <TextInput id="offloadingChargeKobo" inputMode="decimal" placeholder="3000" defaultValue={value("offloadingChargeKobo")} errors={errors.offloadingChargeKobo} />
+            </Field>
+            <Field id="tollChargeKobo" label="Tolls" errors={errors.tollChargeKobo}>
+              <TextInput id="tollChargeKobo" inputMode="decimal" placeholder="2000" defaultValue={value("tollChargeKobo")} errors={errors.tollChargeKobo} />
             </Field>
           </div>
         </fieldset>

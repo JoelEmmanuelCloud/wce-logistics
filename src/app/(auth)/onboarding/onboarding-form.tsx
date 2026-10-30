@@ -6,13 +6,14 @@ import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/field";
 import { fieldsKey, initialFormState, valueOf } from "@/lib/form-state";
+import type { SignUpRole } from "@/server/auth/dal";
 
 const ROLES = [
   { value: "customer", title: "I want to ship goods", detail: "Book verified trucks for interstate loads from 50 kg." },
   { value: "vendor", title: "I own or manage trucks", detail: "List your trucks and routes, and receive paid bookings." },
 ] as const;
 
-export function OnboardingForm() {
+export function OnboardingForm({ defaultRole }: { defaultRole: SignUpRole | null }) {
   const [state, action] = useActionState(completeOnboardingAction, initialFormState);
   const roleErrors = state.fieldErrors?.role;
 
@@ -26,13 +27,13 @@ export function OnboardingForm() {
         {ROLES.map((role) => (
           <label
             key={role.value}
-            className="flex cursor-pointer gap-4 rounded-md border border-navy/15 bg-white p-4 transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
+            className="flex cursor-pointer gap-4 rounded-xl border border-navy/15 bg-white p-4 transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
           >
             <input
               type="radio"
               name="role"
               value={role.value}
-              defaultChecked={valueOf(state.values, "role", "") === role.value}
+              defaultChecked={valueOf(state.values, "role", defaultRole ?? "") === role.value}
               className="mt-1 size-4 accent-[#B84A00]"
               required
             />

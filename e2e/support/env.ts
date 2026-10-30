@@ -25,6 +25,7 @@ export const testEnv = {
   DATABASE_URL: testUrl.toString(),
   SITE_URL: `http://localhost:${e2ePort}`,
   CONTACT_EMAIL: "support@example.com",
+  CONTACT_WHATSAPP: "+2348031234567",
   EMAIL_PROVIDER: "resend",
   EMAIL_FROM: "WCE Logistics <noreply@example.com>",
   RESEND_API_KEY: "re_e2e_test_key",

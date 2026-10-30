@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { confirmReceiptAction, submitReviewAction } from "@/app/account/bookings/actions";
 import { customerCancelBookingAction } from "@/app/account/shipments/actions";
@@ -57,7 +58,8 @@ export default async function CustomerBookingPage({ params, searchParams }: Page
 
   return (
     <>
-      <Link href="/account/bookings" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/account/bookings" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to bookings
       </Link>
       <BookingHeader detail={detail} />

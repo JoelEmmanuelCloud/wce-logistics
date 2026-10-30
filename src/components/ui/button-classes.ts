@@ -16,5 +16,5 @@ export type ButtonVariant = keyof typeof VARIANTS;
 export type ButtonSize = keyof typeof SIZES;
 
 export function buttonClasses(variant: ButtonVariant = "primary", size: ButtonSize = "md", className = ""): string {
-  return `inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-55 ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
+  return `inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-55 ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
 }

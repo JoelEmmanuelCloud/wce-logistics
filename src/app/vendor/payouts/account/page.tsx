@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { redirect } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
@@ -35,7 +36,8 @@ export default async function PayoutAccountPage() {
 
   return (
     <>
-      <Link href="/vendor/payouts" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/vendor/payouts" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to earnings
       </Link>
       <PageHeader

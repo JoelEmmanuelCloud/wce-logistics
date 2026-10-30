@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { ArrowUpRightIcon } from "@/components/line-icons";
 import { Card, CardHeader, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatDateTime, TRUCK_STATUS, VERIFICATION_STATUS } from "@/lib/labels";
@@ -9,16 +11,34 @@ import { requireRole } from "@/server/auth/dal";
 export const metadata: Metadata = { title: { absolute: "Overview | WCE Logistics admin" } };
 
 function Stat({ label, value, href, tone = "default" }: { label: string; value: number; href: string; tone?: "default" | "attention" }) {
+  const waiting = tone === "attention" && value > 0;
   return (
     <Link
       href={href}
-      className={`rounded-lg border p-5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange ${
-        tone === "attention" && value > 0 ? "border-navy/40 bg-white hover:border-navy" : "border-navy/10 bg-white hover:border-navy/30"
+      className={`group flex flex-col justify-between gap-4 rounded-2xl border p-5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange ${
+        waiting ? "border-orange/60 bg-orange/[0.06] hover:border-orange" : "border-navy/10 bg-white hover:border-navy/30"
       }`}
     >
-      <p className="text-[13px] font-semibold text-navy/70">{label}</p>
-      <p className="mt-2 font-display text-[44px] leading-none text-navy">{value}</p>
+      <span className="flex items-start justify-between gap-3">
+        <span className="text-[13px] font-semibold text-navy/70">{label}</span>
+        <ArrowUpRightIcon className="size-4 shrink-0 text-navy/35 transition-[color,translate] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-navy" />
+      </span>
+      <span className="flex items-end justify-between gap-3">
+        <span className={`font-display text-[44px] leading-none ${waiting ? "text-orange-ink" : "text-navy"}`}>{value}</span>
+        {tone === "attention" && (
+          <span className={`text-[12px] font-semibold ${waiting ? "text-orange-ink" : "text-navy/50"}`}>{waiting ? "Needs review" : "All clear"}</span>
+        )}
+      </span>
     </Link>
+  );
+}
+
+function StatGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="mt-8 first:mt-0">
+      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-navy/60">{title}</h2>
+      {children}
+    </section>
   );
 }
 
@@ -33,18 +53,24 @@ export default async function AdminOverviewPage() {
   return (
     <>
       <PageHeader title="Overview" description="Review queues and the health of the vendor network." />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat label="Bookings awaiting payment" value={stats.bookingsAwaitingPayment} href="/admin/bookings?status=payment" tone="attention" />
-        <Stat label="Bookings awaiting vendor" value={stats.bookingsAwaitingVendor} href="/admin/bookings?status=pending" />
-        <Stat label="Confirmed bookings" value={stats.bookingsConfirmed} href="/admin/bookings?status=active" />
-        <Stat label="Vendors awaiting review" value={stats.vendorsAwaiting} href="/admin/vendors?status=awaiting" tone="attention" />
-        <Stat label="Trucks awaiting review" value={stats.trucksAwaiting} href="/admin/trucks?status=awaiting" tone="attention" />
-        <Stat label="Documents expiring in 30 days" value={stats.documentsExpiringSoon} href="/admin/trucks?status=active" tone="attention" />
-        <Stat label="Trucks with expired documents" value={stats.trucksExpired} href="/admin/trucks?status=expired" tone="attention" />
-        <Stat label="Verified vendors" value={stats.vendorsVerified} href="/admin/vendors?status=verified" />
-        <Stat label="Active trucks" value={stats.trucksActive} href="/admin/trucks?status=active" />
-        <Stat label="Suspended vendors" value={stats.vendorsSuspended} href="/admin/vendors?status=suspended" />
-      </div>
+      <StatGroup title="Needs your attention">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <Stat label="Vendors awaiting review" value={stats.vendorsAwaiting} href="/admin/vendors?status=awaiting" tone="attention" />
+          <Stat label="Trucks awaiting review" value={stats.trucksAwaiting} href="/admin/trucks?status=awaiting" tone="attention" />
+          <Stat label="Bookings awaiting payment" value={stats.bookingsAwaitingPayment} href="/admin/bookings?status=payment" tone="attention" />
+          <Stat label="Bookings awaiting vendor" value={stats.bookingsAwaitingVendor} href="/admin/bookings?status=pending" tone="attention" />
+          <Stat label="Documents expiring in 30 days" value={stats.documentsExpiringSoon} href="/admin/trucks?status=active" tone="attention" />
+          <Stat label="Trucks with expired documents" value={stats.trucksExpired} href="/admin/trucks?status=expired" tone="attention" />
+        </div>
+      </StatGroup>
+      <StatGroup title="Network">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+          <Stat label="Confirmed bookings" value={stats.bookingsConfirmed} href="/admin/bookings?status=active" />
+          <Stat label="Verified vendors" value={stats.vendorsVerified} href="/admin/vendors?status=verified" />
+          <Stat label="Active trucks" value={stats.trucksActive} href="/admin/trucks?status=active" />
+          <Stat label="Suspended vendors" value={stats.vendorsSuspended} href="/admin/vendors?status=suspended" />
+        </div>
+      </StatGroup>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-2">
         <Card>

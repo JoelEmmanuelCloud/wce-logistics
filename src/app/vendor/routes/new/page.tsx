@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { redirect } from "next/navigation";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card, EmptyState, PageHeader } from "@/components/ui/card";
@@ -23,7 +24,8 @@ export default async function NewRoutePage() {
 
   return (
     <>
-      <Link href="/vendor/routes" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/vendor/routes" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to trips
       </Link>
       <PageHeader

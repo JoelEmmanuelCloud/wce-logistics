@@ -5,10 +5,11 @@ import { requestCodeAction, verifyCodeAction, type SignInState } from "@/app/(au
 import { FormMessage } from "@/components/ui/alert";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/field";
+import type { SignUpRole } from "@/server/auth/dal";
 
 const initial: SignInState = { status: "idle", step: "email" };
 
-export function SignInForm() {
+export function SignInForm({ role }: { role: SignUpRole | null }) {
   const [requestState, requestAction] = useActionState(requestCodeAction, initial);
   const [verifyState, verifyAction] = useActionState(verifyCodeAction, initial);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -64,6 +65,7 @@ export function SignInForm() {
       <form action={verifyAction} className="grid gap-5" noValidate>
         <FormMessage state={state} />
         <input type="hidden" name="email" value={requestState.email} />
+        {role && <input type="hidden" name="as" value={role} />}
         <Field id="code" label="Verification code" required errors={verifyState.fieldErrors?.code}>
           <TextInput
             id="code"

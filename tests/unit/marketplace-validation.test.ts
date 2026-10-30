@@ -15,9 +15,12 @@ const route = {
   transitHours: "30",
   capacityKg: "12000",
   allowsShared: "on",
-  ratePerKgKobo: "₦25.50",
+  ratePerTonneKobo: "₦25,500",
   minimumChargeKobo: "5,000",
   dedicatedPriceKobo: "",
+  loadingChargeKobo: "1,500",
+  offloadingChargeKobo: "",
+  tollChargeKobo: "",
 };
 
 const shipment = {
@@ -53,9 +56,11 @@ describe("dates", () => {
 describe("route validation", () => {
   it("parses money into kobo and checkbox values", () => {
     const parsed = routeSchema(50).parse(route);
-    expect(parsed.ratePerKgKobo).toBe(2_550);
+    expect(parsed.ratePerTonneKobo).toBe(2_550_000);
     expect(parsed.minimumChargeKobo).toBe(500_000);
     expect(parsed.dedicatedPriceKobo).toBeNull();
+    expect(parsed.loadingChargeKobo).toBe(150_000);
+    expect(parsed.offloadingChargeKobo).toBe(0);
     expect(parsed.allowsShared).toBe(true);
     expect(parsed.capacityKg).toBe(12_000);
   });
@@ -69,8 +74,9 @@ describe("route validation", () => {
   it.each([
     [{ departureDate: addDays(lagosToday(), -1) }, "departureDate"],
     [{ departureDate: addDays(lagosToday(), 120) }, "departureDate"],
-    [{ ratePerKgKobo: "" }, "ratePerKgKobo"],
-    [{ ratePerKgKobo: "12.345" }, "ratePerKgKobo"],
+    [{ ratePerTonneKobo: "" }, "ratePerTonneKobo"],
+    [{ ratePerTonneKobo: "12.345" }, "ratePerTonneKobo"],
+    [{ tollChargeKobo: "-5" }, "tollChargeKobo"],
     [{ capacityKg: "20" }, "capacityKg"],
     [{ destinationState: "Lagos", destinationCity: "apapa" }, "destinationCity"],
   ])("rejects %o", (override, field) => {

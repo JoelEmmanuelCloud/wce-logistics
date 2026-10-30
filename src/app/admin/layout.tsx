@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/app/app-shell";
+import type { NavItem } from "@/components/app/nav-links";
 import { requireRole } from "@/server/auth/dal";
 
 export const instant = false;
@@ -10,19 +11,19 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/admin", label: "Overview", exact: true },
-  { href: "/admin/vendors", label: "Vendors" },
-  { href: "/admin/trucks", label: "Trucks" },
-  { href: "/admin/bookings", label: "Bookings" },
-  { href: "/admin/payments", label: "Payments" },
-  { href: "/admin/payouts", label: "Payouts" },
-  { href: "/admin/reports", label: "Reports" },
-  { href: "/admin/disputes", label: "Disputes" },
-  { href: "/admin/reviews", label: "Reviews" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/settings", label: "Settings" },
-  { href: "/admin/audit", label: "Audit log" },
-] as const;
+  { href: "/admin", label: "Overview", exact: true, icon: "home", primary: true },
+  { href: "/admin/vendors", label: "Vendors", icon: "users", primary: true },
+  { href: "/admin/trucks", label: "Trucks", icon: "truck", primary: true },
+  { href: "/admin/bookings", label: "Bookings", icon: "calendar", primary: true },
+  { href: "/admin/payments", label: "Payments", icon: "receipt" },
+  { href: "/admin/payouts", label: "Payouts", icon: "wallet" },
+  { href: "/admin/reports", label: "Reports", icon: "chart" },
+  { href: "/admin/disputes", label: "Disputes", icon: "flag" },
+  { href: "/admin/reviews", label: "Reviews", icon: "star" },
+  { href: "/admin/users", label: "Users", icon: "user" },
+  { href: "/admin/settings", label: "Settings", icon: "settings" },
+  { href: "/admin/audit", label: "Audit log", icon: "list" },
+] as const satisfies readonly NavItem[];
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   const user = await requireRole("admin");

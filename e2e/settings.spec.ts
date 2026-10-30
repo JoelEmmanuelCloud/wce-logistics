@@ -63,7 +63,7 @@ test.describe("admin settings and reports", () => {
 
     const requester = await createUser("customer", "Window Shipper");
     const windowVendor = await createUser("vendor", "Window Vendor");
-    const { bookingId: requestId } = await acceptedBooking(sql, windowVendor, requester, 60, 2000);
+    const { bookingId: requestId } = await acceptedBooking(sql, windowVendor, requester, 60, 2_000_000);
     await sql`update bookings set status = 'pending_vendor_acceptance' where id = ${requestId}`;
     const vendorRequests = await pageFor(browser, sql, windowVendor);
     await vendorRequests.goto("/vendor/bookings");
@@ -71,7 +71,7 @@ test.describe("admin settings and reports", () => {
 
     const payer = await createUser("customer", "Commission Shipper");
     const commissionVendor = await createUser("vendor", "Commission Vendor");
-    const { bookingId, reference } = await acceptedBooking(sql, commissionVendor, payer, 600, 2000);
+    const { bookingId, reference } = await acceptedBooking(sql, commissionVendor, payer, 600, 2_000_000);
     await adminPage.goto(`/admin/bookings/${bookingId}`);
     await adminPage.getByRole("button", { name: "Record offline payment" }).click();
     await adminPage.getByLabel("Bank transfer or receipt reference").fill("ZEN-TRF-7788");

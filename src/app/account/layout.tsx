@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/app/app-shell";
+import type { NavItem } from "@/components/app/nav-links";
 import { requireRole } from "@/server/auth/dal";
 
 export const instant = false;
@@ -10,10 +11,10 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/account", label: "Overview", exact: true },
-  { href: "/account/shipments", label: "Shipments" },
-  { href: "/account/bookings", label: "Bookings" },
-] as const;
+  { href: "/account", label: "Overview", exact: true, icon: "home", primary: true },
+  { href: "/account/shipments", label: "Shipments", icon: "box", primary: true },
+  { href: "/account/bookings", label: "Bookings", icon: "calendar", primary: true },
+] as const satisfies readonly NavItem[];
 
 export default async function AccountLayout({ children }: LayoutProps<"/account">) {
   const user = await requireRole("customer");

@@ -40,7 +40,7 @@ export function DecisionPanel({
           maxLength={1000}
           aria-invalid={errors?.length ? true : undefined}
           aria-describedby={`${noteId}-hint`}
-          className="w-full rounded-md border border-navy/20 bg-white px-4 py-3 text-[15px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy aria-[invalid=true]:border-[#B42318]"
+          className="w-full rounded-xl border border-navy/20 bg-white px-4 py-3 text-[15px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy aria-[invalid=true]:border-[#B42318]"
         />
         <p id={`${noteId}-hint`} className="text-[13px] text-navy/70">
           {noteHint}

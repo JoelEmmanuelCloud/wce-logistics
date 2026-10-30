@@ -2,7 +2,7 @@ import { PlusIcon } from "@/components/line-icons";
 import { DisplayHeading, Section } from "@/components/section";
 import { FAQS } from "@/data/landing";
 
-export function FaqSection({ contactEmail }: { contactEmail: string }) {
+export function FaqSection({ contactEmail, whatsappUrl }: { contactEmail: string; whatsappUrl: string }) {
   return (
     <Section id="faq" tone="white" labelledBy="faq-title" watermark="left">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
@@ -15,6 +15,15 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
             Still have a question? Write to us at{" "}
             <a href={`mailto:${contactEmail}`} className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
               {contactEmail}
+            </a>{" "}
+            or message us on{" "}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4"
+            >
+              WhatsApp
             </a>
             .
           </p>
@@ -28,7 +37,7 @@ export function FaqSection({ contactEmail }: { contactEmail: string }) {
                   <PlusIcon className="size-5" />
                 </span>
               </summary>
-              <p className="max-w-[44em] pb-7 pr-16 text-[16px] leading-relaxed text-navy/75">{faq.answer}</p>
+              <p className="max-w-[44em] pb-7 sm:pr-16 text-[16px] leading-relaxed text-navy/75">{faq.answer}</p>
             </details>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { decideTruckAction, reviewTruckDocumentAction } from "@/app/admin/actions";
 import { AuditTimeline } from "@/components/admin/audit-timeline";
@@ -55,7 +56,8 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
 
   return (
     <>
-      <Link href="/admin/trucks" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/admin/trucks" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to trucks
       </Link>
       <PageHeader
@@ -126,7 +128,7 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
             ) : (
               <ul className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {photos.map((photo, index) => (
-                  <li key={photo.id} className="relative aspect-[4/3] overflow-hidden rounded-lg bg-navy/5">
+                  <li key={photo.id} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-navy/5">
                     <a href={`/files/truck-photos/${photo.id}`} target="_blank" rel="noopener" className="block size-full">
                       <Image src={`/files/truck-photos/${photo.id}`} alt={`Photo ${index + 1} of ${truck.registrationNumber}`} fill sizes="(min-width: 768px) 20vw, 50vw" className="object-cover" />
                     </a>

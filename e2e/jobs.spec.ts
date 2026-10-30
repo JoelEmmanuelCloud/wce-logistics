@@ -20,7 +20,7 @@ test.describe("scheduled jobs", () => {
   test("expiring an unanswered request emails the shipper and the vendor", async ({ sql, createUser }) => {
     const vendorUser = await createUser("vendor", "Slow Vendor");
     const shipper = await createUser("customer", "Waiting Shipper");
-    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 300, 2000);
+    const { bookingId, reference } = await acceptedBooking(sql, vendorUser, shipper, 300, 2_000_000);
     await sql`update bookings set status = 'pending_vendor_acceptance', response_due_at = now() - interval '1 minute' where id = ${bookingId}`;
 
     expect(await job("expire-bookings")).toMatch(/Expired [1-9]\d* unanswered booking request/);

@@ -70,6 +70,7 @@ npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 | Name | Required | Description |
 |---|---|---|
 | `CONTACT_EMAIL` | Yes | Public contact address used across the site |
+| `CONTACT_WHATSAPP` | Yes | Public WhatsApp number in international form, for example `+2349031193739` |
 | `SITE_URL` | Yes | Public origin, for example `https://wcelogistics.com` |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `POSTGRES_PASSWORD` | Local only | Password for the local Postgres container |

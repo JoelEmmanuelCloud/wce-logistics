@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { decideVendorAction, reviewVendorDocumentAction, setVendorSuspensionAction } from "@/app/admin/actions";
 import { AuditTimeline } from "@/components/admin/audit-timeline";
@@ -33,7 +34,8 @@ export default async function AdminVendorPage({ params }: PageProps<"/admin/vend
 
   return (
     <>
-      <Link href="/admin/vendors" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/admin/vendors" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to vendors
       </Link>
       <PageHeader

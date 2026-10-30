@@ -9,7 +9,7 @@ const TONES = {
 
 export function Alert({ tone = "info", title, children }: { tone?: keyof typeof TONES; title?: string; children?: ReactNode }) {
   return (
-    <div role={tone === "error" ? "alert" : "status"} className={`rounded-md border px-4 py-3.5 text-[14px] leading-relaxed ${TONES[tone]}`}>
+    <div role={tone === "error" ? "alert" : "status"} className={`rounded-xl border px-4 py-3.5 text-[14px] leading-relaxed ${TONES[tone]}`}>
       {title && <p className="font-semibold">{title}</p>}
       {children && <div className={title ? "mt-1" : undefined}>{children}</div>}
     </div>

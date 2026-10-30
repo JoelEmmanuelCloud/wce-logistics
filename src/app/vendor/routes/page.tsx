@@ -37,7 +37,7 @@ export default async function VendorRoutesPage() {
             const usedPercent = Math.round((route.reservedKg / route.capacityKg) * 100);
             const editable = route.status === "active" || route.status === "paused";
             return (
-              <li key={route.id} className="grid gap-5 rounded-lg border border-navy/10 bg-white p-6 lg:grid-cols-[1.4fr_1fr_auto] lg:items-center">
+              <li key={route.id} className="grid gap-5 rounded-2xl border border-navy/10 bg-white p-6 lg:grid-cols-[1.4fr_1fr_auto] lg:items-center">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="font-display text-[26px] uppercase leading-none text-navy">
@@ -49,10 +49,13 @@ export default async function VendorRoutesPage() {
                     {route.originState} to {route.destinationState}. Departs {formatDate(route.departureDate)}, about {formatTransit(route.transitHours)}. Truck {registrationNumber}.
                   </p>
                   <p className="mt-1 text-[14px] text-navy/70">
-                    {formatNaira(route.ratePerKgKobo)}/kg
+                    {formatNaira(route.ratePerTonneKobo)} per tonne
                     {route.minimumChargeKobo > 0 && `, minimum ${formatNaira(route.minimumChargeKobo)}`}
                     {route.dedicatedPriceKobo && `, whole truck ${formatNaira(route.dedicatedPriceKobo)}`}
                     {!route.allowsShared && ", whole truck only"}
+                    {route.loadingChargeKobo > 0 && `, loading ${formatNaira(route.loadingChargeKobo)}`}
+                    {route.offloadingChargeKobo > 0 && `, offloading ${formatNaira(route.offloadingChargeKobo)}`}
+                    {route.tollChargeKobo > 0 && `, tolls ${formatNaira(route.tollChargeKobo)}`}
                   </p>
                 </div>
                 <div>

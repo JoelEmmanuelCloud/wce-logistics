@@ -1,3 +1,5 @@
+import { normalizePhone } from "@/lib/phone";
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function readContactEmail(): string {
@@ -9,6 +11,18 @@ function readContactEmail(): string {
     throw new Error("CONTACT_EMAIL environment variable must be a valid email address");
   }
   return value;
+}
+
+function readContactWhatsApp(): string {
+  const value = process.env.CONTACT_WHATSAPP?.trim();
+  if (!value) {
+    throw new Error("CONTACT_WHATSAPP environment variable is required");
+  }
+  const phone = normalizePhone(value);
+  if (!phone) {
+    throw new Error("CONTACT_WHATSAPP environment variable must be a valid Nigerian mobile number");
+  }
+  return phone;
 }
 
 function readSiteUrl(): URL {
@@ -43,6 +57,12 @@ export const site = {
   ],
   get contactEmail() {
     return readContactEmail();
+  },
+  get contactWhatsApp() {
+    return readContactWhatsApp();
+  },
+  get whatsappUrl() {
+    return `https://wa.me/${readContactWhatsApp().slice(1)}`;
   },
   get url() {
     return readSiteUrl();

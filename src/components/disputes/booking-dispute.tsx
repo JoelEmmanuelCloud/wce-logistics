@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader } from "@/components/ui/card";
 import type { Booking, Dispute } from "@/server/db/schema";
@@ -28,7 +29,8 @@ export function BookingDispute({
   const active = dispute !== null && ACTIVE_DISPUTE_STATUSES.includes(dispute.status);
   return (
     <>
-      <Link href={backHref} className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href={backHref} className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to booking {booking.reference}
       </Link>
       <header className="mb-8 mt-4">

@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 
 const CONTROL =
-  "w-full rounded-md border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/45 transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy aria-[invalid=true]:border-[#B42318] disabled:bg-navy/[0.04] disabled:text-navy/70";
+  "w-full rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/45 transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy aria-[invalid=true]:border-[#B42318] disabled:bg-navy/[0.04] disabled:text-navy/70";
 
 type FieldProps = {
   id: string;
@@ -14,7 +14,7 @@ type FieldProps = {
 
 export function Field({ id, label, hint, errors, required, children }: FieldProps) {
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       <label htmlFor={id} className="text-[14px] font-semibold text-navy">
         {label}
         {required ? <span className="text-orange-ink" aria-hidden="true"> *</span> : <span className="font-normal text-navy/70"> (optional)</span>}
@@ -117,7 +117,7 @@ export function CheckboxGroup({
         {options.map((option) => (
           <label
             key={option.value}
-            className="flex cursor-pointer items-center gap-2.5 rounded-md border border-navy/15 bg-white px-3 py-2.5 text-[14px] text-navy transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-navy/15 bg-white px-3 py-2.5 text-[14px] text-navy transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
           >
             <input
               type="checkbox"

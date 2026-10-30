@@ -8,6 +8,7 @@ import { ServicesSection } from "@/components/sections/services-section";
 import { TrustSection } from "@/components/sections/trust-section";
 import { VendorSection } from "@/components/sections/vendor-section";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { StructuredData } from "@/components/structured-data";
 import { site } from "@/lib/site";
 
@@ -18,20 +19,22 @@ export const metadata: Metadata = {
 
 export default function Home() {
   const contactEmail = site.contactEmail;
+  const whatsappUrl = site.whatsappUrl;
   return (
     <>
       <StructuredData />
+      <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
       <main>
-        <Hero contactEmail={contactEmail} />
+        <Hero contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
         <ServicesSection />
         <HowItWorksSection />
         <TrustSection />
         <PricingSection />
         <IndustriesSection />
         <VendorSection />
-        <FaqSection contactEmail={contactEmail} />
+        <FaqSection contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
       </main>
-      <SiteFooter contactEmail={contactEmail} />
+      <SiteFooter contactEmail={contactEmail} contactWhatsApp={site.contactWhatsApp} whatsappUrl={whatsappUrl} />
     </>
   );
 }

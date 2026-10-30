@@ -10,7 +10,7 @@ async function scheduleTrip(page: Page, origin: string, destination: string, dep
   await page.getByLabel("Town or city").nth(1).fill(`${destination} Central`);
   await page.getByLabel("Capacity offered (kg)").fill(capacity);
   await page.getByLabel("Estimated transit time (hours)").fill("30");
-  await page.getByLabel("Rate per kg").fill("20");
+  await page.getByLabel("Rate per tonne").fill("20000");
   await page.getByLabel("Minimum charge").fill("5000");
   await page.getByLabel("Whole-truck price").fill("300000");
   await page.getByRole("button", { name: "Publish trip" }).click();
@@ -53,7 +53,7 @@ test.describe("marketplace", () => {
     await expect(shipperPage).toHaveURL(/\/account\/shipments\/[0-9a-f-]{36}$/);
     await expect(shipperPage.getByText("1 matching truck")).toBeVisible();
     await expect(shipperPage.getByText("₦12,000").first()).toBeVisible();
-    await expect(shipperPage.getByText("Transport: 600 kg at ₦20/kg")).toBeVisible();
+    await expect(shipperPage.getByText("Transport: 600 kg at ₦20,000 per tonne")).toBeVisible();
 
     await shipperPage.getByRole("button", { name: /Request booking with Kunle Ade Haulage/ }).click();
     await expect(shipperPage).toHaveURL(/\/account\/bookings\/[0-9a-f-]{36}$/);
@@ -109,8 +109,8 @@ test.describe("marketplace", () => {
     const vendorUser = await createUser("vendor", "Race Vendor");
     const { vendorId, truckId } = await verifiedVendorWithTruck(sql, vendorUser);
     const [route] = await sql<{ id: string }[]>`
-      insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, rate_per_kg_kobo, minimum_charge_kobo)
-      values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(6)}, 30, 1000, 2000, 0)
+      insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, rate_per_tonne_kobo, minimum_charge_kobo)
+      values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(6)}, 30, 1000, 2000000, 0)
       returning id`;
 
     const pages: Page[] = [];
@@ -160,8 +160,8 @@ test.describe("marketplace", () => {
     const vendorUser = await signInAs("vendor", { fullName: "Decline Vendor" });
     const { vendorId, truckId } = await verifiedVendorWithTruck(sql, vendorUser);
     const [route] = await sql<{ id: string }[]>`
-      insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, rate_per_kg_kobo, minimum_charge_kobo)
-      values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(7)}, 30, 2000, 2500, 0)
+      insert into routes (truck_id, vendor_id, origin_state, origin_city, destination_state, destination_city, departure_date, transit_hours, capacity_kg, rate_per_tonne_kobo, minimum_charge_kobo)
+      values (${truckId}, ${vendorId}, ${from}, 'Depot', ${to}, 'Depot', ${lagosDate(7)}, 30, 2000, 2500000, 0)
       returning id`;
 
     const shipper = await createUser("customer", "Hopeful Shipper");

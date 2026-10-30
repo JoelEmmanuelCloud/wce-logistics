@@ -36,9 +36,12 @@ export async function createRouteAction(_previous: FormState, formData: FormData
     transitHours: formData.get("transitHours") ?? "",
     capacityKg: formData.get("capacityKg") ?? "",
     allowsShared: formData.get("allowsShared") ?? undefined,
-    ratePerKgKobo: formData.get("ratePerKgKobo") ?? "",
+    ratePerTonneKobo: formData.get("ratePerTonneKobo") ?? "",
     minimumChargeKobo: formData.get("minimumChargeKobo") ?? "",
     dedicatedPriceKobo: formData.get("dedicatedPriceKobo") ?? "",
+    loadingChargeKobo: formData.get("loadingChargeKobo") ?? "",
+    offloadingChargeKobo: formData.get("offloadingChargeKobo") ?? "",
+    tollChargeKobo: formData.get("tollChargeKobo") ?? "",
   });
   if (!parsed.success) {
     return validationErrorState(parsed.error, formData);

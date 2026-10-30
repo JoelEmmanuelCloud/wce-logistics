@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { adminDisputeReplyAction, assignDisputeAction, updateDisputeStatusAction } from "@/app/admin/disputes/actions";
 import { DeliveryTimeline } from "@/components/delivery/delivery-timeline";
@@ -36,7 +37,8 @@ export default async function AdminDisputePage({ params }: PageProps<"/admin/dis
 
   return (
     <>
-      <Link href="/admin/disputes" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/admin/disputes" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to disputes
       </Link>
       <header className="mb-8 mt-4">

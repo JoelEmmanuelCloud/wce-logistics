@@ -7,7 +7,7 @@ import { maskEmail, normalizeEmail } from "@/lib/email-address";
 import { errorState, validationErrorState, type FormState } from "@/lib/form-state";
 import { normalizePhone } from "@/lib/phone";
 import { recordAudit } from "@/server/audit";
-import { getCurrentUser, homePathFor, requireUser } from "@/server/auth/dal";
+import { getCurrentUser, homePathFor, onboardingPathFor, requireUser, signUpRoleFrom } from "@/server/auth/dal";
 import { OTP_LENGTH, OTP_RESEND_SECONDS, requestOtp, verifyOtp } from "@/server/auth/otp";
 import { createSession, destroySession } from "@/server/auth/session";
 import { db, schema } from "@/server/db";
@@ -125,7 +125,7 @@ export async function verifyCodeAction(previous: SignInState, formData: FormData
 
   await createSession(user.id);
   await recordAudit({ actorId: user.id, action: "auth.sign_in", entityType: "user", entityId: user.id });
-  redirect(homePathFor(user));
+  redirect(user.role ? homePathFor(user) : onboardingPathFor(signUpRoleFrom(formData.get("as"))));
 }
 
 export async function signOutAction(): Promise<void> {
