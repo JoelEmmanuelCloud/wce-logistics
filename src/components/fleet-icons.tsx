@@ -56,17 +56,3 @@ export function ExcavatorIcon({ className }: IconProps) {
     </svg>
   );
 }
-
-export function CargoIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-      <path d="M10 33L30 27L54 33L34 40Z" fill="#FF8A33" />
-      <path d="M10 33V49L34 57V40Z" fill="var(--color-orange)" />
-      <path d="M34 40V57L54 50V33Z" fill="#E25E00" />
-      <path d="M18 18L34 13L50 18L34 23Z" fill="#2A4A75" />
-      <path d="M18 18V31L34 36V23Z" fill="var(--color-navy)" />
-      <path d="M34 23V36L50 31V18Z" fill="#132F55" />
-      <path d="M22 46L28 48M40 47L48 44" stroke="#FFFFFF" strokeOpacity="0.7" strokeWidth="1.5" />
-    </svg>
-  );
-}

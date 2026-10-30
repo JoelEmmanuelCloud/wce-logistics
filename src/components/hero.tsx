@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { ContactButton, WhatsAppButton } from "@/components/contact-button";
-import { CargoIcon } from "@/components/fleet-icons";
+import { ArrowButton, GlassButton } from "@/components/action-buttons";
 import { NigeriaRouteMap } from "@/components/nigeria-route-map";
 
 const HERO_IMAGE =
@@ -28,15 +27,10 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
         </h1>
 
         <div className="flex flex-col lg:min-h-0 lg:pt-1">
-          <p className="hero-fade text-[clamp(26px,min(4.6vh,2.9vw),56px)] leading-[1.1] tracking-[-0.01em] text-navy [--d:200ms]">
-            <span className="block">Logistics</span>
-            <span className="block pl-[2.6em]">built for Nigeria</span>
-            <span className="block">run on verified trucks</span>
+          <p className="hero-fade max-w-[22em] rounded-2xl border border-white/15 bg-navy/45 px-5 py-4 text-[clamp(18px,min(2.8vh,1.6vw),26px)] leading-[1.3] text-white backdrop-blur-md [--d:200ms]">
+            Built for Nigeria. Every vendor and truck <span className="text-orange">checked before it moves.</span>
           </p>
-          <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-540px)*1.25))] lg:max-w-none" />
-          <p className="hero-fade [--d:620ms] mt-4 max-w-[19em] self-end rounded-md bg-white px-4 py-3 text-[clamp(15px,min(2.2vh,1.15vw),19px)] leading-[1.3] text-navy">
-            We verify every vendor and truck, and track every load from pickup to delivery.
-          </p>
+          <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-520px)*1.25))] lg:max-w-none" />
         </div>
       </div>
 
@@ -45,16 +39,24 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
           <span className="font-display text-[clamp(56px,min(10vh,6.4vw),112px)] leading-[0.85] text-orange">50KG</span>
           <span className="text-[clamp(14px,min(2.2vh,1.2vw),19px)] leading-[1.3] text-white">
             <span className="block">minimum load, with</span>
-            <span className="block">shared or dedicated</span>
-            <span className="block pl-[5.2em]">trucks</span>
-          </span>
-          <span className="grid size-[clamp(56px,5vw,84px)] shrink-0 place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-            <CargoIcon className="w-[72%]" />
+            <span className="block">shared or dedicated trucks</span>
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <WhatsAppButton href={whatsappUrl} />
-          <ContactButton href={`mailto:${contactEmail}`} label="Get in touch" />
+        <div className="flex flex-col gap-4 sm:items-end">
+          <div className="flex flex-wrap items-center gap-3">
+            <ArrowButton href="/sign-in?as=customer" label="Book a truck" />
+            <GlassButton href="/sign-in?as=vendor">List your truck</GlassButton>
+          </div>
+          <p className="text-[15px] text-white/85">
+            Prefer to talk?{" "}
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-white underline decoration-orange decoration-2 underline-offset-4">
+              WhatsApp us
+            </a>{" "}
+            or{" "}
+            <a href={`mailto:${contactEmail}`} className="font-semibold text-white underline decoration-orange decoration-2 underline-offset-4">
+              send an email
+            </a>
+          </p>
         </div>
       </div>
     </section>
