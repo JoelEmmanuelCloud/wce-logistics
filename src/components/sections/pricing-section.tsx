@@ -7,9 +7,9 @@ import { IMAGES } from "@/data/images";
 const FORMULA = [
   { term: "Chargeable weight", note: "Your declared load in kg" },
   { operator: "×" },
-  { term: "Rate per kg", note: "Set for your route" },
+  { term: "Rate per tonne", note: "Set by the vendor for your route" },
   { operator: "+" },
-  { term: "Itemised charges", note: "Loading, handling, extras" },
+  { term: "Itemised charges", note: "Loading, offloading, tolls" },
   { operator: "=" },
   { term: "Your total", note: "In naira, before you pay", highlight: true },
 ] as const;
@@ -51,7 +51,7 @@ export function PricingSection() {
       <div
         className="mt-[clamp(40px,5vw,72px)] grid items-stretch gap-3 rounded-[28px] bg-sand p-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.15fr]"
         role="group"
-        aria-label="Price calculation: chargeable weight times rate per kilogram, plus itemised charges, equals your total in naira"
+        aria-label="Price calculation: chargeable weight times rate per tonne, plus itemised charges, equals your total in naira"
       >
         {FORMULA.map((part, index) =>
           "operator" in part ? (

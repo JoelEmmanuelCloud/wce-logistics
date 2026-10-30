@@ -163,7 +163,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       list: [
         "Describe your load accurately, including its weight, cargo type, number of packages and value. Trucks are matched to your load on that basis.",
         "Each shipment must meet the minimum weight shown when you book, currently 50 kg.",
-        "Your price is your chargeable weight multiplied by the vendor's rate per kilogram for the route, plus any additional charges, which are listed line by line. You see the final amount in naira before you pay. A dedicated truck is charged at the fixed price shown for that trip.",
+        "Your price is your weight in tonnes multiplied by the vendor's rate per tonne for the route, plus any loading, offloading or toll charges the vendor has set, each listed on its own line. You see the final amount in naira before you pay. A dedicated truck is charged at the fixed price shown for that trip.",
         "When you request a booking, the vendor has a set time to accept it, currently 24 hours. If they do not respond in time, the request expires and no payment is taken.",
         "A booking is confirmed once the vendor accepts it and your payment succeeds. The price you agreed is then held, even if the vendor later changes their rates.",
         "Have your goods packed, labelled and ready at the pickup address on the agreed date, and make sure someone is available to receive them at delivery.",

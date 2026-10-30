@@ -52,7 +52,7 @@ export const SHIPPER_STEPS: ReadonlyArray<Step> = [
 export const VENDOR_STEPS: ReadonlyArray<Step> = [
   { title: "Create your account", detail: "Register as an individual owner, fleet operator or logistics company and verify your phone." },
   { title: "Get verified", detail: "Submit identity, business and truck documents for review by our operations team." },
-  { title: "Publish your routes", detail: "Set the routes you run, departure dates, available capacity and your rate per kilogram." },
+  { title: "Publish your routes", detail: "Set the routes you run, departure dates, available capacity, your rate per tonne and any loading, offloading or toll charges." },
   { title: "Deliver and get paid", detail: "Accept bookings, assign drivers, record delivery and receive your payout." },
 ];
 
@@ -76,7 +76,7 @@ export const FAQS: ReadonlyArray<{ question: string; answer: string }> = [
   },
   {
     question: "How is my price calculated?",
-    answer: "Your chargeable weight is multiplied by the rate per kilogram for your route, then any additional charges such as loading or special handling are added and itemised. You see the final amount in naira before you pay.",
+    answer: "Your weight in tonnes is multiplied by the vendor's rate per tonne for your route. Any loading, offloading or toll charges are then added as separate lines. You see the final amount in naira before you pay.",
   },
   {
     question: "How are vendors and trucks verified?",

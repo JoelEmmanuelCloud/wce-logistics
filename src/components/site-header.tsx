@@ -54,7 +54,7 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
       features: [
         { title: "How it works", detail: "From booking request to proof of delivery", href: "#how-it-works", image: IMAGES.onDemand },
         { title: "Verification", detail: "Every vendor and truck checked before it takes a load", href: "#trust", image: IMAGES.inspection },
-        { title: "Pricing", detail: "Per-kilogram rates with every charge itemised", href: "#pricing", image: IMAGES.warehouse },
+        { title: "Pricing", detail: "Rates per tonne with every charge itemised", href: "#pricing", image: IMAGES.warehouse },
         { title: "Become a vendor", detail: "Truck owners and fleet operators list verified trucks and routes", href: "#vendors", image: IMAGES.vendor },
       ],
       linksTitle: "Get in touch",
