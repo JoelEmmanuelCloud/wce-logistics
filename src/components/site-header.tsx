@@ -62,7 +62,6 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
         { title: "Chat on WhatsApp", href: whatsappUrl },
         { title: contactEmail, href: `mailto:${contactEmail}` },
         { title: "Questions and answers", href: "#faq" },
-        { title: "Sign in", href: "/sign-in" },
       ],
     },
   ];
