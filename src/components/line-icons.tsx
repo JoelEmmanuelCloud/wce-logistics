@@ -93,6 +93,15 @@ export function ClockIcon(props: IconProps) {
   );
 }
 
+export function ChatIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 12C4 7.6 7.6 4 12 4C16.4 4 20 7.6 20 12C20 16.4 16.4 20 12 20C10.7 20 9.4 19.7 8.3 19.1L4 20L5 16C4.4 14.8 4 13.4 4 12Z" />
+      <path d="M8.5 10.5H15.5M8.5 13.5H13" />
+    </LineIcon>
+  );
+}
+
 export function CheckIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
