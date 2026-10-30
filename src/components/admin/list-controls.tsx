@@ -26,7 +26,7 @@ export function FilterTabs({
   param?: string;
 }) {
   return (
-    <nav aria-label="Filter" className="-mx-1 flex gap-1 overflow-x-auto pb-1">
+    <nav aria-label="Filter" className="-mx-1 flex gap-1 overflow-x-auto pb-1 max-md:pr-12 max-md:[mask-image:linear-gradient(to_right,#000_calc(100%-48px),transparent)]">
       {Object.entries(filters).map(([key, filter]) => (
         <Link
           key={key}
