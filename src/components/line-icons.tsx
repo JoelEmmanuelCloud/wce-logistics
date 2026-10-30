@@ -93,6 +93,152 @@ export function ClockIcon(props: IconProps) {
   );
 }
 
+export function HomeIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 10.5L12 4L20 10.5V19.5H14.5V14H9.5V19.5H4Z" />
+    </LineIcon>
+  );
+}
+
+export function BoxIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 8L12 4L20 8V16L12 20L4 16Z" />
+      <path d="M4 8L12 12L20 8M12 12V20" />
+    </LineIcon>
+  );
+}
+
+export function CalendarIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4.5 6.5H19.5V19.5H4.5Z" />
+      <path d="M4.5 10.5H19.5M8.5 4V8M15.5 4V8" />
+    </LineIcon>
+  );
+}
+
+export function TruckLineIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M3 6.5H14V16.5H3Z" />
+      <path d="M14 10H18L21 13V16.5H14" />
+      <circle cx="7" cy="17.5" r="1.8" />
+      <circle cx="17" cy="17.5" r="1.8" />
+    </LineIcon>
+  );
+}
+
+export function RouteIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <circle cx="6" cy="6" r="2.2" />
+      <circle cx="18" cy="18" r="2.2" />
+      <path d="M8.2 6H15.5C17.4 6 18.5 7.1 18.5 9C18.5 10.9 17.4 12 15.5 12H8.5C6.6 12 5.5 13.1 5.5 15C5.5 16.9 6.6 18 8.5 18H15.8" />
+    </LineIcon>
+  );
+}
+
+export function UserIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 19.5C5.8 16.2 8.5 14.5 12 14.5C15.5 14.5 18.2 16.2 19 19.5" />
+    </LineIcon>
+  );
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <circle cx="9" cy="9" r="3" />
+      <path d="M3.5 19C4.2 16.2 6.3 14.5 9 14.5C11.7 14.5 13.8 16.2 14.5 19" />
+      <path d="M15 6.2C16.6 6.4 17.8 7.6 17.8 9.2C17.8 10.8 16.6 12 15 12.2M17 14.8C18.8 15.4 20 16.9 20.5 19" />
+    </LineIcon>
+  );
+}
+
+export function IdCardIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M3.5 6H20.5V18H3.5Z" />
+      <circle cx="9" cy="11" r="2" />
+      <path d="M6 15.5C6.5 14.3 7.6 13.6 9 13.6C10.4 13.6 11.5 14.3 12 15.5M14.5 10H18M14.5 13.5H17" />
+    </LineIcon>
+  );
+}
+
+export function WalletIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 7.5H19.5V19H4Z" />
+      <path d="M4 7.5L15.5 4.5V7.5M15 12.5H19.5V15H15Z" />
+    </LineIcon>
+  );
+}
+
+export function StarIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M12 4L14.4 9L19.8 9.6L15.8 13.3L16.9 18.7L12 16L7.1 18.7L8.2 13.3L4.2 9.6L9.6 9Z" />
+    </LineIcon>
+  );
+}
+
+export function ChartIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 19.5H20" />
+      <path d="M7 16V11M12 16V6M17 16V9" />
+    </LineIcon>
+  );
+}
+
+export function FlagIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M6 20V4.5" />
+      <path d="M6 5H17L15 9L17 13H6" />
+    </LineIcon>
+  );
+}
+
+export function SettingsIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 7H13M17 7H20M4 17H7M11 17H20" />
+      <circle cx="15" cy="7" r="2" />
+      <circle cx="9" cy="17" r="2" />
+    </LineIcon>
+  );
+}
+
+export function ListIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M9 7H20M9 12H20M9 17H20" />
+      <path d="M4.5 7H5M4.5 12H5M4.5 17H5" />
+    </LineIcon>
+  );
+}
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 7H20M4 12H20M4 17H20" />
+    </LineIcon>
+  );
+}
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M6 6L18 18M18 6L6 18" />
+    </LineIcon>
+  );
+}
+
 export function ChevronLeftIcon(props: IconProps) {
   return (
     <LineIcon {...props}>

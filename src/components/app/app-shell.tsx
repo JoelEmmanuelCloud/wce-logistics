@@ -46,15 +46,19 @@ export function AppShell({ user, nav, children }: { user: User; nav: readonly Na
           <AccountFooter user={user} />
         </div>
       </aside>
-      <header className="relative flex items-center justify-between bg-navy px-4 py-3 lg:hidden">
-        <Link href="/" aria-label="WCE Logistics home" className="text-[15px]">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/10 bg-navy/95 px-4 backdrop-blur-lg lg:hidden">
+        <Link href="/" aria-label="WCE Logistics home" className="text-[14px]">
           <WceLogo />
         </Link>
-        <MobileNav items={nav} footer={<AccountFooter user={user} />} />
+        <span className="rounded-full bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/80">{user.role ? ROLE_LABELS[user.role] : "Account"}</span>
       </header>
-      <main id="main" className="mx-auto w-full max-w-[1280px] px-[clamp(16px,3vw,48px)] py-[clamp(24px,4vw,48px)]">
+      <main
+        id="main"
+        className="mx-auto w-full max-w-[1280px] px-[clamp(16px,3vw,48px)] pb-[calc(96px+env(safe-area-inset-bottom))] pt-[clamp(24px,4vw,48px)] lg:pb-[clamp(24px,4vw,48px)]"
+      >
         {children}
       </main>
+      <MobileNav items={nav} footer={<AccountFooter user={user} />} />
     </div>
   );
 }
