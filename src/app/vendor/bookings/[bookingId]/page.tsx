@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound, redirect } from "next/navigation";
 import { assignDriverAction, declineBookingAction, vendorCancelBookingAction, vendorDeliveryUpdateAction } from "@/app/vendor/bookings/actions";
 import { AssignDriverForm } from "@/components/delivery/assign-driver-form";
@@ -52,7 +53,8 @@ export default async function VendorBookingPage({ params }: PageProps<"/vendor/b
 
   return (
     <>
-      <Link href="/vendor/bookings" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/vendor/bookings" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to bookings
       </Link>
       <BookingHeader detail={detail} />

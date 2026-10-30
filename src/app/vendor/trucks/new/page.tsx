@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { redirect } from "next/navigation";
 import { createTruckAction } from "@/app/vendor/trucks/actions";
 import { EMPTY_TRUCK, TruckForm } from "@/app/vendor/trucks/truck-form";
@@ -20,7 +21,8 @@ export default async function NewTruckPage() {
 
   return (
     <>
-      <Link href="/vendor/trucks" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/vendor/trucks" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to trucks
       </Link>
       <PageHeader

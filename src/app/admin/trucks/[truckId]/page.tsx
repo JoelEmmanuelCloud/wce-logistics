@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound } from "next/navigation";
 import { decideTruckAction, reviewTruckDocumentAction } from "@/app/admin/actions";
 import { AuditTimeline } from "@/components/admin/audit-timeline";
@@ -55,7 +56,8 @@ export default async function AdminTruckPage({ params }: PageProps<"/admin/truck
 
   return (
     <>
-      <Link href="/admin/trucks" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/admin/trucks" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to trucks
       </Link>
       <PageHeader

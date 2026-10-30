@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/components/line-icons";
 import { notFound, redirect } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardHeader, DescriptionList, PageHeader } from "@/components/ui/card";
@@ -35,7 +36,8 @@ export default async function VendorDriverPage({ params }: PageProps<"/vendor/dr
 
   return (
     <>
-      <Link href="/vendor/drivers" className="text-[14px] font-semibold text-navy/70 hover:text-navy">
+      <Link href="/vendor/drivers" className="group inline-flex items-center gap-1.5 py-1 text-[14px] font-semibold text-navy/70 transition-colors hover:text-navy">
+        <ChevronLeftIcon className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Back to drivers
       </Link>
       <PageHeader title={driver.fullName} action={<StatusBadge status={driver.status} map={DRIVER_STATUS} />} />

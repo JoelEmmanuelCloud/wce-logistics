@@ -93,6 +93,14 @@ export function ClockIcon(props: IconProps) {
   );
 }
 
+export function ChevronLeftIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M14.5 6L8.5 12L14.5 18" />
+    </LineIcon>
+  );
+}
+
 export function MailIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
