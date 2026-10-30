@@ -2,14 +2,13 @@ import Image from "next/image";
 import { ContactButton } from "@/components/contact-button";
 import { CargoIcon } from "@/components/fleet-icons";
 import { NigeriaRouteMap } from "@/components/nigeria-route-map";
-import { SiteHeader } from "@/components/site-header";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/reserve/9JMZhTL8T7ulzIoD2E78_2010_02280041.JPG";
 
 export function Hero({ contactEmail }: { contactEmail: string }) {
   return (
-    <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-navy px-[clamp(20px,3.2vw,56px)] pb-[clamp(20px,3.4vh,44px)] pt-[clamp(20px,4vh,48px)] lg:h-svh lg:min-h-[680px]">
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-navy px-[clamp(20px,3.2vw,56px)] pb-[clamp(20px,3.4vh,44px)] pt-[calc(clamp(10px,1.6vh,16px)+58px)] lg:h-svh lg:min-h-[680px]">
       <Image
         src={HERO_IMAGE}
         alt="Cargo truck on an open highway at sunset"
@@ -20,8 +19,6 @@ export function Hero({ contactEmail }: { contactEmail: string }) {
         className="-z-20 object-cover object-[30%_center]"
       />
       <div className="hero-warmth -z-10" aria-hidden="true" />
-
-      <SiteHeader contactEmail={contactEmail} />
 
       <div className="mt-[clamp(32px,7vh,88px)] grid flex-1 content-start gap-10 lg:min-h-0 lg:content-stretch lg:grid-cols-[1fr_minmax(340px,31%)] lg:gap-6">
         <h1 className="font-display whitespace-nowrap uppercase leading-[0.86] text-white text-[clamp(60px,min(17.5vh,10.8vw),220px)]">
