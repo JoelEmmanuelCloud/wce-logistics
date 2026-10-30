@@ -38,7 +38,7 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
 
         <div className="flex flex-col lg:min-h-0 lg:pt-1">
           <p className="hero-fade max-w-[22em] rounded-2xl border border-white/15 bg-navy/45 px-5 py-4 text-[clamp(18px,min(2.8vh,1.6vw),26px)] leading-[1.3] text-white backdrop-blur-md [--d:200ms]">
-            Built for Nigeria. Every vendor and truck <span className="hero-underline text-orange">checked before it moves.</span>
+            Built for Nigeria. Every vendor and truck <span className="hero-emphasis text-orange">checked before it moves.</span>
           </p>
           <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-520px)*1.25))] lg:max-w-none" />
         </div>

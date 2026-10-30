@@ -100,14 +100,6 @@ body {
   margin: -0.12em -0.12em -0.04em;
 }
 
-.hero-underline {
-  background-image: linear-gradient(currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 2px;
-  padding-bottom: 2px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -135,8 +127,8 @@ body {
       hero-glow 0.9s ease-in-out calc(1.3s + var(--i, 0) * 450ms) both;
   }
 
-  .hero-underline {
-    animation: hero-underline 0.7s cubic-bezier(0.65, 0, 0.35, 1) 2.4s both;
+  .hero-emphasis {
+    animation: hero-glow 0.9s ease-in-out 2.6s both;
   }
 
   .hero-fade {
@@ -191,12 +183,6 @@ body {
     text-shadow:
       0 0 0.08em currentColor,
       0 0 0.4em color-mix(in srgb, currentColor 55%, transparent);
-  }
-}
-
-@keyframes hero-underline {
-  from {
-    background-size: 0% 2px;
   }
 }
 
