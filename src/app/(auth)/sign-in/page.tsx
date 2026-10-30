@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getCurrentUser, homePathFor } from "@/server/auth/dal";
+import { getCurrentUser, homePathFor, signUpRoleFrom } from "@/server/auth/dal";
 import { SignInForm } from "./sign-in-form";
 
 export const metadata: Metadata = {
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function SignInPage() {
+export default async function SignInPage({ searchParams }: PageProps<"/sign-in">) {
+  const role = signUpRoleFrom((await searchParams).as);
   const user = await getCurrentUser();
   if (user) {
     redirect(homePathFor(user));
@@ -22,7 +23,7 @@ export default async function SignInPage() {
         Use your email address. New here? We will set up your account after you verify it.
       </p>
       <div className="mt-8">
-        <SignInForm />
+        <SignInForm role={role} />
       </div>
       <p className="mt-8 text-[13px] leading-relaxed text-navy/70">
         We only use your email to sign you in and to send booking updates.

@@ -4,6 +4,16 @@ import { cache } from "react";
 import type { User, UserRole } from "@/server/db/schema";
 import { readSessionUser } from "@/server/auth/session";
 
+export type SignUpRole = "customer" | "vendor";
+
+export function signUpRoleFrom(value: unknown): SignUpRole | null {
+  return value === "customer" || value === "vendor" ? value : null;
+}
+
+export function onboardingPathFor(role: SignUpRole | null): string {
+  return role ? `/onboarding?as=${role}` : "/onboarding";
+}
+
 export const getCurrentUser = cache(async (): Promise<User | null> => readSessionUser());
 
 export function homePathFor(user: Pick<User, "role">): string {

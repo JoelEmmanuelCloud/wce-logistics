@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { homePathFor, requireUser } from "@/server/auth/dal";
+import { homePathFor, requireUser, signUpRoleFrom } from "@/server/auth/dal";
 import { OnboardingForm } from "./onboarding-form";
 
 export const metadata: Metadata = {
@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({ searchParams }: PageProps<"/onboarding">) {
+  const role = signUpRoleFrom((await searchParams).as);
   const user = await requireUser();
   if (user.role) {
     redirect(homePathFor(user));
@@ -21,7 +22,7 @@ export default async function OnboardingPage() {
         Signed in as <span className="font-semibold text-navy">{user.email}</span>. Tell us a little about you to finish.
       </p>
       <div className="mt-8">
-        <OnboardingForm />
+        <OnboardingForm defaultRole={role} />
       </div>
     </>
   );
