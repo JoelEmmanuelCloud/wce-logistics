@@ -14,7 +14,7 @@ type FieldProps = {
 
 export function Field({ id, label, hint, errors, required, children }: FieldProps) {
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       <label htmlFor={id} className="text-[14px] font-semibold text-navy">
         {label}
         {required ? <span className="text-orange-ink" aria-hidden="true"> *</span> : <span className="font-normal text-navy/70"> (optional)</span>}
