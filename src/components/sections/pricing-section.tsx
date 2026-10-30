@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { LockIcon, ReceiptIcon, ScaleIcon } from "@/components/line-icons";
 import { DisplayHeading, Section } from "@/components/section";
+import { PriceEstimate } from "@/components/sections/price-estimate";
 import { IMAGES } from "@/data/images";
 
 const FORMULA = [
@@ -72,6 +73,8 @@ export function PricingSection() {
           ),
         )}
       </div>
+
+      <PriceEstimate />
 
       <div className="mt-4 grid gap-4 lg:mt-5 lg:grid-cols-[5fr_7fr] lg:gap-5">
         <div className="relative min-h-[260px] overflow-hidden rounded-[28px]">
