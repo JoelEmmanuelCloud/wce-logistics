@@ -32,7 +32,7 @@ export function FilterTabs({
           key={key}
           href={hrefWith(base, { [param]: key, q: query })}
           aria-current={key === active ? "page" : undefined}
-          className={`whitespace-nowrap rounded-md px-4 py-2 text-[14px] font-semibold transition-colors ${
+          className={`whitespace-nowrap rounded-xl px-4 py-2 text-[14px] font-semibold transition-colors ${
             key === active ? "bg-navy text-white" : "text-navy/70 hover:bg-navy/5 hover:text-navy"
           }`}
         >
@@ -56,9 +56,9 @@ export function SearchForm({ base, status, query, placeholder }: { base: string;
         type="search"
         defaultValue={query}
         placeholder={placeholder}
-        className="h-11 w-full min-w-0 rounded-md border border-navy/20 bg-white px-4 text-[15px] text-navy placeholder:text-navy/70 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy sm:w-72"
+        className="h-11 w-full min-w-0 rounded-xl border border-navy/20 bg-white px-4 text-[15px] text-navy placeholder:text-navy/70 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy sm:w-72"
       />
-      <button type="submit" className="h-11 rounded-md bg-navy px-5 text-[14px] font-semibold text-white hover:bg-[#13335c]">
+      <button type="submit" className="h-11 rounded-xl bg-navy px-5 text-[14px] font-semibold text-white hover:bg-[#13335c]">
         Search
       </button>
     </form>
@@ -88,12 +88,12 @@ export function Pagination({
       </p>
       <div className="flex gap-2">
         {page > 1 && (
-          <Link href={hrefWith(base, { ...params, page: page - 1 })} className="rounded-md border border-navy/20 px-4 py-2 font-semibold text-navy hover:border-navy/40">
+          <Link href={hrefWith(base, { ...params, page: page - 1 })} className="rounded-xl border border-navy/20 px-4 py-2 font-semibold text-navy hover:border-navy/40">
             Previous
           </Link>
         )}
         {page < pageCount && (
-          <Link href={hrefWith(base, { ...params, page: page + 1 })} className="rounded-md border border-navy/20 px-4 py-2 font-semibold text-navy hover:border-navy/40">
+          <Link href={hrefWith(base, { ...params, page: page + 1 })} className="rounded-xl border border-navy/20 px-4 py-2 font-semibold text-navy hover:border-navy/40">
             Next
           </Link>
         )}
@@ -104,7 +104,7 @@ export function Pagination({
 
 export function DataTable({ headers, children, caption, compact = false }: { headers: readonly string[]; children: ReactNode; caption: string; compact?: boolean }) {
   return (
-    <div className="relative overflow-x-auto rounded-lg border border-navy/10 bg-white">
+    <div className="relative overflow-x-auto rounded-2xl border border-navy/10 bg-white">
       <table className={`w-full ${compact ? "min-w-[360px]" : "min-w-[720px]"} border-collapse text-left text-[14px]`}>
         <caption className="sr-only">{caption}</caption>
         <thead>

@@ -87,7 +87,7 @@ export function ColumnChart({ points, unit, caption }: { points: ColumnPoint[]; 
         {hovered && active !== null && (
           <div
             role="presentation"
-            className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-navy/10 bg-white px-3 py-2 text-[13px] shadow-[0_12px_32px_rgb(11_37_69/0.14)]"
+            className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl border border-navy/10 bg-white px-3 py-2 text-[13px] shadow-[0_12px_32px_rgb(11_37_69/0.14)]"
             style={{ left: `min(max(${((LEFT + active * slot + slot / 2) / width) * 100}%, 80px), calc(100% - 80px))` }}
           >
             <p className="font-semibold text-navy">{hovered.title}</p>

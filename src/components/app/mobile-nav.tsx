@@ -25,7 +25,7 @@ export function MobileNav({ items, footer }: { items: readonly NavItem[]; footer
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className="flex h-10 items-center rounded-md border border-white/30 px-4 text-[14px] font-medium text-white lg:hidden"
+        className="flex h-10 items-center rounded-xl border border-white/30 px-4 text-[14px] font-medium text-white lg:hidden"
       >
         {open ? "Close" : "Menu"}
       </button>

@@ -34,7 +34,7 @@ export function DisputeThread({ thread, reply }: { thread: Thread; reply?: React
           {thread.map(({ message, authorName }) => (
             <li
               key={message.id}
-              className={`rounded-lg border p-4 ${message.authorRole === "admin" ? "border-navy/10 bg-navy/[0.04]" : "border-navy/10 bg-white"}`}
+              className={`rounded-2xl border p-4 ${message.authorRole === "admin" ? "border-navy/10 bg-navy/[0.04]" : "border-navy/10 bg-white"}`}
             >
               <p className="text-[13px] font-semibold text-navy">
                 {disputeRole(message.authorRole)}

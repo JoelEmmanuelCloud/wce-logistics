@@ -29,7 +29,7 @@ export default async function ShipmentsPage() {
             <li key={shipment.id}>
               <Link
                 href={`/account/shipments/${shipment.id}`}
-                className="flex flex-col gap-3 rounded-lg border border-navy/10 bg-white p-5 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-2xl border border-navy/10 bg-white p-5 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <p className="text-[17px] font-semibold text-navy">

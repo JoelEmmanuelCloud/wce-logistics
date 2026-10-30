@@ -29,7 +29,7 @@ export function DeliveryUpdateForm({ action, options }: { action: (state: FormSt
         {options.map((option) => (
           <label
             key={option.value}
-            className="flex cursor-pointer items-start gap-3 rounded-md border border-navy/15 bg-white px-4 py-3 text-[15px] text-navy transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
+            className="flex cursor-pointer items-start gap-3 rounded-xl border border-navy/15 bg-white px-4 py-3 text-[15px] text-navy transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
           >
             <input
               type="radio"
@@ -63,7 +63,7 @@ export function DeliveryUpdateForm({ action, options }: { action: (state: FormSt
             accept="image/jpeg,image/png,image/webp"
             capture="environment"
             aria-describedby={errors.photo?.length ? "photo-error" : "photo-hint"}
-            className="block w-full text-[14px] text-navy file:mr-4 file:rounded-md file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]"
+            className="block w-full text-[14px] text-navy file:mr-4 file:rounded-xl file:border-0 file:bg-navy/[0.07] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-navy hover:file:bg-navy/[0.12]"
           />
         </Field>
       </div>

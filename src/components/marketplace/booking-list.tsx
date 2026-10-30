@@ -13,7 +13,7 @@ export function BookingList({ rows, hrefFor, counterparty }: { rows: Row[]; href
         <li key={row.booking.id}>
           <Link
             href={hrefFor(row.booking.id)}
-            className="grid gap-3 rounded-lg border border-navy/10 bg-white p-5 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange md:grid-cols-[1.3fr_1fr_auto] md:items-center"
+            className="grid gap-3 rounded-2xl border border-navy/10 bg-white p-5 transition-colors hover:border-navy/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange md:grid-cols-[1.3fr_1fr_auto] md:items-center"
           >
             <div>
               <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-navy/70">{row.booking.reference}</p>

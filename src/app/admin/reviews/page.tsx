@@ -26,7 +26,7 @@ export default async function AdminReviewsPage() {
       ) : (
         <ul className="grid gap-3">
           {rows.map(({ review, bookingReference, customerName, vendorName }) => (
-            <li key={review.id} className="grid gap-4 rounded-lg border border-navy/10 bg-white p-5 md:grid-cols-[1fr_auto] md:items-start">
+            <li key={review.id} className="grid gap-4 rounded-2xl border border-navy/10 bg-white p-5 md:grid-cols-[1fr_auto] md:items-start">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-2 text-[14px] font-semibold text-navy">

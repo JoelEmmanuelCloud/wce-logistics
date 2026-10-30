@@ -23,7 +23,7 @@ function AccountFooter({ user }: { user: User }) {
       <form action={signOutAction}>
         <button
           type="submit"
-          className="w-full rounded-md border border-white/25 px-4 py-2 text-[14px] font-medium text-white transition-colors hover:border-white/60"
+          className="w-full rounded-xl border border-white/25 px-4 py-2 text-[14px] font-medium text-white transition-colors hover:border-white/60"
         >
           Sign out
         </button>

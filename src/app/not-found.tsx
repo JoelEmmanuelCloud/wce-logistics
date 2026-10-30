@@ -20,7 +20,7 @@ export default function NotFound() {
         </h1>
         <Link
           href="/"
-          className="mt-10 inline-flex items-center rounded-md bg-orange px-7 py-4 text-[17px] font-medium text-navy transition-colors hover:bg-[#FF7F24]"
+          className="mt-10 inline-flex items-center rounded-xl bg-orange px-7 py-4 text-[17px] font-medium text-navy transition-colors hover:bg-[#FF7F24]"
         >
           Back to the homepage
         </Link>

@@ -19,7 +19,7 @@ function percent(value: number | null): string {
 
 function Stat({ label, value, note }: { label: string; value: ReactNode; note?: string }) {
   return (
-    <div className="rounded-lg border border-navy/10 bg-white p-5">
+    <div className="rounded-2xl border border-navy/10 bg-white p-5">
       <p className="text-[13px] font-semibold text-navy/70">{label}</p>
       <p className="mt-2 text-[26px] font-semibold leading-none text-navy">{value}</p>
       {note && <p className="mt-2 text-[12px] text-navy/60">{note}</p>}
@@ -68,7 +68,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps<"/adm
           Money
         </h2>
         <div className="grid gap-4 lg:grid-cols-[1.2fr_2fr]">
-          <div className="rounded-lg bg-navy p-6 text-white">
+          <div className="rounded-2xl bg-navy p-6 text-white">
             <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-white/70">Gross booking value</p>
             <p className="mt-3 text-[clamp(40px,5vw,56px)] font-semibold leading-none">{formatNaira(report.grossKobo)}</p>
             <p className="mt-3 text-[14px] text-white/70">

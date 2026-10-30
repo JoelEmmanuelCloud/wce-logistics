@@ -27,7 +27,7 @@ export function OnboardingForm({ defaultRole }: { defaultRole: SignUpRole | null
         {ROLES.map((role) => (
           <label
             key={role.value}
-            className="flex cursor-pointer gap-4 rounded-md border border-navy/15 bg-white p-4 transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
+            className="flex cursor-pointer gap-4 rounded-xl border border-navy/15 bg-white p-4 transition-colors has-checked:border-navy has-checked:bg-navy/[0.03] has-checked:ring-1 has-checked:ring-navy has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-orange-ink"
           >
             <input
               type="radio"

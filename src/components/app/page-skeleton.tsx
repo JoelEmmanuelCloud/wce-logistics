@@ -5,7 +5,7 @@ function Bone({ className }: { className: string }) {
 }
 
 function Panel({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={`min-w-0 rounded-lg border border-navy/10 bg-white p-[clamp(20px,2.4vw,32px)] ${className ?? ""}`}>{children}</div>;
+  return <div className={`min-w-0 rounded-2xl border border-navy/10 bg-white p-[clamp(20px,2.4vw,32px)] ${className ?? ""}`}>{children}</div>;
 }
 
 function Frame({ label, children }: { label: string; children: ReactNode }) {
@@ -103,7 +103,7 @@ export function DashboardSkeleton({ stats = 4 }: { stats?: number }) {
       <HeaderBones />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {Array.from({ length: stats }, (_, index) => (
-          <div key={index} className="rounded-lg border border-navy/10 bg-white p-5">
+          <div key={index} className="rounded-2xl border border-navy/10 bg-white p-5">
             <Bone className="h-3.5 w-3/4" />
             <Bone className="mt-3 h-10 w-16" />
           </div>
@@ -137,7 +137,7 @@ export function TableSkeleton({ columns = 6, rows = 8, filters = true }: { colum
           <Bone className="h-11 w-full sm:w-80" />
         </div>
       )}
-      <div className="overflow-hidden rounded-lg border border-navy/10 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-navy/10 bg-white">
         <div className="flex gap-6 border-b border-navy/10 bg-navy/[0.03] px-4 py-3.5">
           {Array.from({ length: columns }, (_, index) => (
             <Bone key={index} className={`h-3 flex-1 ${index > 2 ? "hidden md:block" : ""}`} />
@@ -163,7 +163,7 @@ export function CardListSkeleton({ rows = 4, action = false }: { rows?: number; 
       <HeaderBones action={action} />
       <div className="grid gap-4">
         {Array.from({ length: rows }, (_, index) => (
-          <div key={index} className="flex flex-col gap-4 rounded-lg border border-navy/10 bg-white p-5 md:flex-row md:items-center md:justify-between">
+          <div key={index} className="flex flex-col gap-4 rounded-2xl border border-navy/10 bg-white p-5 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0 flex-1">
               <Bone className="h-5 w-56 max-w-full" />
               <Bone className="mt-3 h-3.5 w-80 max-w-full" />
@@ -185,7 +185,7 @@ export function CardGridSkeleton({ cards = 6, action = true }: { cards?: number;
       <HeaderBones action={action} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: cards }, (_, index) => (
-          <div key={index} className="flex h-48 flex-col justify-between rounded-lg border border-navy/10 bg-white p-6">
+          <div key={index} className="flex h-48 flex-col justify-between rounded-2xl border border-navy/10 bg-white p-6">
             <div className="flex items-start justify-between gap-3">
               <Bone className="h-5 w-32" />
               <Bone className="h-6 w-20 rounded-full" />
