@@ -1,15 +1,16 @@
 import { cacheLife } from "next/cache";
+import Link from "next/link";
 import { ContactButton, WhatsAppButton } from "@/components/contact-button";
 import { formatPhone } from "@/lib/phone";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
 
 const COMPANY_LINKS = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Industries", href: "#industries" },
-  { label: "Become a vendor", href: "#vendors" },
-  { label: "FAQ", href: "#faq" },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Industries", href: "/#industries" },
+  { label: "Become a vendor", href: "/#vendors" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 const BRAND_LINE = ["Heavy equipment", "Trucks", "Buses", "Logistics", "On demand"];
@@ -52,9 +53,9 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
             <ul className="mt-5 grid gap-3">
               {SERVICES.map((service) => (
                 <li key={service.key}>
-                  <a href="#services" className="text-[15px] text-white/80 transition-colors hover:text-white">
+                  <Link href="/#services" className="text-[15px] text-white/80 transition-colors hover:text-white">
                     {service.title}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -64,9 +65,9 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
             <ul className="mt-5 grid gap-3">
               {COMPANY_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-[15px] text-white/80 transition-colors hover:text-white">
+                  <Link href={link.href} className="text-[15px] text-white/80 transition-colors hover:text-white">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -113,7 +114,14 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
               </span>
             ))}
           </p>
-          <p>Move more. Build more.</p>
+          <nav aria-label="Legal" className="flex gap-6">
+            <Link href="/privacy" className="transition-colors hover:text-white">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition-colors hover:text-white">
+              Terms
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>
