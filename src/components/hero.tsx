@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { ArrowButton, GlassButton } from "@/components/action-buttons";
+import { MailIcon, WhatsAppIcon } from "@/components/line-icons";
 import { NigeriaRouteMap } from "@/components/nigeria-route-map";
+
+const TALK_LINK =
+  "inline-flex h-10 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 font-semibold text-white backdrop-blur-md transition-colors hover:border-white hover:bg-white hover:text-navy";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/reserve/9JMZhTL8T7ulzIoD2E78_2010_02280041.JPG";
@@ -47,16 +51,17 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
             <ArrowButton href="/sign-in?as=customer" label="Book a truck" />
             <GlassButton href="/sign-in?as=vendor">List your truck</GlassButton>
           </div>
-          <p className="text-[15px] text-white/85">
-            Prefer to talk?{" "}
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-white underline decoration-orange decoration-2 underline-offset-4">
-              WhatsApp us
-            </a>{" "}
-            or{" "}
-            <a href={`mailto:${contactEmail}`} className="font-semibold text-white underline decoration-orange decoration-2 underline-offset-4">
-              send an email
+          <div className="flex flex-wrap items-center gap-2 text-[15px] text-white/85">
+            <span className="mr-1">Prefer to talk?</span>
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={TALK_LINK}>
+              <WhatsAppIcon className="size-[18px] text-[#25D366]" />
+              WhatsApp
             </a>
-          </p>
+            <a href={`mailto:${contactEmail}`} className={TALK_LINK}>
+              <MailIcon className="size-[18px] text-orange" />
+              Email
+            </a>
+          </div>
         </div>
       </div>
     </section>

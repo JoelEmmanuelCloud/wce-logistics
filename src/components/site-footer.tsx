@@ -1,7 +1,7 @@
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { ArrowButton, GlassButton } from "@/components/action-buttons";
-import { ChatIcon } from "@/components/line-icons";
+import { MailIcon, WhatsAppIcon } from "@/components/line-icons";
 import { formatPhone } from "@/lib/phone";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
@@ -37,7 +37,7 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
             </p>
             <div className="flex flex-wrap items-center gap-3 lg:justify-end">
               <GlassButton href={whatsappUrl}>
-                <ChatIcon className="size-6" />
+                <WhatsAppIcon className="size-6 text-[#25D366]" />
                 Chat on WhatsApp
               </GlassButton>
               <ArrowButton href={`mailto:${contactEmail}`} label="Get in touch" />
@@ -80,17 +80,22 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
             <h2 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-orange">Contact</h2>
             <a
               href={`mailto:${contactEmail}`}
-              className="mt-5 inline-block break-all text-[15px] text-white/80 transition-colors hover:text-white"
+              className="mt-5 flex items-center gap-3 break-all text-[15px] text-white/80 transition-colors hover:text-white"
             >
+              <MailIcon className="size-5 shrink-0 text-orange" />
               {contactEmail}
             </a>
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 block text-[15px] text-white/80 transition-colors hover:text-white"
+              className="mt-3 flex items-center gap-3 text-[15px] text-white/80 transition-colors hover:text-white"
             >
-              WhatsApp {formatPhone(contactWhatsApp)}
+              <WhatsAppIcon className="size-5 shrink-0 text-[#25D366]" />
+              <span>
+                <span className="sr-only">WhatsApp </span>
+                {formatPhone(contactWhatsApp)}
+              </span>
             </a>
           </div>
         </div>
