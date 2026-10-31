@@ -6,7 +6,7 @@ export const PRIVACY_POLICY: LegalDocument = {
   title: "Privacy policy",
   summary:
     "What personal information WCE Logistics collects when you use our website and booking platform, why we collect it, who we share it with and the choices you have.",
-  updated: "30 October 2026",
+  updated: "31 October 2026",
   sections: [
     {
       id: "who-we-are",
@@ -72,8 +72,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       id: "cookies",
       heading: "Cookies",
       paragraphs: [
-        "We use one cookie, which keeps you signed in. It lasts up to 30 days and is renewed while you keep using the platform. Signing out removes it.",
-        "We do not use advertising or tracking cookies.",
+        "We use a small number of essential cookies to keep you signed in and to remember your cart and delivery state. We do not use advertising or tracking cookies. Our cookie policy lists each one.",
       ],
     },
     {
@@ -121,6 +120,51 @@ export const PRIVACY_POLICY: LegalDocument = {
       heading: "Changes to this policy",
       paragraphs: [
         "We will update this policy when the way we handle information changes. The date at the top shows when it last changed. If a change is significant, we will tell you by email before it takes effect.",
+      ],
+    },
+  ],
+};
+
+export const COOKIE_POLICY: LegalDocument = {
+  title: "Cookie policy",
+  summary: "The small files we store on your device, what each one does and how long it lasts.",
+  updated: "31 October 2026",
+  sections: [
+    {
+      id: "what-they-are",
+      heading: "What cookies are",
+      paragraphs: ["Cookies are small text files a website stores in your browser. We only use them to make the site work. We do not use cookies for advertising, analytics or tracking you across other websites."],
+    },
+    {
+      id: "cookies-we-use",
+      heading: "Cookies we use",
+      list: [
+        "Sign-in (wce_session): keeps you signed in. Lasts up to 30 days and is removed when you sign out.",
+        "Cart (wce_cart): remembers the goods in your cart. Lasts 30 days.",
+        "Delivery state (wce_deliver_to): remembers the state you chose, so we can show delivered prices. Lasts 180 days.",
+        "Cookie notice (wce_cookie_notice): remembers that you have seen our cookie notice. Lasts 1 year.",
+        "Install prompt (wce_install_dismissed): remembers that you said no to adding the app to your home screen. Lasts 60 days.",
+      ],
+    },
+    {
+      id: "other-storage",
+      heading: "Other things stored on your device",
+      list: [
+        "Recent searches: a list kept in your browser so you can search again quickly. The list stays on your device. You can clear it from the search box.",
+        "App files: if you add WCE Logistics to your home screen, your browser keeps the app's icons, design files and offline page. Pages from your account are never kept on your device.",
+      ],
+    },
+    {
+      id: "payments",
+      heading: "Paying with Paystack",
+      paragraphs: ["When you pay, you go to Paystack's checkout, which may use its own cookies to process your payment securely. Paystack's privacy policy covers these."],
+    },
+    {
+      id: "control",
+      heading: "Your choices",
+      paragraphs: [
+        "Because these cookies are needed for the site to work, there is nothing to turn on or off. You can delete or block cookies in your browser settings, but you will then be signed out and your cart will not be saved.",
+        "If we ever add cookies that are not essential, we will update this page and ask for your agreement first.",
       ],
     },
   ],
