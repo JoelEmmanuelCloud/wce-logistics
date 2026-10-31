@@ -131,6 +131,9 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
             <Link href="/terms" className="transition-colors hover:text-white">
               Terms
             </Link>
+            <Link href="/cookies" className="transition-colors hover:text-white">
+              Cookies
+            </Link>
           </nav>
         </div>
       </div>

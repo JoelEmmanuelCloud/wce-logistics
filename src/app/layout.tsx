@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Archivo, Saira } from "next/font/google";
+import { Suspense } from "react";
+import { SiteNotices } from "@/components/site-notices";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -28,6 +30,7 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
+  appleWebApp: { capable: true, title: "WCE Logistics", statusBarStyle: "black-translucent" },
   keywords: site.keywords,
   openGraph: {
     type: "website",
@@ -52,7 +55,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${anton.variable} ${archivo.variable} ${saira.variable} antialiased`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Suspense fallback={null}>
+          <SiteNotices />
+        </Suspense>
+      </body>
     </html>
   );
 }

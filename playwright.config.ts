@@ -16,6 +16,10 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "retain-on-failure",
+    storageState: {
+      cookies: [{ name: "wce_cookie_notice", value: "1", domain: "localhost", path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }],
+      origins: [],
+    },
   },
   projects: [
     { name: "desktop", testIgnore: ["**/jobs.spec.ts", "**/settings.spec.ts"], use: { ...devices["Desktop Chrome"], channel: "chrome", viewport: { width: 1440, height: 900 } } },
