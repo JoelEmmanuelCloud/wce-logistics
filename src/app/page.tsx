@@ -5,6 +5,7 @@ import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { IndustriesSection } from "@/components/sections/industries-section";
 import { PricingSection } from "@/components/sections/pricing-section";
 import { ServicesSection } from "@/components/sections/services-section";
+import { ShopSection } from "@/components/sections/shop-section";
 import { TrustSection } from "@/components/sections/trust-section";
 import { VendorSection } from "@/components/sections/vendor-section";
 import { SiteCart } from "@/components/shop/site-cart";
@@ -28,6 +29,7 @@ export default function Home() {
       <main>
         <Hero contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
         <ServicesSection />
+        <ShopSection />
         <HowItWorksSection />
         <TrustSection />
         <PricingSection />
