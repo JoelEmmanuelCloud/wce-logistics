@@ -8,11 +8,11 @@ export const PAGE_SIZE = 25;
 
 export type Page<T> = { rows: T[]; total: number; page: number; pageCount: number };
 
-function pageOf<T>(rows: T[], total: number, page: number): Page<T> {
+export function pageOf<T>(rows: T[], total: number, page: number): Page<T> {
   return { rows, total, page, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
-function escapeLike(value: string): string {
+export function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (match) => `\\${match}`);
 }
 
