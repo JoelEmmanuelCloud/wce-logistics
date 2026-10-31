@@ -41,7 +41,7 @@ test.describe("shop", () => {
     await buyerPage.getByRole("button", { name: "Add to cart" }).click();
     await buyerPage.getByRole("link", { name: "View cart and check out" }).click();
     await expect(buyerPage).toHaveURL(/\/cart$/);
-    await buyerPage.getByRole("link", { name: "Check out" }).click();
+    await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
 
     await buyerPage.getByLabel("Delivery state").selectOption("Kano");
     await expect(buyerPage.getByText("₦250,000")).toBeVisible();
@@ -86,7 +86,7 @@ test.describe("shop", () => {
     await buyerPage.getByLabel("Quantity").fill("10");
     await buyerPage.getByRole("button", { name: "Add to cart" }).click();
     await buyerPage.getByRole("link", { name: "View cart and check out" }).click();
-    await buyerPage.getByRole("link", { name: "Check out" }).click();
+    await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
     await buyerPage.getByLabel("Delivery state").selectOption("Kano");
     await buyerPage.getByLabel("Town or city").fill("Fagge");
     await buyerPage.getByLabel("Delivery address").fill("8 Airport Road");
@@ -125,7 +125,7 @@ test.describe("shop", () => {
     await expect(page.getByText("Your cart has goods from another seller")).toBeVisible();
 
     await page.goto("/cart");
-    await page.getByRole("link", { name: "Check out" }).click();
+    await page.getByRole("link", { name: "Check out", exact: true }).click();
     await expect(page).toHaveURL(/\/sign-in\?as=customer&next=%2Fcheckout|\/sign-in\?as=customer&next=\/checkout/);
   });
 });
