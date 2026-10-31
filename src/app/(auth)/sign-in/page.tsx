@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { returnPathFrom } from "@/lib/shop";
 import { getCurrentUser, homePathFor, signUpRoleFrom } from "@/server/auth/dal";
 import { AuthFormSkeleton } from "../form-skeleton";
 import { SignInForm } from "./sign-in-form";
@@ -12,12 +13,14 @@ export const metadata: Metadata = {
 };
 
 async function SignInGate({ searchParams }: { searchParams: PageProps<"/sign-in">["searchParams"] }) {
-  const role = signUpRoleFrom((await searchParams).as);
+  const params = await searchParams;
+  const role = signUpRoleFrom(params.as);
+  const next = returnPathFrom(params.next);
   const user = await getCurrentUser();
   if (user) {
-    redirect(homePathFor(user));
+    redirect(user.role === "customer" && next ? next : homePathFor(user));
   }
-  return <SignInForm role={role} />;
+  return <SignInForm role={role} next={next} />;
 }
 
 export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {

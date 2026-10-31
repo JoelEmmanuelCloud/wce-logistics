@@ -13,13 +13,14 @@ const ROLES = [
   { value: "vendor", title: "I own or manage trucks", detail: "List your trucks and routes, and receive paid bookings." },
 ] as const;
 
-export function OnboardingForm({ defaultRole }: { defaultRole: SignUpRole | null }) {
+export function OnboardingForm({ defaultRole, next }: { defaultRole: SignUpRole | null; next: string | null }) {
   const [state, action] = useActionState(completeOnboardingAction, initialFormState);
   const roleErrors = state.fieldErrors?.role;
 
   return (
     <form action={action} className="grid gap-6" noValidate>
       <FormMessage state={state} />
+      {next && <input type="hidden" name="next" value={next} />}
       <fieldset key={fieldsKey(state)} className="grid gap-3" aria-describedby={roleErrors?.length ? "role-error" : undefined}>
         <legend className="mb-1 text-[14px] font-semibold text-navy">
           How will you use WCE Logistics?<span className="text-orange-ink" aria-hidden="true"> *</span>

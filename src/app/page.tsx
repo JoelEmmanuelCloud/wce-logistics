@@ -7,6 +7,7 @@ import { PricingSection } from "@/components/sections/pricing-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { TrustSection } from "@/components/sections/trust-section";
 import { VendorSection } from "@/components/sections/vendor-section";
+import { SiteCart } from "@/components/shop/site-cart";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { StructuredData } from "@/components/structured-data";
@@ -23,7 +24,7 @@ export default function Home() {
   return (
     <>
       <StructuredData />
-      <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
+      <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} cart={<SiteCart />} />
       <main>
         <Hero contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
         <ServicesSection />

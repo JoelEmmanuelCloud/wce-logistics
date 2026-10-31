@@ -6,6 +6,7 @@ import { z } from "zod";
 import { maskEmail, normalizeEmail } from "@/lib/email-address";
 import { errorState, validationErrorState, type FormState } from "@/lib/form-state";
 import { normalizePhone } from "@/lib/phone";
+import { returnPathFrom } from "@/lib/shop";
 import { recordAudit } from "@/server/audit";
 import { getCurrentUser, homePathFor, onboardingPathFor, requireUser, signUpRoleFrom } from "@/server/auth/dal";
 import { OTP_LENGTH, OTP_RESEND_SECONDS, requestOtp, verifyOtp } from "@/server/auth/otp";
@@ -125,7 +126,11 @@ export async function verifyCodeAction(previous: SignInState, formData: FormData
 
   await createSession(user.id);
   await recordAudit({ actorId: user.id, action: "auth.sign_in", entityType: "user", entityId: user.id });
-  redirect(user.role ? homePathFor(user) : onboardingPathFor(signUpRoleFrom(formData.get("as"))));
+  const next = returnPathFrom(formData.get("next"));
+  if (user.role) {
+    redirect(user.role === "customer" && next ? next : homePathFor(user));
+  }
+  redirect(onboardingPathFor(signUpRoleFrom(formData.get("as")), next));
 }
 
 export async function signOutAction(): Promise<void> {
@@ -177,5 +182,6 @@ export async function completeOnboardingAction(_previous: FormState, formData: F
     .returning();
 
   await recordAudit({ actorId: user.id, action: "user.onboarded", entityType: "user", entityId: user.id, metadata: { role } });
-  redirect(homePathFor(updated ?? user));
+  const next = returnPathFrom(formData.get("next"));
+  redirect(role === "customer" && next ? next : homePathFor(updated ?? user));
 }

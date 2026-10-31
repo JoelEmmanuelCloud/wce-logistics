@@ -9,7 +9,7 @@ import type { SignUpRole } from "@/server/auth/dal";
 
 const initial: SignInState = { status: "idle", step: "email" };
 
-export function SignInForm({ role }: { role: SignUpRole | null }) {
+export function SignInForm({ role, next }: { role: SignUpRole | null; next: string | null }) {
   const [requestState, requestAction] = useActionState(requestCodeAction, initial);
   const [verifyState, verifyAction] = useActionState(verifyCodeAction, initial);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -66,6 +66,7 @@ export function SignInForm({ role }: { role: SignUpRole | null }) {
         <FormMessage state={state} />
         <input type="hidden" name="email" value={requestState.email} />
         {role && <input type="hidden" name="as" value={role} />}
+        {next && <input type="hidden" name="next" value={next} />}
         <Field id="code" label="Verification code" required errors={verifyState.fieldErrors?.code}>
           <TextInput
             id="code"
