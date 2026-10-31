@@ -36,6 +36,7 @@ export function Select({ id, name, options, value, defaultValue = "", onValueCha
   const [title, setTitle] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const typeahead = useRef({ text: "", at: 0 });
   const listId = useId();
@@ -197,7 +198,7 @@ export function Select({ id, name, options, value, defaultValue = "", onValueCha
     }
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (!panelRef.current?.contains(target) && !triggerRef.current?.contains(target)) {
+      if (target !== backdropRef.current && !panelRef.current?.contains(target) && !triggerRef.current?.contains(target)) {
         close(false);
       }
     };
@@ -259,7 +260,7 @@ export function Select({ id, name, options, value, defaultValue = "", onValueCha
       {open &&
         createPortal(
           <>
-            {sheet && <button type="button" tabIndex={-1} aria-hidden="true" onClick={() => close(true)} className="fixed inset-0 z-[60] bg-navy/50 backdrop-blur-[2px]" />}
+            {sheet && <button ref={backdropRef} type="button" tabIndex={-1} aria-hidden="true" onClick={() => close(true)} className="fixed inset-0 z-[60] bg-navy/50 backdrop-blur-[2px]" />}
             <div
               ref={panelRef}
               tabIndex={-1}

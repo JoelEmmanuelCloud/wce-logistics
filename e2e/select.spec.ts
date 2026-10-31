@@ -19,6 +19,7 @@ test.describe("shared dropdown", () => {
     await expect(page.getByRole("listbox")).toHaveCount(0);
     await expect(page.getByRole("combobox", { name: "Deliver to" })).toHaveText(/Kano/);
     await expect(page.getByText("to see delivered prices")).toHaveCount(0);
+    await expect(page.getByRole("combobox", { name: "Deliver to" })).toBeFocused();
 
     await page.reload();
     const reopened = page.getByRole("combobox", { name: "Deliver to" });
@@ -41,6 +42,24 @@ test.describe("shared dropdown", () => {
       await page.getByRole("heading", { level: 1 }).click();
       await expect(page.getByRole("listbox")).toHaveCount(0);
     }
+  });
+
+  test("tapping the dim area closes the phone sheet without tapping what is underneath", async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile", "phone only");
+    await page.goto("/shop");
+    const trigger = page.getByRole("combobox", { name: "Deliver to" });
+    const logo = await page.getByRole("link", { name: "WCE Logistics home" }).boundingBox();
+    if (!logo) {
+      throw new Error("The logo should be on screen");
+    }
+    await trigger.click();
+    await expect(page.getByRole("listbox")).toBeVisible();
+
+    await page.touchscreen.tap(logo.x + logo.width / 2, logo.y + logo.height / 2);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await page.waitForTimeout(600);
+    await expect(page).toHaveURL(/\/shop$/);
+    await expect(trigger).toBeFocused();
   });
 
   test("short lists skip the search box and support type to jump", async ({ page, sql, signInAs }, info) => {
