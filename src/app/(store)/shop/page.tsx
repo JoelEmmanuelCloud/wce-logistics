@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { DeliverToPicker } from "@/components/shop/deliver-to-picker";
 import { ProductCard } from "@/components/shop/product-card";
-import { NIGERIAN_STATES } from "@/data/nigeria-states";
+import { readDeliverTo } from "@/server/cart";
 import { catalogCategories, listCatalog } from "@/server/catalog";
 
 export const metadata: Metadata = {
@@ -27,15 +28,16 @@ function chipClass(active: boolean): string {
 
 async function Catalog({ searchParams }: { searchParams: Params }) {
   const params = await searchParams;
-  const filter = { query: text(params.q), category: text(params.category), state: text(params.state), sellerId: /^[0-9a-f-]{36}$/i.test(text(params.seller)) ? text(params.seller) : "" };
+  const deliverTo = await readDeliverTo();
+  const filter = { query: text(params.q), category: text(params.category), state: deliverTo, sellerId: /^[0-9a-f-]{36}$/i.test(text(params.seller)) ? text(params.seller) : "" };
   const page = Math.max(1, Math.min(1000, Number.parseInt(text(params.page), 10) || 1));
   const [catalog, categories] = await Promise.all([listCatalog({ ...filter, page }), catalogCategories()]);
-  const keep = { q: filter.query, state: filter.state, seller: filter.sellerId };
+  const keep = { q: filter.query, seller: filter.sellerId };
   const current = { ...keep, category: filter.category };
 
   return (
     <>
-      <form action="/shop" method="get" role="search" className="grid gap-3 sm:grid-cols-[1fr_220px_auto]">
+      <form action="/shop" method="get" role="search" className="grid grid-cols-[1fr_auto] gap-2 sm:gap-3">
         {filter.category && <input type="hidden" name="category" value={filter.category} />}
         {filter.sellerId && <input type="hidden" name="seller" value={filter.sellerId} />}
         <label className="sr-only" htmlFor="shop-search">
@@ -49,21 +51,14 @@ async function Catalog({ searchParams }: { searchParams: Params }) {
           placeholder="Search cement, rice, roofing sheets"
           className="h-12 w-full min-w-0 rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/50 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
         />
-        <label className="sr-only" htmlFor="shop-state">
-          Delivers to
-        </label>
-        <select id="shop-state" name="state" defaultValue={filter.state} className="h-12 rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy">
-          <option value="">Delivers anywhere</option>
-          {NIGERIAN_STATES.map((name) => (
-            <option key={name} value={name}>
-              Delivers to {name}
-            </option>
-          ))}
-        </select>
-        <button type="submit" className="h-12 rounded-xl bg-navy px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#13335c]">
+        <button type="submit" className="h-12 rounded-xl bg-navy px-4 text-[15px] sm:px-6 font-semibold text-white transition-colors hover:bg-[#13335c]">
           Search
         </button>
       </form>
+
+      <div className="mt-3">
+        <DeliverToPicker value={deliverTo} id="shop-deliver-to" />
+      </div>
 
       {categories.length > 0 && (
         <nav aria-label="Categories" className="-mx-1 mt-4 flex gap-2 overflow-x-auto pb-1 max-md:pr-12 max-md:[mask-image:linear-gradient(to_right,#000_calc(100%-48px),transparent)]">
@@ -91,10 +86,10 @@ async function Catalog({ searchParams }: { searchParams: Params }) {
           <p className="mt-6 text-[14px] text-navy/70">
             {catalog.total.toLocaleString("en-NG")} product{catalog.total === 1 ? "" : "s"}
           </p>
-          <ul className="mt-3 grid gap-4 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+          <ul className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4 2xl:grid-cols-5">
             {catalog.rows.map((row) => (
               <li key={row.product.id}>
-                <ProductCard row={row} />
+                <ProductCard row={row} deliverTo={deliverTo} />
               </li>
             ))}
           </ul>
@@ -140,11 +135,11 @@ function CatalogSkeleton() {
 export default function ShopPage({ searchParams }: PageProps<"/shop">) {
   return (
     <>
-      <header className="mb-6">
-        <h1 className="font-display text-[clamp(44px,6vw,88px)] uppercase leading-[0.92] text-navy">
+      <header className="mb-4 sm:mb-6">
+        <h1 className="font-display text-[clamp(32px,5vw,72px)] uppercase leading-[0.92] text-navy">
           Buy it. <span className="text-orange-deep">They haul it.</span>
         </h1>
-        <p className="mt-3 max-w-[40em] text-[clamp(16px,1.2vw,19px)] leading-relaxed text-navy/70">
+        <p className="mt-3 hidden max-w-[40em] text-[clamp(16px,1.2vw,19px)] leading-relaxed text-navy/70 sm:block">
           Bulk goods from verified sellers, delivered on their own checked trucks and tracked to your door.
         </p>
       </header>
