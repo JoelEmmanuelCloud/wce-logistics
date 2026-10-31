@@ -239,7 +239,7 @@ export function SiteHeader({ contactEmail, whatsappUrl, cart }: { contactEmail: 
       {mobileOpen && <div aria-hidden="true" className="pointer-events-auto fixed inset-0 -z-10 bg-navy/45 backdrop-blur-[2px] md:hidden" />}
       <div ref={navRef} className="pointer-events-auto relative mx-auto max-w-[1744px]">
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-navy/70 p-2 shadow-[0_12px_40px_rgba(5,14,28,0.28)] backdrop-blur-[10px] backdrop-saturate-150 md:gap-6">
-          <Link href="/" aria-label="WCE Logistics home" className="shrink-0 pl-2 text-[clamp(13px,1.1vw,17px)]">
+          <Link href="/" aria-label="WCE Logistics home" className="shrink-0 pl-2 text-[11px] min-[390px]:text-[13px] md:text-[clamp(13px,1.1vw,17px)]">
             <WceLogo />
           </Link>
 
@@ -284,8 +284,8 @@ export function SiteHeader({ contactEmail, whatsappUrl, cart }: { contactEmail: 
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Link href="/sign-in?as=customer" className="hidden h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-[14px] font-semibold text-navy min-[440px]:flex">
-              Book a truck
+            <Link href="/shop" className="hidden h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-[14px] font-semibold text-navy min-[360px]:flex">
+              Shop
             </Link>
             {cart}
             <button
