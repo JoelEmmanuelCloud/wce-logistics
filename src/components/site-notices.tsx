@@ -73,7 +73,7 @@ export function SiteNotices() {
 
   function acceptCookies() {
     setCookie(COOKIE_NOTICE_COOKIE, 365);
-    setNotice(null);
+    setNotice(installNotice(installEvent.current));
   }
 
   function dismissInstall() {
@@ -133,7 +133,7 @@ export function SiteNotices() {
       {notice === "install-ios" && (
         <>
           <p className="text-[15px] font-semibold">Add WCE Logistics to your home screen</p>
-          <p className="mt-1 text-[14px] leading-relaxed text-navy/70">Tap the Share button in Safari, then choose Add to Home Screen.</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-navy/70">Tap the Share button in your browser, then choose Add to Home Screen.</p>
           <button type="button" onClick={dismissInstall} className="mt-3 text-[14px] font-semibold text-navy/70">
             Not now
           </button>

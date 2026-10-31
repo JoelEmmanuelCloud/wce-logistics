@@ -77,4 +77,20 @@ test.describe("cookie notice", () => {
     await page.waitForTimeout(1800);
     await expect(page.getByRole("complementary", { name: "Cookie notice" })).toHaveCount(0);
   });
+
+  test("offers the install prompt after the notice is closed on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const notice = page.getByRole("complementary", { name: "Cookie notice" });
+    await expect(notice).toBeVisible();
+    await page.evaluate(() => {
+      const event = new Event("beforeinstallprompt", { cancelable: true });
+      Object.assign(event, { prompt: async () => undefined, userChoice: Promise.resolve({ outcome: "dismissed" }) });
+      window.dispatchEvent(event);
+    });
+    await expect(notice).toBeVisible();
+
+    await notice.getByRole("button", { name: "OK" }).click();
+    await expect(page.getByRole("complementary", { name: "Install the app" }).getByRole("button", { name: "Install" })).toBeVisible();
+  });
 });
