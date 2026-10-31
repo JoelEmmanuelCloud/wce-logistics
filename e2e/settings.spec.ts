@@ -50,15 +50,19 @@ test.describe("admin settings and reports", () => {
     const shipperPage = await pageFor(browser, sql, shipper);
     await shipperPage.goto("/account/shipments/new");
     await expect(shipperPage.getByText("Minimum 30 kg.")).toBeVisible();
-    const cargo = shipperPage.getByLabel("Cargo type");
-    await expect(cargo.locator("option", { hasText: "Pharmaceuticals" })).toHaveCount(1);
-    await expect(cargo.locator("option", { hasText: "Furniture" })).toHaveCount(0);
+    await shipperPage.getByLabel("Cargo type").click();
+    await expect(shipperPage.getByRole("option", { name: "Pharmaceuticals" })).toHaveCount(1);
+    await expect(shipperPage.getByRole("option", { name: "Furniture" })).toHaveCount(0);
+    await shipperPage.keyboard.press("Escape");
 
     const vendorUser = await createUser("vendor", "Policy Vendor");
     await verifiedVendorWithTruck(sql, vendorUser);
     const vendorPage = await pageFor(browser, sql, vendorUser);
     await vendorPage.goto("/vendor/trucks/new");
-    await expect(vendorPage.getByLabel("Truck category").locator("option", { hasText: "Tipper truck" })).toHaveCount(0);
+    await vendorPage.getByLabel("Truck category").click();
+    await expect(vendorPage.getByRole("listbox")).toBeVisible();
+    await expect(vendorPage.getByRole("option", { name: "Tipper truck" })).toHaveCount(0);
+    await vendorPage.keyboard.press("Escape");
     await expect(vendorPage.getByLabel("Pharmaceuticals")).toBeVisible();
 
     const requester = await createUser("customer", "Window Shipper");

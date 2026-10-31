@@ -1,6 +1,7 @@
 import path from "node:path";
 import type { Page } from "@playwright/test";
 import { createSessionFor, expect, test } from "./support/fixtures";
+import { pickOption } from "./support/select";
 
 const PDF = path.join(__dirname, "fixtures", "document.pdf");
 const PNG = path.join(__dirname, "fixtures", "truck.png");
@@ -27,7 +28,7 @@ async function completeVendorProfile(page: Page) {
   await page.getByLabel("CAC registration number").fill(`RC ${Math.floor(1_000_000 + Math.random() * 8_999_999)}`);
   await page.getByLabel("Business address").fill("4 Creek Road");
   await page.getByLabel("Town or city").fill("Apapa");
-  await page.getByRole("combobox", { name: "State", exact: true }).selectOption("Lagos");
+  await pickOption(page.getByRole("combobox", { name: "State", exact: true }), "Lagos");
   await page.getByRole("checkbox", { name: "Lagos" }).check();
   await page.getByRole("checkbox", { name: "Kano" }).check();
   await page.getByRole("button", { name: "Save and continue" }).click();
@@ -46,8 +47,8 @@ async function createTruck(page: Page, registrationNumber: string) {
   await page.getByLabel("Make").fill("MAN");
   await page.getByLabel("Model").fill("TGS 26.440");
   await page.getByLabel("Year").fill("2019");
-  await page.getByLabel("Truck category").selectOption("heavy_duty");
-  await page.getByLabel("Cargo body type").selectOption("enclosed");
+  await pickOption(page.getByLabel("Truck category"), "heavy_duty");
+  await pickOption(page.getByLabel("Cargo body type"), "enclosed");
   await page.getByLabel("Maximum permitted payload (kg)").fill("20000");
   await page.getByLabel("Number of tyres").fill("10");
   await page.getByRole("checkbox", { name: "General goods" }).check();
@@ -63,7 +64,7 @@ test.describe("vendor lifecycle", () => {
     await signInAs("vendor", { fullName: "Amaka Nwosu" });
     await completeVendorProfile(page);
 
-    await page.getByLabel("ID type").selectOption("nin");
+    await pickOption(page.getByLabel("ID type"), "nin");
     await page.getByLabel("ID number").fill("12345678901");
     await page.getByRole("button", { name: "Save identity details" }).click();
     await expect(page.getByText("Identity details saved securely.")).toBeVisible();
@@ -82,8 +83,8 @@ test.describe("vendor lifecycle", () => {
     await createTruck(page, "ABCDEF");
     await expect(page.getByText("Enter a valid registration number", { exact: false })).toBeVisible();
     await expect(page.getByLabel("Make")).toHaveValue("MAN");
-    await expect(page.getByLabel("Truck category")).toHaveValue("heavy_duty");
-    await expect(page.getByLabel("Cargo body type")).toHaveValue("enclosed");
+    await expect(page.locator('input[name="category"]')).toHaveValue("heavy_duty");
+    await expect(page.locator('input[name="bodyType"]')).toHaveValue("enclosed");
     await expect(page.getByRole("checkbox", { name: "Machinery and equipment" })).toBeChecked();
 
     const plate = registration();
@@ -163,7 +164,7 @@ test.describe("vendor lifecycle", () => {
     test.slow();
     await signInAs("vendor", { fullName: "Musa Bello" });
     await completeVendorProfile(page);
-    await page.getByLabel("ID type").selectOption("drivers_licence");
+    await pickOption(page.getByLabel("ID type"), "drivers_licence");
     await page.getByLabel("ID number").fill("ABC12345XY");
     await page.getByRole("button", { name: "Save identity details" }).click();
     await expect(page.getByText("Identity details saved securely.")).toBeVisible();

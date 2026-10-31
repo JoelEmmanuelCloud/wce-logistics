@@ -1,12 +1,13 @@
 import type { Page } from "@playwright/test";
 import { createSessionFor, emailsTo, expect, test } from "./support/fixtures";
 import { corridor, createShipment, lagosDate, verifiedVendorWithTruck } from "./support/marketplace";
+import { pickOption } from "./support/select";
 
 async function scheduleTrip(page: Page, origin: string, destination: string, departure: string, capacity: string) {
   await page.goto("/vendor/routes/new");
   await page.getByLabel("Departure date").fill(departure);
-  await page.getByRole("combobox", { name: "State", exact: true }).first().selectOption(origin);
-  await page.getByRole("combobox", { name: "State", exact: true }).nth(1).selectOption(destination);
+  await pickOption(page.getByRole("combobox", { name: "State", exact: true }).first(), origin);
+  await pickOption(page.getByRole("combobox", { name: "State", exact: true }).nth(1), destination);
   await page.getByLabel("Town or city").nth(1).fill(`${destination} Central`);
   await page.getByLabel("Capacity offered (kg)").fill(capacity);
   await page.getByLabel("Estimated transit time (hours)").fill("30");
@@ -33,20 +34,20 @@ test.describe("marketplace", () => {
     const shipperPage = await shipperContext.newPage();
     await createSessionFor(sql, shipperPage, shipper.id);
     await shipperPage.goto("/account/shipments/new");
-    await shipperPage.getByRole("combobox", { name: "State", exact: true }).first().selectOption(from);
+    await pickOption(shipperPage.getByRole("combobox", { name: "State", exact: true }).first(), from);
     await shipperPage.getByLabel("Town or city").first().fill("Ikeja");
     await shipperPage.getByLabel("Pickup address").fill("12 Allen Avenue");
-    await shipperPage.getByRole("combobox", { name: "State", exact: true }).nth(1).selectOption(to);
+    await pickOption(shipperPage.getByRole("combobox", { name: "State", exact: true }).nth(1), to);
     await shipperPage.getByLabel("Town or city").nth(1).fill(`${to} Central`);
     await shipperPage.getByLabel("Delivery address").fill("3 Bompai Road");
-    await shipperPage.getByLabel("Cargo type").selectOption("general_goods");
+    await pickOption(shipperPage.getByLabel("Cargo type"), "general_goods");
     await shipperPage.getByLabel("Total weight (kg)").fill("40");
     await shipperPage.getByLabel("Number of packages").fill("20");
     await shipperPage.getByLabel("What are you sending?").fill("Cartons of floor tiles");
     await shipperPage.getByLabel("Pickup date").fill(lagosDate(4));
     await shipperPage.getByRole("button", { name: "Find trucks" }).click();
     await expect(shipperPage.getByText("must be at least 50")).toBeVisible();
-    await expect(shipperPage.getByLabel("Cargo type")).toHaveValue("general_goods");
+    await expect(shipperPage.locator('input[name="cargoType"]')).toHaveValue("general_goods");
 
     await shipperPage.getByLabel("Total weight (kg)").fill("600");
     await shipperPage.getByRole("button", { name: "Find trucks" }).click();
