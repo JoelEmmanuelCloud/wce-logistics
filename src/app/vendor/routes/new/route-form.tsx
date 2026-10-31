@@ -38,7 +38,7 @@ export function RouteForm({ trucks, minDate, maxDate }: { trucks: RouteTruckOpti
       <div key={fieldsKey(state)} className="grid gap-8">
         <div className="grid gap-6 md:grid-cols-2">
           <Field id="truckId" label="Truck" required errors={errors.truckId}>
-            <SelectInput id="truckId" defaultValue={value("truckId", truck?.id)} onChange={(event) => setTruckId(event.target.value)} errors={errors.truckId}>
+            <SelectInput id="truckId" defaultValue={value("truckId", truck?.id)} onValueChange={setTruckId} errors={errors.truckId}>
               {trucks.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.label}

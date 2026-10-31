@@ -1,4 +1,5 @@
-import type { ComponentProps, ReactNode } from "react";
+import { Children, isValidElement, type ComponentProps, type ReactNode } from "react";
+import { Select, type SelectOption } from "@/components/ui/select";
 
 const CONTROL =
   "w-full rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/45 transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy aria-[invalid=true]:border-[#B42318] disabled:bg-navy/[0.04] disabled:text-navy/70";
@@ -56,25 +57,54 @@ export function TextInput({ id, errors, hasHint, className, ...rest }: Component
   );
 }
 
+function optionsFrom(children: ReactNode): SelectOption[] {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<ComponentProps<"option">>(child) || child.type !== "option") {
+      return [];
+    }
+    const { value, disabled, children: label } = child.props;
+    return [{ value: String(value ?? ""), label: Children.toArray(label).join(""), disabled }];
+  });
+}
+
 export function SelectInput({
   id,
+  name,
   errors,
   hasHint,
   className,
   children,
-  ...rest
-}: ComponentProps<"select"> & ControlExtras & { id: string }) {
+  value,
+  defaultValue,
+  onValueChange,
+  disabled,
+}: {
+  id: string;
+  name?: string;
+  errors?: string[];
+  hasHint?: boolean;
+  className?: string;
+  children: ReactNode;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  disabled?: boolean;
+}) {
+  const options = optionsFrom(children);
   return (
-    <select
+    <Select
       id={id}
-      name={id}
-      aria-invalid={errors?.length ? true : undefined}
-      aria-describedby={describedBy(id, errors, hasHint)}
-      className={`${CONTROL} h-12 appearance-none bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6L8 10.5L12.5 6' fill='none' stroke='%230B2545' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")] bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10 ${className ?? ""}`}
-      {...rest}
-    >
-      {children}
-    </select>
+      name={name ?? id}
+      options={options}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      placeholder={options.find((option) => option.value === "")?.label}
+      disabled={disabled}
+      invalid={Boolean(errors?.length)}
+      describedBy={describedBy(id, errors, hasHint)}
+      className={className}
+    />
   );
 }
 

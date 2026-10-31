@@ -94,6 +94,17 @@ body {
   animation: rise-in 0.35s ease-out both;
 }
 
+.select-panel {
+  animation: select-in 0.14s ease-out both;
+}
+
+@keyframes select-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
 .hero-mask {
   display: block;
   padding: 0.12em 0.12em 0.04em calc(0.12em + var(--indent, 0em));
@@ -111,7 +122,8 @@ body {
   }
 
   .status-line,
-  .faq-item[open] > p {
+  .faq-item[open] > p,
+  .select-panel {
     animation: none;
   }
 }
