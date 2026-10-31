@@ -25,6 +25,9 @@ export async function addToCartAction(productId: string, _previous: FormState, f
   if (!product) {
     return errorState("This product is no longer on sale.");
   }
+  if (product.rates.length === 0) {
+    return errorState("This seller is not taking orders right now.");
+  }
   if (quantity.data < product.product.minOrderUnits) {
     return errorState(`The minimum order is ${product.product.minOrderUnits.toLocaleString("en-NG")}.`);
   }
