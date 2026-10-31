@@ -64,6 +64,13 @@
       "when": 1793335866957,
       "tag": "0008_per_tonne_rates_and_extra_charges",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793407461582,
+      "tag": "0009_shop_products_and_orders",
+      "breakpoints": true
     }
   ]
 }

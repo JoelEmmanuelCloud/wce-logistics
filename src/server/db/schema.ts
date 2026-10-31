@@ -735,6 +735,134 @@ export const disputeMessages = pgTable(
   (table) => [index("dispute_messages_dispute_idx").on(table.disputeId, table.createdAt)],
 );
 
+export const productStatus = pgEnum("product_status", ["active", "paused", "hidden", "archived"]);
+export const orderStatus = pgEnum("order_status", ["awaiting_seller", "accepted", "declined", "cancelled", "expired"]);
+
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    category: text("category").notNull(),
+    unitLabel: text("unit_label").notNull(),
+    unitWeightKg: integer("unit_weight_kg").notNull(),
+    priceKobo: integer("price_kobo").notNull(),
+    stockUnits: integer("stock_units").notNull().default(0),
+    minOrderUnits: integer("min_order_units").notNull().default(1),
+    status: productStatus("status").notNull().default("active"),
+    statusNote: text("status_note"),
+    ...timestamps,
+  },
+  (table) => [
+    index("products_catalog_idx").on(table.status, table.category, table.createdAt),
+    index("products_vendor_idx").on(table.vendorId, table.status),
+    check("products_price_positive", sql`${table.priceKobo} > 0`),
+    check("products_unit_weight_positive", sql`${table.unitWeightKg} > 0`),
+    check("products_stock_non_negative", sql`${table.stockUnits} >= 0`),
+    check("products_min_order_positive", sql`${table.minOrderUnits} > 0`),
+  ],
+);
+
+export const productPhotos = pgTable(
+  "product_photos",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    storageKey: text("storage_key").notNull(),
+    contentType: text("content_type").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("product_photos_product_idx").on(table.productId, table.uploadedAt)],
+);
+
+export const deliveryRates = pgTable(
+  "delivery_rates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "cascade" }),
+    destinationState: text("destination_state").notNull(),
+    ratePerTonneKobo: integer("rate_per_tonne_kobo").notNull(),
+    minimumChargeKobo: integer("minimum_charge_kobo").notNull().default(0),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("delivery_rates_vendor_state_key").on(table.vendorId, table.destinationState),
+    index("delivery_rates_state_idx").on(table.destinationState),
+    check("delivery_rates_rate_positive", sql`${table.ratePerTonneKobo} > 0`),
+    check("delivery_rates_minimum_non_negative", sql`${table.minimumChargeKobo} >= 0`),
+  ],
+);
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reference: text("reference").notNull(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendorProfiles.id, { onDelete: "restrict" }),
+    status: orderStatus("status").notNull().default("awaiting_seller"),
+    destinationState: text("destination_state").notNull(),
+    destinationCity: text("destination_city").notNull(),
+    destinationAddress: text("destination_address").notNull(),
+    deliveryNotes: text("delivery_notes"),
+    weightKg: integer("weight_kg").notNull(),
+    ratePerTonneKobo: integer("rate_per_tonne_kobo").notNull(),
+    goodsKobo: integer("goods_kobo").notNull(),
+    deliveryKobo: integer("delivery_kobo").notNull(),
+    totalKobo: integer("total_kobo").notNull(),
+    responseDueAt: timestamp("response_due_at", { withTimezone: true }).notNull(),
+    statusNote: text("status_note"),
+    bookingId: uuid("booking_id").references(() => bookings.id, { onDelete: "restrict" }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("orders_reference_key").on(table.reference),
+    uniqueIndex("orders_booking_key").on(table.bookingId),
+    index("orders_customer_idx").on(table.customerId, table.createdAt),
+    index("orders_vendor_idx").on(table.vendorId, table.status),
+    index("orders_status_due_idx").on(table.status, table.responseDueAt),
+    check("orders_total_positive", sql`${table.totalKobo} > 0`),
+    check("orders_weight_positive", sql`${table.weightKg} > 0`),
+  ],
+);
+
+export const orderItems = pgTable(
+  "order_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    unitLabel: text("unit_label").notNull(),
+    unitWeightKg: integer("unit_weight_kg").notNull(),
+    unitPriceKobo: integer("unit_price_kobo").notNull(),
+    quantity: integer("quantity").notNull(),
+    lineTotalKobo: integer("line_total_kobo").notNull(),
+  },
+  (table) => [
+    index("order_items_order_idx").on(table.orderId),
+    index("order_items_product_idx").on(table.productId),
+    check("order_items_quantity_positive", sql`${table.quantity} > 0`),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type UserRole = (typeof userRole.enumValues)[number];
 export type VendorProfile = typeof vendorProfiles.$inferSelect;
@@ -760,3 +888,9 @@ export type DisputeMessage = typeof disputeMessages.$inferSelect;
 export type PayoutAccount = typeof payoutAccounts.$inferSelect;
 export type PlatformSettings = typeof platformSettings.$inferSelect;
 export type CargoCategory = typeof cargoCategories.$inferSelect;
+export type Product = typeof products.$inferSelect;
+export type ProductPhoto = typeof productPhotos.$inferSelect;
+export type DeliveryRate = typeof deliveryRates.$inferSelect;
+export type Order = typeof orders.$inferSelect;
+export type OrderItem = typeof orderItems.$inferSelect;
+export type OrderStatus = (typeof orderStatus.enumValues)[number];
