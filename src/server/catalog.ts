@@ -22,10 +22,6 @@ const firstPhotoId = sql<string | null>`(
 
 const onSale = and(eq(schema.products.status, "active"), eq(schema.vendorProfiles.verificationStatus, "verified"));
 
-export function photoPath(photoId: string): string {
-  return `/shop/photos/${photoId}`;
-}
-
 export type CatalogFilter = { query: string; category: string; state: string; sellerId: string; page: number };
 
 export async function listCatalog({ query, category, state, sellerId, page }: CatalogFilter) {

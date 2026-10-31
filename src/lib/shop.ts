@@ -13,6 +13,10 @@ export type DeliveryRateInput = { ratePerTonneKobo: number; minimumChargeKobo: n
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export function photoPath(photoId: string): string {
+  return `/shop/photos/${photoId}`;
+}
+
 export function deliveryFeeKobo(weightKg: number, rate: DeliveryRateInput): number {
   return Math.max(transportKobo(weightKg, rate.ratePerTonneKobo), rate.minimumChargeKobo);
 }
