@@ -20,6 +20,39 @@ const firstPhotoId = sql<string | null>`(
   order by ${schema.productPhotos.uploadedAt} asc limit 1
 )`;
 
+const ratingAverage = sql<number | null>`(
+  select round(avg(${schema.reviews.rating}), 1)::float from ${schema.reviews}
+  where ${schema.reviews.vendorId} = ${schema.products.vendorId} and ${schema.reviews.status} = 'published'
+)`;
+
+const ratingCount = sql<number>`(
+  select count(*)::int from ${schema.reviews}
+  where ${schema.reviews.vendorId} = ${schema.products.vendorId} and ${schema.reviews.status} = 'published'
+)`;
+
+const unitsSold = sql<number>`coalesce((
+  select sum(${schema.orderItems.quantity})::int from ${schema.orderItems}
+  inner join ${schema.orders} on ${schema.orders.id} = ${schema.orderItems.orderId}
+  where ${schema.orderItems.productId} = ${schema.products.id} and ${schema.orders.status} = 'accepted'
+), 0)`;
+
+const cardFields = {
+  product: schema.products,
+  sellerName,
+  sellerCity: schema.vendorProfiles.city,
+  sellerState: schema.vendorProfiles.state,
+  photoId: firstPhotoId,
+  ratingAverage,
+  ratingCount,
+  unitsSold,
+  ratePerTonneKobo: schema.deliveryRates.ratePerTonneKobo,
+  minimumChargeKobo: schema.deliveryRates.minimumChargeKobo,
+};
+
+function rateForState(state: string) {
+  return and(eq(schema.deliveryRates.vendorId, schema.products.vendorId), eq(schema.deliveryRates.destinationState, state));
+}
+
 const onSale = and(eq(schema.products.status, "active"), eq(schema.vendorProfiles.verificationStatus, "verified"));
 
 export type CatalogFilter = { query: string; category: string; state: string; sellerId: string; page: number };
@@ -49,9 +82,10 @@ export async function listCatalog({ query, category, state, sellerId, page }: Ca
   const where = and(...conditions);
   const [rows, totals] = await Promise.all([
     db()
-      .select({ product: schema.products, sellerName, sellerCity: schema.vendorProfiles.city, sellerState: schema.vendorProfiles.state, photoId: firstPhotoId })
+      .select(cardFields)
       .from(schema.products)
       .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+      .leftJoin(schema.deliveryRates, rateForState(state))
       .where(where)
       .orderBy(sql`case when ${schema.products.stockUnits} > 0 then 0 else 1 end`, desc(schema.products.createdAt))
       .limit(CATALOG_PAGE_SIZE)
@@ -67,24 +101,17 @@ export async function listCatalog({ query, category, state, sellerId, page }: Ca
 
 export type CatalogRow = Awaited<ReturnType<typeof listCatalog>>["rows"][number];
 
-export async function popularProducts(limit = 8): Promise<CatalogRow[]> {
-  const sold = sql<number>`coalesce((
-    select sum(${schema.orderItems.quantity} * ${schema.orderItems.unitWeightKg}) from ${schema.orderItems}
-    inner join ${schema.orders} on ${schema.orders.id} = ${schema.orderItems.orderId}
-    where ${schema.orderItems.productId} = ${schema.products.id} and ${schema.orders.status} = 'accepted'
-  ), 0)`;
+export async function popularProducts(state: string, limit = 8): Promise<CatalogRow[]> {
+  const delivers = state
+    ? rateForState(state)
+    : eq(schema.deliveryRates.vendorId, schema.products.vendorId);
   return db()
-    .select({ product: schema.products, sellerName, sellerCity: schema.vendorProfiles.city, sellerState: schema.vendorProfiles.state, photoId: firstPhotoId })
+    .select(cardFields)
     .from(schema.products)
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
-    .where(
-      and(
-        onSale,
-        sql`${schema.products.stockUnits} > 0`,
-        exists(db().select({ id: schema.deliveryRates.id }).from(schema.deliveryRates).where(eq(schema.deliveryRates.vendorId, schema.products.vendorId))),
-      ),
-    )
-    .orderBy(desc(sold), desc(schema.products.createdAt))
+    .leftJoin(schema.deliveryRates, rateForState(state))
+    .where(and(onSale, sql`${schema.products.stockUnits} > 0`, exists(db().select({ id: schema.deliveryRates.id }).from(schema.deliveryRates).where(delivers))))
+    .orderBy(desc(unitsSold), desc(schema.products.createdAt))
     .limit(limit);
 }
 
@@ -103,7 +130,7 @@ export async function catalogCategories(): Promise<Array<{ value: string; label:
 
 export async function getCatalogProduct(productId: string) {
   const [row] = await db()
-    .select({ product: schema.products, sellerName, sellerCity: schema.vendorProfiles.city, sellerState: schema.vendorProfiles.state })
+    .select({ product: schema.products, sellerName, sellerCity: schema.vendorProfiles.city, sellerState: schema.vendorProfiles.state, ratingAverage, ratingCount, unitsSold })
     .from(schema.products)
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
     .where(and(eq(schema.products.id, productId), onSale))

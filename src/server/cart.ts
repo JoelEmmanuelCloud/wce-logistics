@@ -1,7 +1,8 @@
 import "server-only";
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { CART_COOKIE, orderTotals, parseCart, serializeCart, type CartLine } from "@/lib/shop";
+import { isNigerianState } from "@/data/nigeria-states";
+import { CART_COOKIE, DELIVER_TO_COOKIE, orderTotals, parseCart, serializeCart, type CartLine } from "@/lib/shop";
 import { db, schema } from "@/server/db";
 import { serverEnv } from "@/server/env";
 import { listDeliveryRates } from "@/server/catalog";
@@ -25,6 +26,20 @@ export async function writeCart(lines: readonly CartLine[]): Promise<void> {
     path: "/",
     maxAge: CART_DAYS * 24 * 60 * 60,
   });
+}
+
+export async function readDeliverTo(): Promise<string> {
+  const value = (await cookies()).get(DELIVER_TO_COOKIE)?.value ?? "";
+  return isNigerianState(value) ? value : "";
+}
+
+export async function writeDeliverTo(state: string): Promise<void> {
+  const store = await cookies();
+  if (!state) {
+    store.delete(DELIVER_TO_COOKIE);
+    return;
+  }
+  store.set(DELIVER_TO_COOKIE, state, { httpOnly: true, secure: serverEnv().NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 180 * 24 * 60 * 60 });
 }
 
 export async function cartVendorId(lines: readonly CartLine[]): Promise<string | null> {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, lagosToday } from "@/lib/dates";
 import { nairaToKobo } from "@/lib/pricing";
-import { deliveryFeeKobo, MAX_CART_LINES, orderTotals, parseCart, returnPathFrom, serializeCart, setCartLine } from "@/lib/shop";
+import { deliveredUnitKobo, deliveryFeeKobo, MAX_CART_LINES, orderTotals, parseCart, returnPathFrom, serializeCart, setCartLine } from "@/lib/shop";
 import { acceptOrderSchema, checkoutSchema, deliveryRateSchema, productSchema } from "@/lib/validation/shop";
 
 const productA = "11111111-1111-4111-8111-111111111111";
@@ -38,6 +38,18 @@ describe("orderTotals", () => {
     const totals = orderTotals(lines, null);
     expect(totals.deliveryKobo).toBe(0);
     expect(totals.totalKobo).toBe(totals.goodsKobo);
+  });
+});
+
+describe("deliveredUnitKobo", () => {
+  it("shares delivery of the minimum order across its units", () => {
+    const product = { priceKobo: nairaToKobo(10_000), unitWeightKg: 50, minOrderUnits: 20 };
+    expect(deliveredUnitKobo(product, { ratePerTonneKobo: nairaToKobo(40_000), minimumChargeKobo: 0 })).toBe(nairaToKobo(12_000));
+  });
+
+  it("includes the seller's minimum delivery charge", () => {
+    const product = { priceKobo: nairaToKobo(10_000), unitWeightKg: 50, minOrderUnits: 2 };
+    expect(deliveredUnitKobo(product, { ratePerTonneKobo: nairaToKobo(40_000), minimumChargeKobo: nairaToKobo(10_000) })).toBe(nairaToKobo(15_000));
   });
 });
 

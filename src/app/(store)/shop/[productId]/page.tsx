@@ -3,10 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { addToCartAction } from "@/app/(store)/actions";
-import { ChevronLeftIcon } from "@/components/line-icons";
+import { ChevronLeftIcon, ShieldCheckIcon, StarIcon } from "@/components/line-icons";
+import { DeliverToPicker } from "@/components/shop/deliver-to-picker";
 import { ProductImage } from "@/components/shop/product-image";
 import { formatKg } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
+import { deliveredUnitKobo } from "@/lib/shop";
+import { readDeliverTo } from "@/server/cart";
 import { getCatalogProduct } from "@/server/catalog";
 import { AddToCartForm } from "./add-to-cart";
 
@@ -18,7 +21,9 @@ async function Product({ params }: { params: PageProps<"/shop/[productId]">["par
   if (!detail) {
     notFound();
   }
-  const { product, photos, rates } = detail;
+  const { product, photos, rates, ratingAverage, ratingCount, unitsSold } = detail;
+  const deliverTo = await readDeliverTo();
+  const rate = rates.find((option) => option.destinationState === deliverTo);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
@@ -44,10 +49,32 @@ async function Product({ params }: { params: PageProps<"/shop/[productId]">["par
           </Link>
           , {detail.sellerCity}, {detail.sellerState}
         </p>
+        <ul className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] font-semibold text-navy/70">
+          <li className="inline-flex items-center gap-1.5 text-[#05603A]">
+            <ShieldCheckIcon className="size-4" />
+            Verified seller
+          </li>
+          {ratingAverage !== null && ratingCount > 0 && (
+            <li className="inline-flex items-center gap-1.5">
+              <StarIcon className="size-4 text-orange-ink" />
+              {ratingAverage.toFixed(1)} from {ratingCount} review{ratingCount === 1 ? "" : "s"}
+            </li>
+          )}
+          {unitsSold > 0 && <li>{unitsSold.toLocaleString("en-NG")} sold</li>}
+        </ul>
         <p className="mt-5">
           <span className="font-display text-[clamp(36px,3.4vw,52px)] leading-none text-navy">{formatNaira(product.priceKobo)}</span>
           <span className="ml-2 text-[15px] text-navy/70">per {product.unitLabel}</span>
         </p>
+        <div className="mt-4 grid gap-2">
+          <DeliverToPicker value={deliverTo} id="product-deliver-to" />
+          {rate && (
+            <p className="text-[15px] font-semibold text-orange-ink">
+              {formatNaira(deliveredUnitKobo(product, rate))} per unit delivered to {deliverTo}, on the minimum order
+            </p>
+          )}
+          {deliverTo && !rate && <p className="text-[15px] font-semibold text-orange-ink">This seller does not deliver to {deliverTo}.</p>}
+        </div>
 
         <div className="mt-6 rounded-2xl bg-white p-5">
           {product.stockUnits === 0 ? (

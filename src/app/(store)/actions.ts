@@ -4,17 +4,24 @@ import { after } from "next/server";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { isNigerianState } from "@/data/nigeria-states";
 import { errorState, successState, validationErrorState, withValues, type FormState } from "@/lib/form-state";
 import { MAX_CART_LINES, MAX_CART_QUANTITY, setCartLine } from "@/lib/shop";
 import { checkoutSchema } from "@/lib/validation/shop";
 import { requireRole } from "@/server/auth/dal";
-import { cartVendorId, readCart, writeCart } from "@/server/cart";
+import { cartVendorId, readCart, writeCart, writeDeliverTo } from "@/server/cart";
 import { getCatalogProduct } from "@/server/catalog";
 import { notifyOrder } from "@/server/notifications";
 import { OrderError, placeOrder } from "@/server/orders";
 
 const idSchema = z.uuid();
 const quantitySchema = z.coerce.number({ message: "Enter a quantity." }).int("Enter a whole number.").min(1, "Enter a quantity.").max(MAX_CART_QUANTITY, "That is more than we can take in one order.");
+
+export async function chooseDeliverToAction(formData: FormData): Promise<void> {
+  const state = String(formData.get("deliverTo") ?? "");
+  await writeDeliverTo(isNigerianState(state) ? state : "");
+  refresh();
+}
 
 export async function addToCartAction(productId: string, _previous: FormState, formData: FormData): Promise<FormState> {
   const quantity = quantitySchema.safeParse(formData.get("quantity"));

@@ -3,36 +3,51 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { ArrowUpRightIcon } from "@/components/line-icons";
 import { Section } from "@/components/section";
+import { DeliverToPicker } from "@/components/shop/deliver-to-picker";
 import { ProductCard } from "@/components/shop/product-card";
+import { readDeliverTo } from "@/server/cart";
 import { popularProducts, type CatalogRow } from "@/server/catalog";
 
 async function ProductRow() {
   await connection();
+  const deliverTo = await readDeliverTo();
   let rows: CatalogRow[];
   try {
-    rows = await popularProducts();
+    rows = await popularProducts(deliverTo);
   } catch (error) {
     console.error(error);
     rows = [];
   }
+  const picker = (
+    <div className="mt-5">
+      <DeliverToPicker value={deliverTo} id="home-deliver-to" />
+    </div>
+  );
   if (rows.length === 0) {
     return (
-      <p className="mt-6 rounded-2xl bg-white p-6 text-[15px] text-navy/70">
-        New goods are on the way.{" "}
-        <Link href="/shop" className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
-          Visit the shop
-        </Link>
-      </p>
+      <>
+        {picker}
+        <p className="mt-6 rounded-2xl bg-white p-6 text-[15px] text-navy/70">
+          {deliverTo ? `No sellers deliver to ${deliverTo} yet. Try another state or ` : "New goods are on the way. "}
+          <Link href="/shop" className="font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
+            visit the shop
+          </Link>
+          .
+        </p>
+      </>
     );
   }
   return (
-    <ul className="-mx-[clamp(20px,3.2vw,56px)] mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[clamp(20px,3.2vw,56px)] pb-2 lg:mx-0 lg:grid lg:snap-none lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 lg:[&>li:nth-child(n+5)]:hidden">
-      {rows.map((row) => (
-        <li key={row.product.id} className="w-[72vw] max-w-[300px] shrink-0 snap-start lg:w-auto lg:max-w-none">
-          <ProductCard row={row} />
-        </li>
-      ))}
-    </ul>
+    <>
+      {picker}
+      <ul className="-mx-[clamp(20px,3.2vw,56px)] mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[clamp(20px,3.2vw,56px)] pb-2 lg:mx-0 lg:grid lg:snap-none lg:grid-cols-4 lg:overflow-visible lg:px-0 lg:pb-0 lg:[&>li:nth-child(n+5)]:hidden">
+        {rows.map((row) => (
+          <li key={row.product.id} className="w-[72vw] max-w-[300px] shrink-0 snap-start lg:w-auto lg:max-w-none">
+            <ProductCard row={row} deliverTo={deliverTo} />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

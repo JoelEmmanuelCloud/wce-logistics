@@ -32,6 +32,9 @@ test.describe("shop", () => {
     await createSessionFor(sql, buyerPage, buyer.id);
 
     await buyerPage.goto(`/shop?q=${encodeURIComponent(title)}`);
+    await buyerPage.getByLabel("Deliver to").selectOption("Kano");
+    await expect(buyerPage.getByText("₦15,000 delivered to Kano")).toBeVisible();
+    await expect(buyerPage.getByText("Verified seller", { exact: true })).toBeVisible();
     await buyerPage.getByRole("link", { name: title }).click();
     await expect(buyerPage.getByRole("heading", { level: 1 })).toHaveText(title);
     await buyerPage.getByLabel("Quantity").fill("20");

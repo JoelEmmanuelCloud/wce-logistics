@@ -4,6 +4,7 @@ export const MAX_ORDER_KOBO = 2_000_000_000;
 export const MAX_CART_LINES = 30;
 export const MAX_CART_QUANTITY = 100_000;
 export const CART_COOKIE = "wce_cart";
+export const DELIVER_TO_COOKIE = "wce_deliver_to";
 
 export type CartLine = { productId: string; quantity: number };
 
@@ -26,6 +27,12 @@ export function orderTotals(lines: readonly PricedLine[], rate: DeliveryRateInpu
   const weightKg = lines.reduce((sum, line) => sum + line.unitWeightKg * line.quantity, 0);
   const deliveryKobo = rate ? deliveryFeeKobo(weightKg, rate) : 0;
   return { goodsKobo, weightKg, deliveryKobo, totalKobo: goodsKobo + deliveryKobo };
+}
+
+export function deliveredUnitKobo(product: { priceKobo: number; unitWeightKg: number; minOrderUnits: number }, rate: DeliveryRateInput): number {
+  const units = product.minOrderUnits;
+  const { totalKobo } = orderTotals([{ unitPriceKobo: product.priceKobo, unitWeightKg: product.unitWeightKg, quantity: units }], rate);
+  return Math.round(totalKobo / units);
 }
 
 export function parseCart(value: string | undefined): CartLine[] {
