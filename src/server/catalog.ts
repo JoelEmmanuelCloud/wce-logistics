@@ -114,6 +114,29 @@ export async function popularProducts(state: string, limit = 8): Promise<Catalog
     .limit(limit);
 }
 
+export async function suggestProducts(query: string) {
+  const startsWith = `${escapeLike(query)}%`;
+  const startsWord = `% ${escapeLike(query)}%`;
+  return db()
+    .select({ id: schema.products.id, title: schema.products.title, priceKobo: schema.products.priceKobo, unitLabel: schema.products.unitLabel, photoId: firstPhotoId })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(and(onSale, ilike(schema.products.title, `%${escapeLike(query)}%`)))
+    .orderBy(sql`case when ${schema.products.title} ilike ${startsWith} then 0 when ${schema.products.title} ilike ${startsWord} then 1 else 2 end`, desc(unitsSold), desc(schema.products.createdAt))
+    .limit(5);
+}
+
+export async function popularSearches(limit = 5): Promise<string[]> {
+  const rows = await db()
+    .select({ title: schema.products.title })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(and(onSale, sql`${schema.products.stockUnits} > 0`))
+    .orderBy(desc(unitsSold), desc(schema.products.createdAt))
+    .limit(limit);
+  return rows.map((row) => row.title);
+}
+
 export async function catalogCategories(): Promise<Array<{ value: string; label: string }>> {
   const [categories, used] = await Promise.all([
     activeCargoCategories(),

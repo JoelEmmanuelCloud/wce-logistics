@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, lagosToday } from "@/lib/dates";
 import { nairaToKobo } from "@/lib/pricing";
-import { deliveredUnitKobo, deliveryFeeKobo, MAX_CART_LINES, orderTotals, parseCart, returnPathFrom, serializeCart, setCartLine } from "@/lib/shop";
+import { addRecentSearch, deliveredUnitKobo, deliveryFeeKobo, MAX_CART_LINES, MAX_RECENT_SEARCHES, orderTotals, parseCart, parseRecentSearches, returnPathFrom, serializeCart, setCartLine } from "@/lib/shop";
 import { acceptOrderSchema, checkoutSchema, deliveryRateSchema, productSchema } from "@/lib/validation/shop";
 
 const productA = "11111111-1111-4111-8111-111111111111";
@@ -76,6 +76,25 @@ describe("cart cookie", () => {
     const two = setCartLine(one, productB, 1);
     expect(setCartLine(two, productA, 5).find((line) => line.productId === productA)?.quantity).toBe(5);
     expect(setCartLine(two, productA, 0)).toEqual([{ productId: productB, quantity: 1 }]);
+  });
+});
+
+describe("recent searches", () => {
+  it("puts the newest first and removes duplicates, ignoring case", () => {
+    expect(addRecentSearch(["cement", "rice"], "Rice")).toEqual(["Rice", "cement"]);
+  });
+
+  it("keeps a short list and ignores blank searches", () => {
+    const many = Array.from({ length: MAX_RECENT_SEARCHES }, (_, index) => `term ${index}`);
+    expect(addRecentSearch(many, "new")).toHaveLength(MAX_RECENT_SEARCHES);
+    expect(addRecentSearch(["cement"], "   ")).toEqual(["cement"]);
+  });
+
+  it("survives broken stored values", () => {
+    expect(parseRecentSearches(null)).toEqual([]);
+    expect(parseRecentSearches("not json")).toEqual([]);
+    expect(parseRecentSearches('{"a":1}')).toEqual([]);
+    expect(parseRecentSearches('["cement", 4, ""]')).toEqual(["cement"]);
   });
 });
 

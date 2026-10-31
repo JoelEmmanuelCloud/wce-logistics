@@ -223,6 +223,15 @@ export function ListIcon(props: IconProps) {
   );
 }
 
+export function SearchIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M16 16L20 20" />
+    </LineIcon>
+  );
+}
+
 export function CartIcon(props: IconProps) {
   return (
     <LineIcon {...props}>
