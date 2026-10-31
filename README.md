@@ -65,6 +65,10 @@ Create the first administrator, then sign in with that number at `/sign-in`:
 npm run admin:create -- --email ada@wcelogistics.com --name "Ada Obi"
 ```
 
+## Demo data
+
+`npm run demo:seed` adds three verified sellers with trucks, delivery rates and products to the database in `.env.local`, so the shop has something to show. It is safe to run again, and fills in any photos that are missing.
+
 ## Environment variables
 
 | Name | Required | Description |

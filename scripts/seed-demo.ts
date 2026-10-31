@@ -126,7 +126,20 @@ async function main() {
       const email = `demo-${seller.slug}@example.com`;
       const [existing] = await sql<{ id: string }[]>`select id from users where email = ${email}`;
       if (existing) {
-        console.log(`${seller.name} already exists, skipping.`);
+        let added = 0;
+        for (const product of seller.products) {
+          const [missing] = await sql<{ id: string }[]>`
+            select p.id from products p
+            join vendor_profiles v on v.id = p.vendor_id
+            where v.user_id = ${existing.id} and p.title = ${product.title}
+              and not exists (select 1 from product_photos ph where ph.product_id = p.id)`;
+          const photo = missing ? await uploadPhoto(client, product.image, missing.id) : null;
+          if (missing && photo) {
+            await sql`insert into product_photos (product_id, storage_key, content_type, size_bytes) values (${missing.id}, ${photo.storageKey}, 'image/jpeg', ${photo.sizeBytes})`;
+            added += 1;
+          }
+        }
+        console.log(`${seller.name} already exists, added ${added} missing photo${added === 1 ? "" : "s"}.`);
         continue;
       }
       const [user] = await sql<{ id: string }[]>`insert into users (email, full_name, role) values (${email}, ${seller.name}, 'vendor') returning id`;
