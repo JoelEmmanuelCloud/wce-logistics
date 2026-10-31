@@ -1,6 +1,7 @@
 import type postgres from "postgres";
 import { createSessionFor, expect, test } from "./support/fixtures";
 import { lagosDate, verifiedVendorWithTruck } from "./support/marketplace";
+import { pickOption } from "./support/select";
 
 async function listProduct(sql: postgres.Sql, vendorId: string, title: string, stock = 100) {
   await sql`insert into delivery_rates (vendor_id, destination_state, rate_per_tonne_kobo, minimum_charge_kobo) values (${vendorId}, 'Kano', 5000000, 1000000) on conflict do nothing`;
@@ -32,7 +33,7 @@ test.describe("shop", () => {
     await createSessionFor(sql, buyerPage, buyer.id);
 
     await buyerPage.goto(`/shop?q=${encodeURIComponent(title)}`);
-    await buyerPage.getByLabel("Deliver to").selectOption("Kano");
+    await pickOption(buyerPage.getByLabel("Deliver to"), "Kano");
     await expect(buyerPage.getByText("₦15,000 delivered to Kano")).toBeVisible();
     await expect(buyerPage.getByText("Verified seller", { exact: true })).toBeVisible();
     await buyerPage.getByRole("link", { name: title }).click();
@@ -43,7 +44,7 @@ test.describe("shop", () => {
     await expect(buyerPage).toHaveURL(/\/cart$/);
     await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
 
-    await buyerPage.getByLabel("Delivery state").selectOption("Kano");
+    await pickOption(buyerPage.getByLabel("Delivery state"), "Kano");
     await expect(buyerPage.getByText("₦250,000")).toBeVisible();
     await buyerPage.getByLabel("Town or city").fill("Nassarawa");
     await buyerPage.getByLabel("Delivery address").fill("4 Zoo Road");
@@ -87,7 +88,7 @@ test.describe("shop", () => {
     await buyerPage.getByRole("button", { name: "Add to cart" }).click();
     await buyerPage.getByRole("link", { name: "View cart and check out" }).click();
     await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
-    await buyerPage.getByLabel("Delivery state").selectOption("Kano");
+    await pickOption(buyerPage.getByLabel("Delivery state"), "Kano");
     await buyerPage.getByLabel("Town or city").fill("Fagge");
     await buyerPage.getByLabel("Delivery address").fill("8 Airport Road");
     await buyerPage.getByRole("button", { name: "Place order" }).click();

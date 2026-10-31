@@ -3,6 +3,7 @@ import type { Browser, Page } from "@playwright/test";
 import type postgres from "postgres";
 import { createSessionFor, emailsTo, expect, readOtp, test, uniqueEmail, type TestUser } from "./support/fixtures";
 import { addDriver, lagosDate, paidBooking } from "./support/marketplace";
+import { pickOption } from "./support/select";
 
 const PNG = path.join(__dirname, "fixtures", "truck.png");
 
@@ -40,7 +41,7 @@ test.describe("delivery operations", () => {
     await page.getByLabel("Email address").fill(driverEmail);
     await page.getByLabel("Mobile number").fill("0803 444 0199");
     await page.getByLabel("Driver's licence number").fill(`LAG ${Date.now().toString().slice(-8)} AB`);
-    await page.getByLabel("Licence class").selectOption("E");
+    await pickOption(page.getByLabel("Licence class"), "E");
     await page.getByLabel("Licence expiry date").fill(lagosDate(400));
     await page.getByRole("button", { name: "Add driver" }).click();
     await expect(page).toHaveURL(/\/vendor\/drivers\/[0-9a-f-]{36}$/);
@@ -52,14 +53,14 @@ test.describe("delivery operations", () => {
     await page.getByLabel("Email address").fill(shipper.email);
     await page.getByLabel("Mobile number").fill("0803 444 0200");
     await page.getByLabel("Driver's licence number").fill("ZZZ99999999");
-    await page.getByLabel("Licence class").selectOption("G");
+    await pickOption(page.getByLabel("Licence class"), "G");
     await page.getByLabel("Licence expiry date").fill(lagosDate(400));
     await page.getByRole("button", { name: "Add driver" }).click();
     await expect(page.getByText("This email already belongs to a WCE Logistics account.")).toBeVisible();
 
     await page.goto(`/vendor/bookings/${bookingId}`);
     await expect(page.getByText("Assign a driver")).toBeVisible();
-    await page.getByLabel("Driver").selectOption({ label: "Musa Bello, class E" });
+    await pickOption(page.getByLabel("Driver"), { label: "Musa Bello, class E" });
     await page.getByRole("button", { name: "Assign driver" }).click();
     await expect(page.getByText("Driver assigned. The shipper and the driver have been emailed.")).toBeVisible();
     await expect.poll(async () => (await emailsTo(shipper.email)).map((email) => email.subject)).toContain(`Driver assigned to ${reference}`);
@@ -142,7 +143,7 @@ test.describe("delivery operations", () => {
     await shipperPage.goto(`/account/bookings/${bookingId}`);
     await shipperPage.getByRole("link", { name: "Report a problem" }).click();
     await expect(shipperPage).toHaveURL(/\/dispute$/);
-    await shipperPage.getByLabel("What went wrong?").selectOption("damaged_goods");
+    await pickOption(shipperPage.getByLabel("What went wrong?"), "damaged_goods");
     await shipperPage.getByLabel("Describe the problem").fill("Four cartons of tiles arrived cracked and unusable.");
     await shipperPage.getByLabel("Evidence").setInputFiles(PNG);
     await shipperPage.getByRole("button", { name: "Open dispute" }).click();
@@ -170,7 +171,7 @@ test.describe("delivery operations", () => {
     await adminPage.getByRole("link", { name: reference }).click();
     await adminPage.getByRole("button", { name: "Assign to me" }).click();
     await expect(adminPage.getByText("Assigned to you.")).toBeVisible();
-    await adminPage.getByLabel("Status").selectOption("awaiting_information");
+    await pickOption(adminPage.getByLabel("Status"), "awaiting_information");
     await adminPage.getByRole("button", { name: "Update status" }).click();
     await expect(adminPage.getByText("Dispute updated. Both parties have been emailed.")).toBeVisible();
 
@@ -183,7 +184,7 @@ test.describe("delivery operations", () => {
     expect(reopened.status).toBe("under_review");
 
     await adminPage.reload();
-    await adminPage.getByLabel("Status").selectOption("resolved");
+    await pickOption(adminPage.getByLabel("Status"), "resolved");
     await adminPage.getByLabel("Outcome").fill("Vendor agreed to replace four cartons on the next trip. Payout released.");
     await adminPage.getByRole("button", { name: "Close dispute" }).click();
     await expect.poll(() => payoutStatus(sql, bookingId)).toBe("eligible");
@@ -212,10 +213,13 @@ test.describe("delivery operations", () => {
     const vendorPage = await pageFor(browser, sql, vendorUser);
     await vendorPage.goto(`/vendor/bookings/${bookingId}`);
     const select = vendorPage.getByLabel("Driver");
-    await expect(select.locator("option", { hasText: "Light Licence" })).toBeDisabled();
-    await expect(select.locator("option", { hasText: "Light Licence" })).toContainText("does not cover this truck");
-    await expect(select.locator("option", { hasText: "Expiring Licence" })).toContainText("expires before the trip departs");
-    await select.selectOption({ label: "Assigned Driver, class E" });
+    await select.click();
+    const lightLicence = vendorPage.getByRole("option", { name: /Light Licence/ });
+    await expect(lightLicence).toHaveAttribute("aria-disabled", "true");
+    await expect(lightLicence).toContainText("does not cover this truck");
+    await expect(vendorPage.getByRole("option", { name: /Expiring Licence/ })).toContainText("expires before the trip departs");
+    await vendorPage.keyboard.press("Escape");
+    await pickOption(select, { label: "Assigned Driver, class E" });
     await vendorPage.getByRole("button", { name: "Assign driver" }).click();
     await expect(vendorPage.getByText("Driver assigned.", { exact: false })).toBeVisible();
 

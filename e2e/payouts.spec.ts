@@ -3,6 +3,7 @@ import type postgres from "postgres";
 import { fakePaystackPort } from "./support/env";
 import { createSessionFor, emailsTo, expect, test, type TestUser } from "./support/fixtures";
 import { paidBooking } from "./support/marketplace";
+import { pickOption } from "./support/select";
 
 async function pageFor(browser: Browser, sql: postgres.Sql, user: TestUser): Promise<Page> {
   const page = await (await browser.newContext()).newPage();
@@ -30,7 +31,7 @@ async function completeTransfer(reference: string, status: "success" | "failed")
 
 async function addBankAccount(page: Page, accountNumber: string) {
   await page.goto("/vendor/payouts/account");
-  await page.getByLabel("Bank").selectOption({ label: "Guaranty Trust Bank" });
+  await pickOption(page.getByLabel("Bank"), { label: "Guaranty Trust Bank" });
   await page.getByLabel("Account number").fill(accountNumber);
   await page.getByRole("button", { name: "Verify and save" }).click();
 }
@@ -46,7 +47,10 @@ test.describe("vendor payouts", () => {
     const vendorPage = await pageFor(browser, sql, vendorUser);
 
     await vendorPage.goto("/vendor/payouts/account");
-    await expect(vendorPage.getByLabel("Bank").locator("option", { hasText: "Retired Bank" })).toHaveCount(0);
+    await vendorPage.getByLabel("Bank").click();
+    await expect(vendorPage.getByRole("option", { name: "Guaranty Trust Bank" })).toBeVisible();
+    await expect(vendorPage.getByRole("option", { name: "Retired Bank" })).toHaveCount(0);
+    await vendorPage.keyboard.press("Escape");
     await addBankAccount(vendorPage, "9990001111");
     await expect(vendorPage.getByText("We could not find that account at the selected bank.", { exact: false })).toBeVisible();
 

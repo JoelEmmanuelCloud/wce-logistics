@@ -24,7 +24,7 @@ export function DisputeStatusForm({ action, current }: { action: (state: FormSta
       <FormMessage state={state} />
       <div key={fieldsKey(state)} className="grid gap-5">
         <Field id="status" label="Status" required errors={errors.status}>
-          <SelectInput id="status" value={status} onChange={(event) => setStatus(event.target.value)} errors={errors.status}>
+          <SelectInput id="status" value={status} onValueChange={setStatus} errors={errors.status}>
             {OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

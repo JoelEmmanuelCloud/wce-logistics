@@ -28,7 +28,7 @@ export function CheckoutForm({ sellerName, origin, lines, rates }: { sellerName:
         <FormMessage state={state} />
         <div key={fieldsKey(state)} className="grid gap-5">
           <Field id="destinationState" label="Delivery state" required hint={`${sellerName} delivers to ${rates.length} state${rates.length === 1 ? "" : "s"}.`} errors={errors.destinationState}>
-            <SelectInput id="destinationState" value={destination} onChange={(event) => setDestination(event.target.value)} hasHint errors={errors.destinationState}>
+            <SelectInput id="destinationState" value={destination} onValueChange={setDestination} hasHint errors={errors.destinationState}>
               <option value="" disabled>
                 Choose a state
               </option>

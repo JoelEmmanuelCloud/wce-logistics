@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useState, type ReactNode } from "react";
 import { ArrowUpRightIcon } from "@/components/line-icons";
+import { Select } from "@/components/ui/select";
 import { estimateRange, formatNaira, type RouteLane } from "@/lib/pricing";
 
 const FIELD = "h-12 w-full rounded-xl border border-white/15 bg-white px-4 text-[16px] text-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange/60";
@@ -45,34 +46,18 @@ export function PriceEstimator({ lanes, minShipmentKg }: { lanes: RouteLane[]; m
   return (
     <EstimateFrame>
       <div className="grid gap-5 sm:grid-cols-2">
-        <label className="grid gap-2" htmlFor={`${id}-from`}>
-          <span className={LABEL}>From</span>
-          <select id={`${id}-from`} value={origin} onChange={(event) => chooseOrigin(event.target.value)} className={FIELD}>
-            <option value="">Choose a state</option>
-            {origins.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-2" htmlFor={`${id}-to`}>
-          <span className={LABEL}>To</span>
-          <select
-            id={`${id}-to`}
-            value={destination}
-            onChange={(event) => setDestination(event.target.value)}
-            disabled={!origin}
-            className={`${FIELD} disabled:cursor-not-allowed disabled:opacity-50`}
-          >
-            <option value="">Choose a state</option>
-            {destinations.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="grid gap-2">
+          <label htmlFor={`${id}-from`} className={LABEL}>
+            From
+          </label>
+          <Select id={`${id}-from`} options={origins.map((state) => ({ value: state, label: state }))} value={origin} onValueChange={chooseOrigin} placeholder="Choose a state" />
+        </div>
+        <div className="grid gap-2">
+          <label htmlFor={`${id}-to`} className={LABEL}>
+            To
+          </label>
+          <Select id={`${id}-to`} options={destinations.map((state) => ({ value: state, label: state }))} value={destination} onValueChange={setDestination} disabled={!origin} placeholder="Choose a state" />
+        </div>
         <label className="grid gap-2 sm:col-span-2" htmlFor={`${id}-weight`}>
           <span className={LABEL}>Weight in kg</span>
           <input
