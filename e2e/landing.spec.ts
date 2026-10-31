@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("landing page", () => {
-  test("renders the hero with brand content and no console errors", async ({ page }) => {
+  test("renders the hero with brand content and no console errors", async ({ page, isMobile }) => {
     const errors: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") errors.push(message.text());
@@ -11,7 +11,9 @@ test.describe("landing page", () => {
     await page.goto("/");
     await expect(page).toHaveTitle(/WCE Logistics/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Every State");
-    await expect(page.getByRole("img", { name: /Map of Nigeria/ })).toBeVisible();
+    if (!isMobile) {
+      await expect(page.getByRole("img", { name: /Map of Nigeria/ })).toBeVisible();
+    }
     expect(errors).toEqual([]);
   });
 
@@ -28,6 +30,7 @@ test.describe("landing page", () => {
   test("hero buttons start sign-up as a shipper or a vendor", async ({ page }) => {
     await page.goto("/");
     const hero = page.locator("main > section").first();
+    await expect(hero.getByRole("link", { name: "Shop goods" })).toHaveAttribute("href", "/shop");
     await expect(hero.getByRole("link", { name: "Book a truck" })).toHaveAttribute("href", "/sign-in?as=customer");
     await hero.getByRole("link", { name: "List your truck" }).click();
     await expect(page).toHaveURL(/\/sign-in\?as=vendor$/);

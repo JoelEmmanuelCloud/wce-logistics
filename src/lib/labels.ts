@@ -118,6 +118,21 @@ export const BOOKING_STATUS: Record<string, { label: string; tone: Tone }> = {
   disputed: { label: "Disputed", tone: "danger" },
 };
 
+export const ORDER_STATUS: Record<string, { label: string; tone: Tone }> = {
+  awaiting_seller: { label: "Awaiting seller", tone: "info" },
+  accepted: { label: "Accepted", tone: "success" },
+  declined: { label: "Declined by seller", tone: "danger" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+  expired: { label: "Expired", tone: "neutral" },
+};
+
+export const PRODUCT_STATUS: Record<string, { label: string; tone: Tone }> = {
+  active: { label: "On sale", tone: "success" },
+  paused: { label: "Paused", tone: "warning" },
+  hidden: { label: "Hidden by admin", tone: "danger" },
+  archived: { label: "Archived", tone: "neutral" },
+};
+
 export const ROUTE_STATUS: Record<string, { label: string; tone: Tone }> = {
   active: { label: "Open for bookings", tone: "success" },
   paused: { label: "Paused", tone: "warning" },

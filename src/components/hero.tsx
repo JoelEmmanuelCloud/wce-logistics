@@ -40,7 +40,7 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
           <p className="hero-fade max-w-[22em] rounded-2xl border border-white/15 bg-navy/45 px-5 py-4 text-[clamp(18px,min(2.8vh,1.6vw),26px)] leading-[1.3] text-white backdrop-blur-md [--d:200ms]">
             Built for Nigeria. Every vendor and truck <span className="hero-emphasis text-orange">checked before it moves.</span>
           </p>
-          <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] w-full max-w-[460px] lg:w-[min(100%,calc((100svh-520px)*1.25))] lg:max-w-none" />
+          <NigeriaRouteMap className="hero-fade [--d:380ms] mt-[clamp(16px,3vh,36px)] hidden w-full sm:block max-w-[460px] lg:w-[min(100%,calc((100svh-520px)*1.25))] lg:max-w-none" />
         </div>
       </div>
 
@@ -54,7 +54,8 @@ export function Hero({ contactEmail, whatsappUrl }: { contactEmail: string; what
         </div>
         <div className="flex flex-col gap-4 sm:items-end">
           <div className="flex flex-wrap items-center gap-3">
-            <ArrowButton href="/sign-in?as=customer" label="Book a truck" />
+            <ArrowButton href="/shop" label="Shop goods" />
+            <GlassButton href="/sign-in?as=customer">Book a truck</GlassButton>
             <GlassButton href="/sign-in?as=vendor">List your truck</GlassButton>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-[15px] text-white/85">

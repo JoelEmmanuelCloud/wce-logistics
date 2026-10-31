@@ -15,6 +15,8 @@ const NAV = [
   { href: "/admin/vendors", label: "Vendors", icon: "users", primary: true },
   { href: "/admin/trucks", label: "Trucks", icon: "truck", primary: true },
   { href: "/admin/bookings", label: "Bookings", icon: "calendar", primary: true },
+  { href: "/admin/orders", label: "Orders", icon: "receipt" },
+  { href: "/admin/products", label: "Products", icon: "box" },
   { href: "/admin/payments", label: "Payments", icon: "receipt" },
   { href: "/admin/payouts", label: "Payouts", icon: "wallet" },
   { href: "/admin/reports", label: "Reports", icon: "chart" },

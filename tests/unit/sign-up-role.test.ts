@@ -21,4 +21,8 @@ describe("onboardingPathFor", () => {
     expect(onboardingPathFor("vendor")).toBe("/onboarding?as=vendor");
     expect(onboardingPathFor(null)).toBe("/onboarding");
   });
+
+  it("carries the page to return to after onboarding", () => {
+    expect(onboardingPathFor("customer", "/checkout")).toBe("/onboarding?as=customer&next=%2Fcheckout");
+  });
 });

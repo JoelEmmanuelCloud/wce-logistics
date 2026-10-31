@@ -7,6 +7,7 @@ import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
 
 const COMPANY_LINKS = [
+  { label: "Shop", href: "/shop" },
   { label: "How it works", href: "/#how-it-works" },
   { label: "Pricing", href: "/#pricing" },
   { label: "Industries", href: "/#industries" },

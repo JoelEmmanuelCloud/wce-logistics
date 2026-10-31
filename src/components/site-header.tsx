@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRightIcon, CloseIcon, MailIcon, MenuIcon, WhatsAppIcon } from "@/components/line-icons";
+import { ArrowUpRightIcon, CloseIcon, MailIcon, MenuIcon, StoreIcon, WhatsAppIcon } from "@/components/line-icons";
 import { WceLogo } from "@/components/wce-logo";
 import { IMAGES, type SiteImage } from "@/data/images";
 import { INDUSTRIES, SERVICES } from "@/data/landing";
@@ -20,14 +20,15 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
       features: SERVICES.map((service) => ({
         title: service.title,
         detail: service.summary,
-        href: "#services",
+        href: "/#services",
         image: IMAGES[service.key],
       })),
       linksTitle: "Plan a shipment",
       links: [
-        { title: "Check a price", href: "#estimate" },
-        { title: "How booking works", href: "#how-it-works" },
-        { title: "Common questions", href: "#faq" },
+        { title: "Shop bulk goods", href: "/shop" },
+        { title: "Check a price", href: "/#estimate" },
+        { title: "How booking works", href: "/#how-it-works" },
+        { title: "Common questions", href: "/#faq" },
         { title: "Book a truck", href: "/sign-in?as=customer" },
       ],
     },
@@ -37,14 +38,14 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
       features: INDUSTRIES.map((industry) => ({
         title: industry.title,
         detail: industry.summary,
-        href: "#industries",
+        href: "/#industries",
         image: IMAGES[industry.key],
       })),
       linksTitle: "Why businesses choose us",
       links: [
-        { title: "Verified vendors and trucks", href: "#trust" },
-        { title: "Tracked from pickup to delivery", href: "#how-it-works" },
-        { title: "Every charge itemised", href: "#pricing" },
+        { title: "Verified vendors and trucks", href: "/#trust" },
+        { title: "Tracked from pickup to delivery", href: "/#how-it-works" },
+        { title: "Every charge itemised", href: "/#pricing" },
         { title: "Talk to our team", href: `mailto:${contactEmail}` },
       ],
     },
@@ -52,16 +53,16 @@ function buildMenus(contactEmail: string, whatsappUrl: string): Menu[] {
       label: "Company",
       intro: "About WCE Logistics",
       features: [
-        { title: "How it works", detail: "From booking request to proof of delivery", href: "#how-it-works", image: IMAGES.onDemand },
-        { title: "Verification", detail: "Every vendor and truck checked before it takes a load", href: "#trust", image: IMAGES.inspection },
-        { title: "Pricing", detail: "Rates per tonne with every charge itemised", href: "#pricing", image: IMAGES.warehouse },
-        { title: "Become a vendor", detail: "Truck owners and fleet operators list verified trucks and routes", href: "#vendors", image: IMAGES.vendor },
+        { title: "How it works", detail: "From booking request to proof of delivery", href: "/#how-it-works", image: IMAGES.onDemand },
+        { title: "Verification", detail: "Every vendor and truck checked before it takes a load", href: "/#trust", image: IMAGES.inspection },
+        { title: "Pricing", detail: "Rates per tonne with every charge itemised", href: "/#pricing", image: IMAGES.warehouse },
+        { title: "Become a vendor", detail: "Truck owners and fleet operators list verified trucks and routes", href: "/#vendors", image: IMAGES.vendor },
       ],
       linksTitle: "Get in touch",
       links: [
         { title: "Chat on WhatsApp", href: whatsappUrl },
         { title: contactEmail, href: `mailto:${contactEmail}` },
-        { title: "Questions and answers", href: "#faq" },
+        { title: "Questions and answers", href: "/#faq" },
       ],
     },
   ];
@@ -178,7 +179,7 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string; whatsappUrl: string }) {
+export function SiteHeader({ contactEmail, whatsappUrl, cart }: { contactEmail: string; whatsappUrl: string; cart: ReactNode }) {
   const menus = buildMenus(contactEmail, whatsappUrl);
   const [menuIndex, setMenuIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -238,12 +239,17 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
       {mobileOpen && <div aria-hidden="true" className="pointer-events-auto fixed inset-0 -z-10 bg-navy/45 backdrop-blur-[2px] md:hidden" />}
       <div ref={navRef} className="pointer-events-auto relative mx-auto max-w-[1744px]">
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-navy/70 p-2 shadow-[0_12px_40px_rgba(5,14,28,0.28)] backdrop-blur-[10px] backdrop-saturate-150 md:gap-6">
-          <Link href="/" aria-label="WCE Logistics home" className="shrink-0 pl-2 text-[clamp(13px,1.1vw,17px)]">
+          <Link href="/" aria-label="WCE Logistics home" className="shrink-0 pl-2 text-[11px] min-[390px]:text-[13px] md:text-[clamp(13px,1.1vw,17px)]">
             <WceLogo />
           </Link>
 
           <nav aria-label="Main" className="hidden md:block">
             <ul className="flex items-center gap-1">
+              <li>
+                <Link href="/shop" onClick={closeMenus} className="flex h-10 items-center rounded-xl px-4 text-[15px] font-medium text-white transition-colors hover:bg-white/10">
+                  Shop
+                </Link>
+              </li>
               {menus.map((menu, index) => {
                 const open = menuOpen && menuIndex === index;
                 return (
@@ -265,6 +271,7 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
           </nav>
 
           <div className="hidden shrink-0 items-center gap-1 md:flex">
+            {cart}
             <Link href="/sign-in" className="flex h-10 items-center rounded-xl px-4 text-[15px] font-medium text-white transition-colors hover:bg-white/10">
               Sign in
             </Link>
@@ -277,9 +284,10 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Link href="/sign-in?as=customer" className="flex h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-[14px] font-semibold text-navy">
-              Book a truck
+            <Link href="/shop" className="hidden h-10 items-center whitespace-nowrap rounded-xl bg-orange px-3.5 text-[14px] font-semibold text-navy min-[360px]:flex">
+              Shop
             </Link>
+            {cart}
             <button
               type="button"
               aria-expanded={mobileOpen}
@@ -307,6 +315,12 @@ export function SiteHeader({ contactEmail, whatsappUrl }: { contactEmail: string
           className="absolute inset-x-0 top-full mt-2 flex max-h-[calc(100svh-88px)] flex-col overflow-hidden rounded-2xl border border-white/40 bg-white text-navy shadow-[0_24px_60px_rgba(11,37,69,0.35)] md:hidden"
         >
           <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-1">
+            <Link href="/shop" onClick={closeMenus} className="flex items-center justify-between gap-3 border-b border-navy/10 px-3 py-4 text-[17px] font-semibold text-navy">
+              Shop
+              <span className="grid size-8 place-items-center rounded-full bg-orange text-navy">
+                <StoreIcon className="size-4" />
+              </span>
+            </Link>
             {menus.map((menu, index) => {
               const open = mobileSection === index;
               const sectionId = `${baseId}-mobile-${index}`;

@@ -3,10 +3,13 @@ import { Hero } from "@/components/hero";
 import { FaqSection } from "@/components/sections/faq-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { IndustriesSection } from "@/components/sections/industries-section";
+import { PopularProducts } from "@/components/sections/popular-products";
 import { PricingSection } from "@/components/sections/pricing-section";
 import { ServicesSection } from "@/components/sections/services-section";
+import { ShopSection } from "@/components/sections/shop-section";
 import { TrustSection } from "@/components/sections/trust-section";
 import { VendorSection } from "@/components/sections/vendor-section";
+import { SiteCart } from "@/components/shop/site-cart";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { StructuredData } from "@/components/structured-data";
@@ -23,9 +26,11 @@ export default function Home() {
   return (
     <>
       <StructuredData />
-      <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
+      <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} cart={<SiteCart />} />
       <main>
         <Hero contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
+        <PopularProducts />
+        <ShopSection />
         <ServicesSection />
         <HowItWorksSection />
         <TrustSection />

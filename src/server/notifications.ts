@@ -4,7 +4,7 @@ import { formatPhone } from "@/lib/phone";
 import { formatNaira } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import { db, schema } from "@/server/db";
-import type { Booking, Dispute, Payout } from "@/server/db/schema";
+import type { Booking, Dispute, Order, Payout } from "@/server/db/schema";
 import { sendEmail, type EmailMessage } from "@/server/email";
 import { getPlatformSettings } from "@/server/settings";
 
@@ -35,7 +35,12 @@ type Template =
   | "review.received"
   | "dispute.opened"
   | "dispute.updated"
-  | "dispute.message";
+  | "dispute.message"
+  | "order.placed"
+  | "order.accepted"
+  | "order.declined"
+  | "order.cancelled"
+  | "order.expired";
 
 type Content = Omit<EmailMessage, "to">;
 
@@ -71,6 +76,82 @@ async function vendorUserId(vendorId: string): Promise<string | null> {
 
 function link(path: string): string {
   return new URL(path, site.url).toString();
+}
+
+export async function notifyOrder(event: Extract<Template, `order.${string}`>, order: Order): Promise<void> {
+  const amount = formatNaira(order.totalKobo);
+  const vendorUser = await vendorUserId(order.vendorId);
+  const forCustomer = { label: "View order", url: link(`/account/orders/${order.id}`) };
+  const forVendor = { label: "View order", url: link(`/vendor/orders/${order.id}`) };
+  const jobs: Array<Promise<void>> = [];
+
+  switch (event) {
+    case "order.placed": {
+      const { responseWindowHours } = await getPlatformSettings();
+      jobs.push(
+        deliver(order.customerId, event, {
+          subject: `Order ${order.reference} received`,
+          heading: "We have your order",
+          paragraphs: [`The seller has ${responseWindowHours} hours to confirm order ${order.reference}. You pay ${amount} once they accept and schedule delivery.`],
+          action: forCustomer,
+        }),
+      );
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, event, {
+            subject: `New order ${order.reference}`,
+            heading: "You have a new order",
+            paragraphs: [`A customer ordered ${order.weightKg.toLocaleString("en-NG")} kg of goods for delivery to ${order.destinationCity}, ${order.destinationState}.`, `Accept and choose a truck within ${responseWindowHours} hours, or the order expires and the stock is released.`],
+            action: { label: "Review order", url: forVendor.url },
+          }),
+        );
+      }
+      break;
+    }
+    case "order.accepted":
+      jobs.push(
+        deliver(order.customerId, event, {
+          subject: `Order ${order.reference} accepted`,
+          heading: "The seller accepted your order",
+          paragraphs: [`Delivery is scheduled for order ${order.reference}. Pay ${amount} to confirm it.`],
+          action: { label: "Pay now", url: forCustomer.url },
+        }),
+      );
+      break;
+    case "order.declined":
+      jobs.push(
+        deliver(order.customerId, event, {
+          subject: `Order ${order.reference} declined`,
+          heading: "The seller could not take this order",
+          paragraphs: [order.statusNote ? `Their reason: ${order.statusNote}` : "The seller declined this order.", "You have not been charged."],
+          action: { label: "Back to the shop", url: link("/shop") },
+        }),
+      );
+      break;
+    case "order.cancelled":
+      if (vendorUser) {
+        jobs.push(
+          deliver(vendorUser, event, {
+            subject: `Order ${order.reference} cancelled`,
+            heading: "The customer cancelled this order",
+            paragraphs: [order.statusNote ? `Reason: ${order.statusNote}` : "The order was cancelled.", "The stock is back on sale."],
+            action: forVendor,
+          }),
+        );
+      }
+      break;
+    case "order.expired":
+      jobs.push(
+        deliver(order.customerId, event, {
+          subject: `Order ${order.reference} expired`,
+          heading: "This order expired",
+          paragraphs: [order.statusNote ?? "The order expired.", "You have not been charged."],
+          action: { label: "Back to the shop", url: link("/shop") },
+        }),
+      );
+      break;
+  }
+  await Promise.all(jobs);
 }
 
 export async function notifyBooking(event: Extract<Template, `booking.${string}` | "payment.refunded">, booking: Booking): Promise<void> {

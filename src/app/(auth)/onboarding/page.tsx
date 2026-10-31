@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { returnPathFrom } from "@/lib/shop";
 import { homePathFor, requireUser, signUpRoleFrom } from "@/server/auth/dal";
 import { AuthFormSkeleton } from "../form-skeleton";
 import { OnboardingForm } from "./onboarding-form";
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 };
 
 async function OnboardingGate({ searchParams }: { searchParams: PageProps<"/onboarding">["searchParams"] }) {
-  const role = signUpRoleFrom((await searchParams).as);
+  const params = await searchParams;
+  const role = signUpRoleFrom(params.as);
   const user = await requireUser();
   if (user.role) {
     redirect(homePathFor(user));
@@ -23,7 +25,7 @@ async function OnboardingGate({ searchParams }: { searchParams: PageProps<"/onbo
         Signed in as <span className="font-semibold text-navy">{user.email}</span>. Tell us a little about you to finish.
       </p>
       <div className="mt-8">
-        <OnboardingForm defaultRole={role} />
+        <OnboardingForm defaultRole={role} next={returnPathFrom(params.next)} />
       </div>
     </>
   );

@@ -12,8 +12,10 @@ export const metadata: Metadata = {
 
 const NAV = [
   { href: "/account", label: "Overview", exact: true, icon: "home", primary: true },
+  { href: "/account/orders", label: "Orders", icon: "receipt", primary: true },
   { href: "/account/shipments", label: "Shipments", icon: "box", primary: true },
   { href: "/account/bookings", label: "Bookings", icon: "calendar", primary: true },
+  { href: "/shop", label: "Shop", icon: "store" },
 ] as const satisfies readonly NavItem[];
 
 export default async function AccountLayout({ children }: LayoutProps<"/account">) {

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, isNull, lte, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, gte, inArray, isNull, lte, ne, not, sql } from "drizzle-orm";
 import { randomInt } from "node:crypto";
 import { addDays, lagosToday } from "@/lib/dates";
 import { quoteFor, type Quote } from "@/lib/pricing";
@@ -8,6 +8,7 @@ import { recordAudit } from "@/server/audit";
 import { db, schema, type Database } from "@/server/db";
 import { getPlatformSettings } from "@/server/settings";
 import type { Booking, BookingStatus, Route, Shipment } from "@/server/db/schema";
+import { closeOrderForBooking } from "@/server/order-stock";
 
 export const SEARCH_WINDOW_DAYS = 3;
 
@@ -24,7 +25,7 @@ export const OPEN_BOOKING_STATUSES: BookingStatus[] = [
 export const CUSTOMER_CANCELLABLE: BookingStatus[] = ["pending_vendor_acceptance", "awaiting_payment", "confirmed", "pickup_scheduled"];
 export const VENDOR_CANCELLABLE: BookingStatus[] = ["awaiting_payment", "confirmed", "pickup_scheduled"];
 
-type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 export class MarketplaceError extends Error {}
 
@@ -48,70 +49,72 @@ export async function listRoutesForVendor(vendorId: string) {
 }
 
 export async function createRoute(vendorId: string, actorId: string, input: RouteInput): Promise<Route> {
-  return db().transaction(async (tx) => {
-    const [truck] = await tx
-      .select()
-      .from(schema.trucks)
-      .where(and(eq(schema.trucks.id, input.truckId), eq(schema.trucks.vendorId, vendorId), isNull(schema.trucks.archivedAt)))
-      .limit(1)
-      .for("update");
-    if (!truck) {
-      throw new MarketplaceError("Choose one of your trucks.");
-    }
-    if (truck.listingStatus !== "active" && truck.listingStatus !== "unavailable") {
-      throw new MarketplaceError("Only approved trucks can be scheduled. Finish the truck review first.");
-    }
-    if (input.capacityKg > truck.maxPayloadKg) {
-      throw new MarketplaceError(`Capacity cannot exceed this truck's payload of ${truck.maxPayloadKg.toLocaleString("en-NG")} kg.`);
-    }
-    const [clash] = await tx
-      .select({ id: schema.routes.id })
-      .from(schema.routes)
-      .where(
-        and(
-          eq(schema.routes.truckId, truck.id),
-          eq(schema.routes.departureDate, input.departureDate),
-          inArray(schema.routes.status, ["active", "paused"]),
-        ),
-      )
-      .limit(1);
-    if (clash) {
-      throw new MarketplaceError("This truck already has a trip departing on that date.");
-    }
+  return db().transaction((tx) => createRouteIn(tx, vendorId, actorId, input));
+}
 
-    const [route] = await tx
-      .insert(schema.routes)
-      .values({
-        truckId: truck.id,
-        vendorId,
-        originState: input.originState,
-        originCity: input.originCity,
-        destinationState: input.destinationState,
-        destinationCity: input.destinationCity,
-        departureDate: input.departureDate,
-        transitHours: input.transitHours,
-        capacityKg: input.capacityKg,
-        allowsShared: input.allowsShared,
-        ratePerTonneKobo: input.ratePerTonneKobo,
-        minimumChargeKobo: input.minimumChargeKobo,
-        dedicatedPriceKobo: input.dedicatedPriceKobo,
-        loadingChargeKobo: input.loadingChargeKobo,
-        offloadingChargeKobo: input.offloadingChargeKobo,
-        tollChargeKobo: input.tollChargeKobo,
-      })
-      .returning();
-    await recordAudit(
-      {
-        actorId,
-        action: "route.created",
-        entityType: "route",
-        entityId: route.id,
-        metadata: { truckId: truck.id, from: input.originState, to: input.destinationState, departureDate: input.departureDate },
-      },
-      tx,
-    );
-    return route;
-  });
+export async function createRouteIn(tx: Transaction, vendorId: string, actorId: string, input: RouteInput): Promise<Route> {
+  const [truck] = await tx
+    .select()
+    .from(schema.trucks)
+    .where(and(eq(schema.trucks.id, input.truckId), eq(schema.trucks.vendorId, vendorId), isNull(schema.trucks.archivedAt)))
+    .limit(1)
+    .for("update");
+  if (!truck) {
+    throw new MarketplaceError("Choose one of your trucks.");
+  }
+  if (truck.listingStatus !== "active" && truck.listingStatus !== "unavailable") {
+    throw new MarketplaceError("Only approved trucks can be scheduled. Finish the truck review first.");
+  }
+  if (input.capacityKg > truck.maxPayloadKg) {
+    throw new MarketplaceError(`Capacity cannot exceed this truck's payload of ${truck.maxPayloadKg.toLocaleString("en-NG")} kg.`);
+  }
+  const [clash] = await tx
+    .select({ id: schema.routes.id })
+    .from(schema.routes)
+    .where(
+      and(
+        eq(schema.routes.truckId, truck.id),
+        eq(schema.routes.departureDate, input.departureDate),
+        inArray(schema.routes.status, ["active", "paused"]),
+      ),
+    )
+    .limit(1);
+  if (clash) {
+    throw new MarketplaceError("This truck already has a trip departing on that date.");
+  }
+
+  const [route] = await tx
+    .insert(schema.routes)
+    .values({
+      truckId: truck.id,
+      vendorId,
+      originState: input.originState,
+      originCity: input.originCity,
+      destinationState: input.destinationState,
+      destinationCity: input.destinationCity,
+      departureDate: input.departureDate,
+      transitHours: input.transitHours,
+      capacityKg: input.capacityKg,
+      allowsShared: input.allowsShared,
+      ratePerTonneKobo: input.ratePerTonneKobo,
+      minimumChargeKobo: input.minimumChargeKobo,
+      dedicatedPriceKobo: input.dedicatedPriceKobo,
+      loadingChargeKobo: input.loadingChargeKobo,
+      offloadingChargeKobo: input.offloadingChargeKobo,
+      tollChargeKobo: input.tollChargeKobo,
+    })
+    .returning();
+  await recordAudit(
+    {
+      actorId,
+      action: "route.created",
+      entityType: "route",
+      entityId: route.id,
+      metadata: { truckId: truck.id, from: input.originState, to: input.destinationState, departureDate: input.departureDate },
+    },
+    tx,
+  );
+  return route;
 }
 
 export async function setRouteStatus(vendorId: string, actorId: string, routeId: string, status: "active" | "paused" | "cancelled"): Promise<void> {
@@ -208,7 +211,7 @@ export async function searchOffers(shipment: Shipment) {
     .sort((a, b) => a.quote.totalKobo - b.quote.totalKobo || a.route.departureDate.localeCompare(b.route.departureDate));
 }
 
-async function addEvent(tx: Transaction, bookingId: string, status: BookingStatus, actorId: string | null, note: string | null = null) {
+export async function addEvent(tx: Transaction, bookingId: string, status: BookingStatus, actorId: string | null, note: string | null = null) {
   await tx.insert(schema.bookingEvents).values({ bookingId, status, actorId, note });
 }
 
@@ -359,7 +362,11 @@ export async function cancelBooking(
       .where(eq(schema.bookings.id, booking.id))
       .returning();
     await releaseCapacity(tx, booking);
-    await tx.update(schema.shipments).set({ status: "open" }).where(eq(schema.shipments.id, booking.shipmentId));
+    const closedOrder = await closeOrderForBooking(tx, booking, "cancelled", reason);
+    await tx
+      .update(schema.shipments)
+      .set({ status: closedOrder ? "cancelled" : "open" })
+      .where(eq(schema.shipments.id, booking.shipmentId));
     await addEvent(tx, booking.id, "cancelled", actor.id, reason);
     await recordAudit({ actorId: actor.id, action: "booking.cancelled", entityType: "booking", entityId: booking.id, metadata: { reason, by: actor.role } }, tx);
     return updated;
@@ -438,7 +445,21 @@ export async function listShipmentsForCustomer(customerId: string) {
   return db()
     .select()
     .from(schema.shipments)
-    .where(and(eq(schema.shipments.customerId, customerId), ne(schema.shipments.status, "cancelled")))
+    .where(
+      and(
+        eq(schema.shipments.customerId, customerId),
+        ne(schema.shipments.status, "cancelled"),
+        not(
+          exists(
+            db()
+              .select({ id: schema.orders.id })
+              .from(schema.orders)
+              .innerJoin(schema.bookings, eq(schema.bookings.id, schema.orders.bookingId))
+              .where(eq(schema.bookings.shipmentId, schema.shipments.id)),
+          ),
+        ),
+      ),
+    )
     .orderBy(desc(schema.shipments.createdAt))
     .limit(100);
 }

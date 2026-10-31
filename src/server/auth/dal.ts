@@ -10,8 +10,12 @@ export function signUpRoleFrom(value: unknown): SignUpRole | null {
   return value === "customer" || value === "vendor" ? value : null;
 }
 
-export function onboardingPathFor(role: SignUpRole | null): string {
-  return role ? `/onboarding?as=${role}` : "/onboarding";
+export function onboardingPathFor(role: SignUpRole | null, next: string | null = null): string {
+  const query = new URLSearchParams();
+  if (role) query.set("as", role);
+  if (next) query.set("next", next);
+  const suffix = query.toString();
+  return suffix ? `/onboarding?${suffix}` : "/onboarding";
 }
 
 export const getCurrentUser = cache(async (): Promise<User | null> => readSessionUser());

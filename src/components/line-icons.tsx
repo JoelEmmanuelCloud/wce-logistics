@@ -223,6 +223,25 @@ export function ListIcon(props: IconProps) {
   );
 }
 
+export function CartIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M3.5 4.5H6L8.5 15.5H18L20 7.5H7" />
+      <circle cx="10" cy="19" r="1.4" />
+      <circle cx="16.5" cy="19" r="1.4" />
+    </LineIcon>
+  );
+}
+
+export function StoreIcon(props: IconProps) {
+  return (
+    <LineIcon {...props}>
+      <path d="M4 10V19.5H20V10" />
+      <path d="M3 10L5 4.5H19L21 10C21 11.4 19.9 12.5 18.5 12.5C17.1 12.5 16 11.4 16 10C16 11.4 14.9 12.5 13.5 12.5H10.5C9.1 12.5 8 11.4 8 10C8 11.4 6.9 12.5 5.5 12.5C4.1 12.5 3 11.4 3 10Z" />
+    </LineIcon>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <LineIcon {...props}>

@@ -23,6 +23,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       list: [
         "Account details: your email address, full name, phone number and whether you ship goods or run trucks.",
         "Sign-in details: the one-time codes we email you, which we store only in scrambled form and which expire after 10 minutes, and the IP address and browser details of sign-in attempts.",
+        "Order details: the goods you buy, your delivery address and any delivery notes.",
         "Shipment details: pickup and delivery addresses, cargo type and description, weight, number of packages, declared value and handling notes.",
         "Vendor details: legal and business name, business address, the states you operate in, CAC registration number, identity document number and the documents you upload, such as vehicle registration, proof of ownership, roadworthiness certificates and insurance.",
         "Truck details: registration number, make, model, payload, base location and photos.",
@@ -170,6 +171,17 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       ],
     },
     {
+      id: "shop",
+      heading: "Buying from the shop",
+      list: [
+        "Goods in the shop are sold by verified vendors, not by WCE Logistics. The seller is responsible for the goods, their description and their delivery.",
+        "Your order is a request until the seller accepts it. The seller has a set time to accept, currently 24 hours, and your goods are held for you until then.",
+        "When the seller accepts, they choose a truck and delivery date. You then pay the full amount, goods and delivery together. If you do not pay in time, the order lapses and the goods go back on sale.",
+        "You pay nothing before the seller accepts, and you can cancel free of charge until then.",
+        "Once paid, your order is handled as a booking under these terms, including cancellations, refunds, delivery and disputes.",
+      ],
+    },
+    {
       id: "prohibited-goods",
       heading: "Goods you may not send",
       paragraphs: ["You may not book transport for:"],
@@ -192,6 +204,16 @@ export const TERMS_OF_SERVICE: LegalDocument = {
         "Once you accept a booking, carry it out as agreed. Assign a driver who holds a valid licence for the vehicle, and record pickup and delivery on the platform.",
         "Take reasonable care of the goods while they are in your possession, and keep insurance that covers the goods you carry.",
         "We deduct our platform commission from each booking. Your share is paid to your verified bank account through Paystack after the booking is completed.",
+      ],
+    },
+    {
+      id: "selling",
+      heading: "Selling in the shop",
+      list: [
+        "Only verified vendors can sell. List only goods you own or may sell, and describe them accurately, including their weight and quality.",
+        "Keep your prices, stock and delivery rates up to date. You must deliver accepted orders yourself on an approved truck.",
+        "The goods rules in these terms apply to everything you list. We may hide any product that breaks them.",
+        "Our platform commission applies to the full order, goods and delivery together.",
       ],
     },
     {

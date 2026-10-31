@@ -16,6 +16,7 @@
     "test": "vitest run",
     "storage:setup": "tsx scripts/storage-setup.ts",
     "admin:create": "tsx scripts/create-admin.ts",
+    "demo:seed": "tsx scripts/seed-demo.ts",
     "jobs:expire-documents": "node --conditions=react-server --import tsx scripts/run-job.ts expire-documents",
     "jobs:expire-bookings": "node --conditions=react-server --import tsx scripts/run-job.ts expire-bookings",
     "jobs:complete-deliveries": "node --conditions=react-server --import tsx scripts/run-job.ts complete-deliveries"
