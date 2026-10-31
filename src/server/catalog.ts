@@ -67,6 +67,27 @@ export async function listCatalog({ query, category, state, sellerId, page }: Ca
 
 export type CatalogRow = Awaited<ReturnType<typeof listCatalog>>["rows"][number];
 
+export async function popularProducts(limit = 8): Promise<CatalogRow[]> {
+  const sold = sql<number>`coalesce((
+    select sum(${schema.orderItems.quantity} * ${schema.orderItems.unitWeightKg}) from ${schema.orderItems}
+    inner join ${schema.orders} on ${schema.orders.id} = ${schema.orderItems.orderId}
+    where ${schema.orderItems.productId} = ${schema.products.id} and ${schema.orders.status} = 'accepted'
+  ), 0)`;
+  return db()
+    .select({ product: schema.products, sellerName, sellerCity: schema.vendorProfiles.city, sellerState: schema.vendorProfiles.state, photoId: firstPhotoId })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(
+      and(
+        onSale,
+        sql`${schema.products.stockUnits} > 0`,
+        exists(db().select({ id: schema.deliveryRates.id }).from(schema.deliveryRates).where(eq(schema.deliveryRates.vendorId, schema.products.vendorId))),
+      ),
+    )
+    .orderBy(desc(sold), desc(schema.products.createdAt))
+    .limit(limit);
+}
+
 export async function catalogCategories(): Promise<Array<{ value: string; label: string }>> {
   const [categories, used] = await Promise.all([
     activeCargoCategories(),

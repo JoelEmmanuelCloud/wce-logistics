@@ -3,6 +3,7 @@ import { Hero } from "@/components/hero";
 import { FaqSection } from "@/components/sections/faq-section";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
 import { IndustriesSection } from "@/components/sections/industries-section";
+import { PopularProducts } from "@/components/sections/popular-products";
 import { PricingSection } from "@/components/sections/pricing-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { ShopSection } from "@/components/sections/shop-section";
@@ -28,8 +29,9 @@ export default function Home() {
       <SiteHeader contactEmail={contactEmail} whatsappUrl={whatsappUrl} cart={<SiteCart />} />
       <main>
         <Hero contactEmail={contactEmail} whatsappUrl={whatsappUrl} />
-        <ServicesSection />
+        <PopularProducts />
         <ShopSection />
+        <ServicesSection />
         <HowItWorksSection />
         <TrustSection />
         <PricingSection />
