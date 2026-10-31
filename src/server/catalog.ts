@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, count, desc, eq, exists, ilike, inArray, ne, or, sql, type SQL } from "drizzle-orm";
 import type { DeliveryRateFormInput, ProductInput } from "@/lib/validation/shop";
-import { escapeLike, pageOf } from "@/server/admin";
+import { escapeLike, lastPage, PAGE_SIZE, pageOf } from "@/server/admin";
 import { recordAudit } from "@/server/audit";
 import { db, schema } from "@/server/db";
 import type { DeliveryRate, Product, ProductPhoto } from "@/server/db/schema";
@@ -80,23 +80,22 @@ export async function listCatalog({ query, category, state, sellerId, page }: Ca
     );
   }
   const where = and(...conditions);
-  const [rows, totals] = await Promise.all([
-    db()
-      .select(cardFields)
-      .from(schema.products)
-      .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
-      .leftJoin(schema.deliveryRates, rateForState(state))
-      .where(where)
-      .orderBy(sql`case when ${schema.products.stockUnits} > 0 then 0 else 1 end`, desc(schema.products.createdAt))
-      .limit(CATALOG_PAGE_SIZE)
-      .offset((page - 1) * CATALOG_PAGE_SIZE),
-    db()
-      .select({ value: count() })
-      .from(schema.products)
-      .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
-      .where(where),
-  ]);
-  return { ...pageOf(rows, totals[0]?.value ?? 0, page), pageCount: Math.max(1, Math.ceil((totals[0]?.value ?? 0) / CATALOG_PAGE_SIZE)) };
+  const [{ total }] = await db()
+    .select({ total: count() })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(where);
+  const current = lastPage(page, total, CATALOG_PAGE_SIZE);
+  const rows = await db()
+    .select(cardFields)
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .leftJoin(schema.deliveryRates, rateForState(state))
+    .where(where)
+    .orderBy(sql`case when ${schema.products.stockUnits} > 0 then 0 else 1 end`, desc(schema.products.createdAt), desc(schema.products.id))
+    .limit(CATALOG_PAGE_SIZE)
+    .offset((current - 1) * CATALOG_PAGE_SIZE);
+  return { rows, total, page: current, pageCount: Math.max(1, Math.ceil(total / CATALOG_PAGE_SIZE)) };
 }
 
 export type CatalogRow = Awaited<ReturnType<typeof listCatalog>>["rows"][number];
@@ -113,6 +112,29 @@ export async function popularProducts(state: string, limit = 8): Promise<Catalog
     .where(and(onSale, sql`${schema.products.stockUnits} > 0`, exists(db().select({ id: schema.deliveryRates.id }).from(schema.deliveryRates).where(delivers))))
     .orderBy(desc(unitsSold), desc(schema.products.createdAt))
     .limit(limit);
+}
+
+export async function suggestProducts(query: string) {
+  const startsWith = `${escapeLike(query)}%`;
+  const startsWord = `% ${escapeLike(query)}%`;
+  return db()
+    .select({ id: schema.products.id, title: schema.products.title, priceKobo: schema.products.priceKobo, unitLabel: schema.products.unitLabel, photoId: firstPhotoId })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(and(onSale, ilike(schema.products.title, `%${escapeLike(query)}%`)))
+    .orderBy(sql`case when ${schema.products.title} ilike ${startsWith} then 0 when ${schema.products.title} ilike ${startsWord} then 1 else 2 end`, desc(unitsSold), desc(schema.products.createdAt))
+    .limit(5);
+}
+
+export async function popularSearches(limit = 5): Promise<string[]> {
+  const rows = await db()
+    .select({ title: schema.products.title })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(and(onSale, sql`${schema.products.stockUnits} > 0`))
+    .orderBy(desc(unitsSold), desc(schema.products.createdAt))
+    .limit(limit);
+  return rows.map((row) => row.title);
 }
 
 export async function catalogCategories(): Promise<Array<{ value: string; label: string }>> {
@@ -142,12 +164,18 @@ export async function getCatalogProduct(productId: string) {
   return { ...row, photos, rates };
 }
 
-export async function listProductsForVendor(vendorId: string) {
-  return db()
+export async function listProductsForVendor(vendorId: string, requestedPage = 1) {
+  const where = and(eq(schema.products.vendorId, vendorId), ne(schema.products.status, "archived"));
+  const [{ total }] = await db().select({ total: count() }).from(schema.products).where(where);
+  const page = lastPage(requestedPage, total);
+  const rows = await db()
     .select({ product: schema.products, photoId: firstPhotoId })
     .from(schema.products)
-    .where(and(eq(schema.products.vendorId, vendorId), ne(schema.products.status, "archived")))
-    .orderBy(desc(schema.products.createdAt));
+    .where(where)
+    .orderBy(desc(schema.products.createdAt), desc(schema.products.id))
+    .limit(PAGE_SIZE)
+    .offset((page - 1) * PAGE_SIZE);
+  return pageOf(rows, total, page);
 }
 
 export async function findVendorProduct(vendorId: string, productId: string): Promise<Product | null> {
@@ -258,22 +286,21 @@ export async function listProductsForAdmin({ filter, query, page }: { filter: Pr
     conditions.push(or(ilike(schema.products.title, pattern), ilike(schema.vendorProfiles.businessName, pattern), ilike(schema.vendorProfiles.legalName, pattern)));
   }
   const where = and(...conditions);
-  const [rows, totals] = await Promise.all([
-    db()
-      .select({ product: schema.products, sellerName, photoId: firstPhotoId })
-      .from(schema.products)
-      .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
-      .where(where)
-      .orderBy(desc(schema.products.createdAt))
-      .limit(50)
-      .offset((page - 1) * 50),
-    db()
-      .select({ value: count() })
-      .from(schema.products)
-      .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
-      .where(where),
-  ]);
-  return { rows, total: totals[0]?.value ?? 0, page, pageCount: Math.max(1, Math.ceil((totals[0]?.value ?? 0) / 50)) };
+  const [{ total }] = await db()
+    .select({ total: count() })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(where);
+  const current = lastPage(page, total);
+  const rows = await db()
+    .select({ product: schema.products, sellerName, photoId: firstPhotoId })
+    .from(schema.products)
+    .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.products.vendorId))
+    .where(where)
+    .orderBy(desc(schema.products.createdAt), desc(schema.products.id))
+    .limit(PAGE_SIZE)
+    .offset((current - 1) * PAGE_SIZE);
+  return pageOf(rows, total, current);
 }
 
 export async function setProductVisibility(adminId: string, productId: string, visible: boolean, note: string | null): Promise<Product> {

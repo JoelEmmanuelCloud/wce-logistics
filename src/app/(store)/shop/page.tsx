@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { DeliverToPicker } from "@/components/shop/deliver-to-picker";
 import { ProductCard } from "@/components/shop/product-card";
+import { SearchBox } from "@/components/shop/search-box";
+import { parsePage } from "@/server/admin";
 import { readDeliverTo } from "@/server/cart";
 import { catalogCategories, listCatalog } from "@/server/catalog";
 
@@ -30,31 +32,18 @@ async function Catalog({ searchParams }: { searchParams: Params }) {
   const params = await searchParams;
   const deliverTo = await readDeliverTo();
   const filter = { query: text(params.q), category: text(params.category), state: deliverTo, sellerId: /^[0-9a-f-]{36}$/i.test(text(params.seller)) ? text(params.seller) : "" };
-  const page = Math.max(1, Math.min(1000, Number.parseInt(text(params.page), 10) || 1));
-  const [catalog, categories] = await Promise.all([listCatalog({ ...filter, page }), catalogCategories()]);
+  const [catalog, categories] = await Promise.all([listCatalog({ ...filter, page: parsePage(params.page) }), catalogCategories()]);
+  const page = catalog.page;
   const keep = { q: filter.query, seller: filter.sellerId };
   const current = { ...keep, category: filter.category };
 
   return (
     <>
-      <form action="/shop" method="get" role="search" className="grid grid-cols-[1fr_auto] gap-2 sm:gap-3">
-        {filter.category && <input type="hidden" name="category" value={filter.category} />}
-        {filter.sellerId && <input type="hidden" name="seller" value={filter.sellerId} />}
-        <label className="sr-only" htmlFor="shop-search">
-          Search products
-        </label>
-        <input
-          id="shop-search"
-          name="q"
-          type="search"
-          defaultValue={filter.query}
-          placeholder="Search cement, rice, roofing sheets"
-          className="h-12 w-full min-w-0 rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/50 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
-        />
-        <button type="submit" className="h-12 rounded-xl bg-navy px-4 text-[15px] sm:px-6 font-semibold text-white transition-colors hover:bg-[#13335c]">
-          Search
-        </button>
-      </form>
+      <SearchBox
+        id="shop-search"
+        defaultValue={filter.query}
+        hidden={Object.fromEntries(Object.entries({ category: filter.category, seller: filter.sellerId }).filter(([, value]) => value))}
+      />
 
       <div className="mt-3">
         <DeliverToPicker value={deliverTo} id="shop-deliver-to" />

@@ -5,6 +5,9 @@ export const MAX_CART_LINES = 30;
 export const MAX_CART_QUANTITY = 100_000;
 export const CART_COOKIE = "wce_cart";
 export const DELIVER_TO_COOKIE = "wce_deliver_to";
+export const RECENT_SEARCHES_KEY = "wce_recent_searches";
+export const MAX_RECENT_SEARCHES = 5;
+export const MIN_SEARCH_LENGTH = 2;
 
 export type CartLine = { productId: string; quantity: number };
 
@@ -66,6 +69,26 @@ export function serializeCart(lines: readonly CartLine[]): string {
 export function setCartLine(lines: readonly CartLine[], productId: string, quantity: number): CartLine[] {
   const others = lines.filter((line) => line.productId !== productId);
   return quantity > 0 ? [...others, { productId, quantity }] : others;
+}
+
+export function parseRecentSearches(value: string | null): string[] {
+  if (!value) {
+    return [];
+  }
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((entry): entry is string => typeof entry === "string" && entry.length > 0).slice(0, MAX_RECENT_SEARCHES) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addRecentSearch(terms: readonly string[], term: string): string[] {
+  const value = term.trim().slice(0, 40);
+  if (!value) {
+    return [...terms];
+  }
+  return [value, ...terms.filter((entry) => entry.toLowerCase() !== value.toLowerCase())].slice(0, MAX_RECENT_SEARCHES);
 }
 
 export function returnPathFrom(value: unknown): "/checkout" | null {

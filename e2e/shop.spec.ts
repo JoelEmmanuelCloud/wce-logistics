@@ -41,7 +41,7 @@ test.describe("shop", () => {
     await buyerPage.getByRole("button", { name: "Add to cart" }).click();
     await buyerPage.getByRole("link", { name: "View cart and check out" }).click();
     await expect(buyerPage).toHaveURL(/\/cart$/);
-    await buyerPage.getByRole("link", { name: "Check out" }).click();
+    await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
 
     await buyerPage.getByLabel("Delivery state").selectOption("Kano");
     await expect(buyerPage.getByText("₦250,000")).toBeVisible();
@@ -86,7 +86,7 @@ test.describe("shop", () => {
     await buyerPage.getByLabel("Quantity").fill("10");
     await buyerPage.getByRole("button", { name: "Add to cart" }).click();
     await buyerPage.getByRole("link", { name: "View cart and check out" }).click();
-    await buyerPage.getByRole("link", { name: "Check out" }).click();
+    await buyerPage.getByRole("link", { name: "Check out", exact: true }).click();
     await buyerPage.getByLabel("Delivery state").selectOption("Kano");
     await buyerPage.getByLabel("Town or city").fill("Fagge");
     await buyerPage.getByLabel("Delivery address").fill("8 Airport Road");
@@ -107,6 +107,37 @@ test.describe("shop", () => {
     await buyerContext.close();
   });
 
+  test("search suggests products, remembers recent searches and shows popular ones", async ({ page, sql, createUser }) => {
+    const seller = await createUser("vendor", "Search Stores");
+    const { vendorId } = await verifiedVendorWithTruck(sql, seller);
+    const title = `Zebra cement ${Date.now()}`;
+    const productId = await listProduct(sql, vendorId, title);
+
+    await page.goto("/shop");
+    const box = page.getByRole("combobox", { name: "Search products" });
+    await box.click();
+    await expect(page.getByRole("group", { name: "Popular" })).toBeVisible();
+
+    await box.fill("zebra");
+    await expect(page.getByRole("option", { name: new RegExp(title) })).toBeVisible();
+    await box.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+
+    await box.press("Enter");
+    await expect(page).toHaveURL(/\/shop\?q=zebra$/);
+    await expect(page.getByRole("link", { name: title })).toBeVisible();
+
+    await page.goto("/shop");
+    await page.getByRole("combobox", { name: "Search products" }).click();
+    await expect(page.getByRole("group", { name: "Recent searches" }).getByRole("option", { name: "zebra" })).toBeVisible();
+    await page.getByRole("button", { name: "Clear" }).click();
+    await expect(page.getByRole("group", { name: "Recent searches" })).toHaveCount(0);
+
+    await page.getByRole("combobox", { name: "Search products" }).fill("zeb");
+    await page.getByRole("option", { name: new RegExp(title) }).click();
+    await expect(page).toHaveURL(new RegExp(`/shop/${productId}$`));
+  });
+
   test("a guest is sent to sign in at checkout and the cart keeps one seller", async ({ page, sql, createUser }) => {
     const sellerA = await createUser("vendor", "Dele Traders");
     const sellerB = await createUser("vendor", "Efe Traders");
@@ -125,7 +156,7 @@ test.describe("shop", () => {
     await expect(page.getByText("Your cart has goods from another seller")).toBeVisible();
 
     await page.goto("/cart");
-    await page.getByRole("link", { name: "Check out" }).click();
+    await page.getByRole("link", { name: "Check out", exact: true }).click();
     await expect(page).toHaveURL(/\/sign-in\?as=customer&next=%2Fcheckout|\/sign-in\?as=customer&next=\/checkout/);
   });
 });

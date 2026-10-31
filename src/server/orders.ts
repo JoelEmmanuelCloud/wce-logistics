@@ -4,6 +4,7 @@ import type { NigerianState } from "@/data/nigeria-states";
 import { formatKg } from "@/lib/labels";
 import { MAX_ORDER_KOBO, orderTotals, type CartLine } from "@/lib/shop";
 import type { AcceptOrderInput, CheckoutInput } from "@/lib/validation/shop";
+import { lastPage, PAGE_SIZE, pageOf } from "@/server/admin";
 import { recordAudit } from "@/server/audit";
 import { db, schema } from "@/server/db";
 import type { Booking, Order, OrderItem, OrderStatus } from "@/server/db/schema";
@@ -285,22 +286,26 @@ export async function expireOverdueOrders(): Promise<Order[]> {
   });
 }
 
-export type OrderFilter = { customerId?: string; vendorId?: string; statuses?: OrderStatus[] };
+export type OrderFilter = { customerId?: string; vendorId?: string; statuses?: OrderStatus[]; page?: number };
 
 export async function listOrders(filter: OrderFilter) {
   const conditions = [];
   if (filter.customerId) conditions.push(eq(schema.orders.customerId, filter.customerId));
   if (filter.vendorId) conditions.push(eq(schema.orders.vendorId, filter.vendorId));
   if (filter.statuses?.length) conditions.push(inArray(schema.orders.status, filter.statuses));
+  const where = conditions.length ? and(...conditions) : undefined;
+  const [{ total }] = await db().select({ total: sql<number>`count(*)::int` }).from(schema.orders).where(where);
+  const page = lastPage(filter.page ?? 1, total);
   const rows = await db()
     .select({ order: schema.orders, sellerName, customerName: schema.users.fullName, bookingStatus: schema.bookings.status })
     .from(schema.orders)
     .innerJoin(schema.vendorProfiles, eq(schema.vendorProfiles.id, schema.orders.vendorId))
     .innerJoin(schema.users, eq(schema.users.id, schema.orders.customerId))
     .leftJoin(schema.bookings, eq(schema.bookings.id, schema.orders.bookingId))
-    .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(schema.orders.createdAt))
-    .limit(200);
+    .where(where)
+    .orderBy(desc(schema.orders.createdAt), desc(schema.orders.id))
+    .limit(PAGE_SIZE)
+    .offset((page - 1) * PAGE_SIZE);
   const items = rows.length
     ? await db()
         .select()
@@ -311,10 +316,10 @@ export async function listOrders(filter: OrderFilter) {
   for (const item of items) {
     byOrder.set(item.orderId, [...(byOrder.get(item.orderId) ?? []), item]);
   }
-  return rows.map((row) => ({ ...row, items: byOrder.get(row.order.id) ?? [] }));
+  return pageOf(rows.map((row) => ({ ...row, items: byOrder.get(row.order.id) ?? [] })), total, page);
 }
 
-export type OrderRow = Awaited<ReturnType<typeof listOrders>>[number];
+export type OrderRow = Awaited<ReturnType<typeof listOrders>>["rows"][number];
 
 export async function getOrderDetail(orderId: string) {
   const [row] = await db()

@@ -8,6 +8,7 @@ import { EmptyState, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PRODUCT_STATUS } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
+import { parsePage } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 import { listProductsForAdmin, PRODUCT_FILTERS, type ProductFilter } from "@/server/catalog";
 
@@ -18,7 +19,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/ad
   const params = await searchParams;
   const status = (typeof params.status === "string" && params.status in PRODUCT_FILTERS ? params.status : "active") as ProductFilter;
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 80) : "";
-  const page = Math.max(1, Number.parseInt(typeof params.page === "string" ? params.page : "1", 10) || 1);
+  const page = parsePage(params.page);
   const result = await listProductsForAdmin({ filter: status, query, page });
 
   return (

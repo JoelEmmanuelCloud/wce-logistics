@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Pagination } from "@/components/admin/list-controls";
 import { ProductImage } from "@/components/shop/product-image";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button-classes";
@@ -7,16 +8,19 @@ import { EmptyState, PageHeader } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PRODUCT_STATUS } from "@/lib/labels";
 import { formatNaira } from "@/lib/pricing";
+import { parsePage } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 import { listDeliveryRates, listProductsForVendor } from "@/server/catalog";
 import { findVendorProfileByUser } from "@/server/vendors";
 
 export const metadata: Metadata = { title: "Products" };
 
-export default async function VendorProductsPage() {
+export default async function VendorProductsPage({ searchParams }: PageProps<"/vendor/products">) {
   const user = await requireRole("vendor");
+  const params = await searchParams;
   const profile = await findVendorProfileByUser(user.id);
-  const [rows, rates] = profile ? await Promise.all([listProductsForVendor(profile.id), listDeliveryRates(profile.id)]) : [[], []];
+  const [result, rates] = profile ? await Promise.all([listProductsForVendor(profile.id, parsePage(params.page)), listDeliveryRates(profile.id)]) : [null, []];
+  const total = result?.total ?? 0;
   const addProduct = (
     <Link href={profile ? "/vendor/products/new" : "/vendor/profile"} className={buttonClasses("primary")}>
       {profile ? "Add a product" : "Complete your profile first"}
@@ -25,7 +29,7 @@ export default async function VendorProductsPage() {
 
   return (
     <>
-      <PageHeader title="Products" description="List the goods you sell. You deliver every order with your own verified trucks." action={rows.length > 0 ? addProduct : undefined} />
+      <PageHeader title="Products" description="List the goods you sell. You deliver every order with your own verified trucks." action={total > 0 ? addProduct : undefined} />
       <div className="grid gap-4">
         {profile && profile.verificationStatus !== "verified" && (
           <Alert tone="info" title="Not visible in the shop yet">
@@ -40,11 +44,11 @@ export default async function VendorProductsPage() {
             </Link>
           </Alert>
         )}
-        {rows.length === 0 ? (
+        {!result || total === 0 ? (
           <EmptyState title="No products yet" description="Add your first product with its price, stock and photos." action={addProduct} />
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {rows.map(({ product, photoId }) => (
+            {result.rows.map(({ product, photoId }) => (
               <li key={product.id}>
                 <Link
                   href={`/vendor/products/${product.id}`}
@@ -69,6 +73,7 @@ export default async function VendorProductsPage() {
           </ul>
         )}
       </div>
+      {result && total > 0 && <Pagination base="/vendor/products" page={result.page} pageCount={result.pageCount} total={total} params={{}} />}
     </>
   );
 }

@@ -12,6 +12,10 @@ export function pageOf<T>(rows: T[], total: number, page: number): Page<T> {
   return { rows, total, page, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
+export function lastPage(page: number, total: number, size = PAGE_SIZE): number {
+  return Math.min(page, Math.max(1, Math.ceil(total / size)));
+}
+
 export function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (match) => `\\${match}`);
 }

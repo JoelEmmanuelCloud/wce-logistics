@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { FilterTabs } from "@/components/admin/list-controls";
+import { FilterTabs, Pagination } from "@/components/admin/list-controls";
 import { OrderList } from "@/components/shop/order-parts";
 import { EmptyState, PageHeader } from "@/components/ui/card";
+import { parsePage } from "@/server/admin";
 import { requireRole } from "@/server/auth/dal";
 import type { OrderStatus } from "@/server/db/schema";
 import { listOrders } from "@/server/orders";
@@ -19,7 +20,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
   await requireRole("admin");
   const params = await searchParams;
   const filter = (typeof params.status === "string" && params.status in FILTERS ? params.status : "all") as keyof typeof FILTERS;
-  const rows = await listOrders({ statuses: [...FILTERS[filter].statuses] });
+  const result = await listOrders({ statuses: [...FILTERS[filter].statuses], page: parsePage(params.page) });
 
   return (
     <>
@@ -27,10 +28,13 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
       <div className="mb-5">
         <FilterTabs base="/admin/orders" filters={FILTERS} active={filter} query="" />
       </div>
-      {rows.length === 0 ? (
+      {result.total === 0 ? (
         <EmptyState title="Nothing here" description="No orders match this view." />
       ) : (
-        <OrderList rows={rows} hrefFor={(orderId) => `/admin/orders/${orderId}`} counterparty="both" />
+        <>
+          <OrderList rows={result.rows} hrefFor={(orderId) => `/admin/orders/${orderId}`} counterparty="both" />
+          <Pagination base="/admin/orders" page={result.page} pageCount={result.pageCount} total={result.total} params={{ status: filter }} />
+        </>
       )}
     </>
   );
