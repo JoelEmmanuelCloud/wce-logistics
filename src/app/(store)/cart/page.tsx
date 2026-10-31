@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { emptyCartAction, removeCartLineAction, updateCartLineAction } from "@/app/(store)/actions";
 import { ProductImage } from "@/components/shop/product-image";
@@ -15,6 +16,7 @@ import { CartQuantityForm } from "./quantity-form";
 export const metadata: Metadata = { title: "Cart", robots: { index: false } };
 
 async function Cart() {
+  await connection();
   const [cart, settings] = await Promise.all([loadCart(), getPlatformSettings()]);
   if (cart.lines.length === 0) {
     return (
