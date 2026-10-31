@@ -107,6 +107,37 @@ test.describe("shop", () => {
     await buyerContext.close();
   });
 
+  test("search suggests products, remembers recent searches and shows popular ones", async ({ page, sql, createUser }) => {
+    const seller = await createUser("vendor", "Search Stores");
+    const { vendorId } = await verifiedVendorWithTruck(sql, seller);
+    const title = `Zebra cement ${Date.now()}`;
+    const productId = await listProduct(sql, vendorId, title);
+
+    await page.goto("/shop");
+    const box = page.getByRole("combobox", { name: "Search products" });
+    await box.click();
+    await expect(page.getByRole("group", { name: "Popular" })).toBeVisible();
+
+    await box.fill("zebra");
+    await expect(page.getByRole("option", { name: new RegExp(title) })).toBeVisible();
+    await box.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+
+    await box.press("Enter");
+    await expect(page).toHaveURL(/\/shop\?q=zebra$/);
+    await expect(page.getByRole("link", { name: title })).toBeVisible();
+
+    await page.goto("/shop");
+    await page.getByRole("combobox", { name: "Search products" }).click();
+    await expect(page.getByRole("group", { name: "Recent searches" }).getByRole("option", { name: "zebra" })).toBeVisible();
+    await page.getByRole("button", { name: "Clear" }).click();
+    await expect(page.getByRole("group", { name: "Recent searches" })).toHaveCount(0);
+
+    await page.getByRole("combobox", { name: "Search products" }).fill("zeb");
+    await page.getByRole("option", { name: new RegExp(title) }).click();
+    await expect(page).toHaveURL(new RegExp(`/shop/${productId}$`));
+  });
+
   test("a guest is sent to sign in at checkout and the cart keeps one seller", async ({ page, sql, createUser }) => {
     const sellerA = await createUser("vendor", "Dele Traders");
     const sellerB = await createUser("vendor", "Efe Traders");

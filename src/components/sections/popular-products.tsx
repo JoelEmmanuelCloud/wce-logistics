@@ -5,6 +5,7 @@ import { ArrowUpRightIcon } from "@/components/line-icons";
 import { Section } from "@/components/section";
 import { DeliverToPicker } from "@/components/shop/deliver-to-picker";
 import { ProductCard } from "@/components/shop/product-card";
+import { SearchBox } from "@/components/shop/search-box";
 import { readDeliverTo } from "@/server/cart";
 import { popularProducts, type CatalogRow } from "@/server/catalog";
 
@@ -73,21 +74,7 @@ export function PopularProducts() {
           <p className="mt-2 text-[16px] text-navy/70">Bulk goods from verified sellers, delivered on their own trucks.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <form action="/shop" method="get" role="search" className="flex gap-2">
-            <label htmlFor="home-search" className="sr-only">
-              Search products
-            </label>
-            <input
-              id="home-search"
-              name="q"
-              type="search"
-              placeholder="Search cement, rice, roofing"
-              className="h-12 w-full min-w-0 rounded-xl border border-navy/20 bg-white px-4 text-[16px] text-navy placeholder:text-navy/50 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy sm:w-72"
-            />
-            <button type="submit" className="h-12 shrink-0 rounded-xl bg-navy px-5 text-[15px] font-semibold text-white transition-colors hover:bg-[#13335c]">
-              Search
-            </button>
-          </form>
+          <SearchBox id="home-search" className="sm:w-[26rem]" />
           <Link href="/shop" className="inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-navy underline decoration-orange decoration-2 underline-offset-4">
             See all
             <ArrowUpRightIcon className="size-4" />
