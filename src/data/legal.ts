@@ -151,7 +151,7 @@ export const COOKIE_POLICY: LegalDocument = {
       heading: "Other things stored on your device",
       list: [
         "Recent searches: a list kept in your browser so you can search again quickly. The list stays on your device. You can clear it from the search box.",
-        "App files: if you add WCE Logistics to your home screen, your browser keeps the app's icons, design files and offline page. Pages from your account are never kept on your device.",
+        "App files: when you visit, your browser keeps our icons, design files and offline page, so the site loads faster and can tell you when you are offline. Pages from your account are never kept on your device.",
       ],
     },
     {
