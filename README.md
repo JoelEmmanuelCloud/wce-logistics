@@ -1,6 +1,6 @@
 # WCE Logistics
 
-Interstate logistics and truck booking platform for Nigeria. Move more. Build more.
+Interstate logistics and truck booking platform. Move more. Build more.
 
 - Product requirements: [docs/PRD.md](docs/PRD.md)
 - Architecture and Phase 1 decisions: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
