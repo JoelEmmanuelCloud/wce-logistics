@@ -55,6 +55,7 @@ export const site = {
     "freight marketplace",
     "bus charter Nigeria",
   ],
+  address: "House 4, Road 1C, Bmuko Zone A, Dutse Alhaji, Abuja FCT, Nigeria",
   get contactEmail() {
     return readContactEmail();
   },

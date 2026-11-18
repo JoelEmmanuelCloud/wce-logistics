@@ -103,6 +103,11 @@ test.describe("landing page", () => {
       expect(href).toMatch(/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+/);
     }
   });
+
+  test("footer shows the office address", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("contentinfo").locator("address")).toHaveText("House 4, Road 1C, Bmuko Zone A, Dutse Alhaji, Abuja FCT, Nigeria");
+  });
 });
 
 test.describe("desktop navigation", () => {
