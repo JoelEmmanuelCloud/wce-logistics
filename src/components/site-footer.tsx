@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowButton, GlassButton } from "@/components/action-buttons";
 import { MailIcon, WhatsAppIcon } from "@/components/line-icons";
 import { formatPhone } from "@/lib/phone";
+import { site } from "@/lib/site";
 import { WceLogo, WceMonogramMarks } from "@/components/wce-logo";
 import { SERVICES } from "@/data/landing";
 
@@ -98,6 +99,7 @@ export function SiteFooter({ contactEmail, contactWhatsApp, whatsappUrl }: { con
                 {formatPhone(contactWhatsApp)}
               </span>
             </a>
+            <address className="mt-3 max-w-[18em] text-[15px] not-italic leading-relaxed text-white/80">{site.address}</address>
           </div>
         </div>
       </div>
